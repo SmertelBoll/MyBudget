@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { memo, useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { FlatList, Pressable, View, type StyleProp, type ViewStyle } from "react-native";
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import type { Period } from "@/api/types";
@@ -63,6 +63,95 @@ const labels = (start: string, granularity: Period, lang: string): [string, stri
   }
 };
 
+const heightFor = (value: number, peak: number) => (peak > 0 && value > 0 ? Math.min(BAR_AREA, Math.max(2, (value / peak) * BAR_AREA)) : 0);
+
+type BarPress = (index: number, part: BarPart, barCenter: number, value: number) => void;
+
+// One period. Memoized: a tap redraws only the bars whose selection state changed, not the whole list.
+// selectedPart: undefined = nothing is selected; "none" = another period is; otherwise this period's chosen bar.
+const BarItem = memo(function BarItem({
+  bucket,
+  index,
+  mode,
+  granularity,
+  itemWidth,
+  peak,
+  selectedPart,
+  colorOf,
+  onBarPress,
+}: {
+  bucket: Bucket;
+  index: number;
+  mode: ChartMode;
+  granularity: Period;
+  itemWidth: number;
+  peak: number;
+  selectedPart: BarPart | "none" | undefined;
+  colorOf: (id: string) => string;
+  onBarPress: BarPress;
+}) {
+  const { colors } = useTheme();
+  const { lang } = useI18n();
+  const [line1, line2] = labels(bucket.range.start, granularity, lang);
+  const opacity = (part: BarPart) => (selectedPart === undefined || selectedPart === part ? 1 : 0.45);
+
+  let bars;
+  if (mode === "general") {
+    const diff = bucket.income - bucket.expense;
+    const parts: { part: BarPart; value: number; color: string }[] = [
+      { part: "income", value: bucket.income, color: CHART_COLORS.income },
+      { part: "expense", value: bucket.expense, color: CHART_COLORS.expense },
+      { part: "diff", value: diff, color: diff >= 0 ? CHART_COLORS.profit : CHART_COLORS.loss },
+    ];
+    const gap = (itemWidth - GENERAL_BAR * 3) / 4;
+    bars = parts.map(({ part, value, color }, position) => (
+      <Bar
+        key={part}
+        height={heightFor(Math.abs(value), peak)}
+        onPress={() => onBarPress(index, part, gap + position * (GENERAL_BAR + gap) + GENERAL_BAR / 2, value)}
+        style={{ width: GENERAL_BAR, backgroundColor: color, opacity: opacity(part), borderTopLeftRadius: 3, borderTopRightRadius: 3 }}
+      />
+    ));
+  } else {
+    const total = stackSum(bucket);
+    bars = (
+      <Bar
+        height={heightFor(total, peak)}
+        onPress={() => onBarPress(index, mode, itemWidth / 2, total)}
+        style={{
+          width: STACKED_BAR,
+          opacity: opacity(mode),
+          overflow: "hidden",
+          borderTopLeftRadius: 3,
+          borderTopRightRadius: 3,
+          flexDirection: "column-reverse",
+        }}
+      >
+        {bucket.stacks.map((stack) => (
+          <View key={stack.id} style={{ flex: stack.value, backgroundColor: colorOf(stack.id), borderTopWidth: 1, borderTopColor: colors.surface }} />
+        ))}
+      </Bar>
+    );
+  }
+  const chosen = selectedPart !== undefined && selectedPart !== "none";
+  return (
+    <View style={{ width: itemWidth }}>
+      <View style={{ height: BAR_AREA, flexDirection: "row", alignItems: "flex-end", justifyContent: "space-evenly" }}>{bars}</View>
+      <View style={{ height: 1, backgroundColor: colors.textSecondary }} />
+      <View style={{ height: LABEL_HEIGHT, alignItems: "center", paddingTop: 4 }}>
+        <AppText variant="caption" color={chosen ? colors.text : colors.textSecondary} style={{ textTransform: "capitalize" }}>
+          {line1}
+        </AppText>
+        {line2 ? (
+          <AppText variant="caption" secondary style={{ fontSize: 11, textTransform: "capitalize" }}>
+            {line2}
+          </AppText>
+        ) : null}
+      </View>
+    </View>
+  );
+});
+
 type Props = {
   buckets: Bucket[];
   todayIndex: number;
@@ -74,8 +163,8 @@ type Props = {
   onSelect: (selection: BarSelection | null) => void;
 };
 
-// Spec 6: bars for every period of the chosen size, scrolled sideways, today's on the right at first; empty periods
-// before and after can be scrolled to as well. The tallest bar among those at least half on screen fills the height.
+// Spec 6: bars for every period of the chosen size from the first entry, scrolled sideways, today's on the right at
+// first. The tallest bar among those at least half on screen fills the height.
 // A tap on a bar selects it (the screen shows that period below) and shows its sum; a second tap clears it.
 export function BarChart(props: Props) {
   const [viewport, setViewport] = useState<number | null>(null);
@@ -108,88 +197,59 @@ function Bars({ buckets, todayIndex, granularity, mode, colorOf, selection, onSe
   const last = Math.min(buckets.length - 1, Math.floor((restX + viewport) / itemWidth - 0.5));
   let peak = 0;
   for (let i = first; i <= last; i++) peak = Math.max(peak, bucketPeak(buckets[i], mode));
-  const fromYear = buckets[first]?.range.start.slice(0, 4) ?? "";
-  const toYear = buckets[last]?.range.start.slice(0, 4) ?? "";
-  const years = fromYear === toYear ? fromYear : `${fromYear} – ${toYear}`;
-
-  const heightOf = (value: number) => (peak > 0 && value > 0 ? Math.min(BAR_AREA, Math.max(2, (value / peak) * BAR_AREA)) : 0);
+  // Under the chart: the years on screen; for days the months too ("October – November 2026"), as the bars only
+  // carry day numbers.
+  const firstStart = buckets[first]?.range.start ?? "";
+  const lastStart = buckets[last]?.range.start ?? "";
+  const span = (() => {
+    if (!firstStart) return "";
+    const [fromYear, toYear] = [firstStart.slice(0, 4), lastStart.slice(0, 4)];
+    if (granularity !== "day") return fromYear === toYear ? fromYear : `${fromYear} – ${toYear}`;
+    const month = (date: string) => format(date, lang, { month: "long" });
+    const monthYear = (date: string) => format(date, lang, { month: "long", year: "numeric" });
+    if (firstStart.slice(0, 7) === lastStart.slice(0, 7)) return monthYear(firstStart);
+    return fromYear === toYear ? `${month(firstStart)} – ${monthYear(lastStart)}` : `${monthYear(firstStart)} – ${monthYear(lastStart)}`;
+  })();
 
   const settle = () => {
     if (settleTimer.current) clearTimeout(settleTimer.current);
     settleTimer.current = setTimeout(() => setRestX(scrollX.current), SETTLE_MS);
   };
 
-  const select = (index: number, part: BarPart, barCenter: number, value: number) => {
-    if (selection?.index === index && selection.part === part) {
-      setPlate(null);
-      onSelect(null);
-      return;
-    }
-    const bar = heightOf(Math.abs(value));
-    setPlate({ x: index * itemWidth - scrollX.current + barCenter, y: BAR_AREA - bar - 34, text: money(value, baseCurrency, true) });
-    onSelect({ index, part });
-  };
+  // Read only inside the tap handler, so a new selection doesn't hand every bar a new handler.
+  const selectionRef = useRef(selection);
+  useEffect(() => {
+    selectionRef.current = selection;
+  }, [selection]);
 
-  const dim = (index: number, part?: BarPart) =>
-    selection && (selection.index !== index || (part && selection.part !== part)) ? 0.45 : 1;
+  const onBarPress = useCallback<BarPress>(
+    (index, part, barCenter, value) => {
+      const current = selectionRef.current;
+      if (current?.index === index && current.part === part) {
+        setPlate(null);
+        onSelect(null);
+        return;
+      }
+      const bar = heightFor(Math.abs(value), peak);
+      setPlate({ x: index * itemWidth - scrollX.current + barCenter, y: BAR_AREA - bar - 34, text: money(value, baseCurrency, true) });
+      onSelect({ index, part });
+    },
+    [peak, itemWidth, money, baseCurrency, onSelect]
+  );
 
-  const renderItem = ({ item, index }: { item: Bucket; index: number }) => {
-    const [line1, line2] = labels(item.range.start, granularity, lang);
-    let bars;
-    if (mode === "general") {
-      const diff = item.income - item.expense;
-      const parts: { part: BarPart; value: number; color: string }[] = [
-        { part: "income", value: item.income, color: CHART_COLORS.income },
-        { part: "expense", value: item.expense, color: CHART_COLORS.expense },
-        { part: "diff", value: diff, color: diff >= 0 ? CHART_COLORS.profit : CHART_COLORS.loss },
-      ];
-      const gap = (itemWidth - GENERAL_BAR * 3) / 4;
-      bars = parts.map(({ part, value, color }, position) => (
-        <Bar
-          key={part}
-          height={heightOf(Math.abs(value))}
-          onPress={() => select(index, part, gap + position * (GENERAL_BAR + gap) + GENERAL_BAR / 2, value)}
-          style={{ width: GENERAL_BAR, backgroundColor: color, opacity: dim(index, part), borderTopLeftRadius: 3, borderTopRightRadius: 3 }}
-        />
-      ));
-    } else {
-      const total = stackSum(item);
-      bars = (
-        <Bar
-          height={heightOf(total)}
-          onPress={() => select(index, mode, itemWidth / 2, total)}
-          style={{
-            width: STACKED_BAR,
-            opacity: dim(index),
-            overflow: "hidden",
-            borderTopLeftRadius: 3,
-            borderTopRightRadius: 3,
-            flexDirection: "column-reverse",
-          }}
-        >
-          {item.stacks.map((stack) => (
-            <View key={stack.id} style={{ flex: stack.value, backgroundColor: colorOf(stack.id), borderTopWidth: 1, borderTopColor: colors.surface }} />
-          ))}
-        </Bar>
-      );
-    }
-    return (
-      <View style={{ width: itemWidth }}>
-        <View style={{ height: BAR_AREA, flexDirection: "row", alignItems: "flex-end", justifyContent: "space-evenly" }}>{bars}</View>
-        <View style={{ height: 1, backgroundColor: colors.textSecondary }} />
-        <View style={{ height: LABEL_HEIGHT, alignItems: "center", paddingTop: 4 }}>
-          <AppText variant="caption" color={selection?.index === index ? colors.text : colors.textSecondary} style={{ textTransform: "capitalize" }}>
-            {line1}
-          </AppText>
-          {line2 ? (
-            <AppText variant="caption" secondary style={{ fontSize: 11, textTransform: "capitalize" }}>
-              {line2}
-            </AppText>
-          ) : null}
-        </View>
-      </View>
-    );
-  };
+  const renderItem = ({ item, index }: { item: Bucket; index: number }) => (
+    <BarItem
+      bucket={item}
+      index={index}
+      mode={mode}
+      granularity={granularity}
+      itemWidth={itemWidth}
+      peak={peak}
+      selectedPart={!selection ? undefined : selection.index === index ? selection.part : "none"}
+      colorOf={colorOf}
+      onBarPress={onBarPress}
+    />
+  );
 
   return (
     <View>
@@ -223,8 +283,8 @@ function Bars({ buckets, todayIndex, granularity, mode, colorOf, selection, onSe
           </View>
         </View>
       )}
-      <AppText secondary style={{ textAlign: "center", marginTop: spacing.xs }}>
-        {years}
+      <AppText secondary style={{ textAlign: "center", marginTop: spacing.xs, textTransform: "capitalize" }}>
+        {span}
       </AppText>
     </View>
   );

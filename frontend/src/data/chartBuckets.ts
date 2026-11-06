@@ -11,9 +11,6 @@ export type ChartMode = "general" | EntryType;
 export type Stack = { id: string; value: number };
 export type Bucket = { range: PeriodRange; income: number; expense: number; stacks: Stack[] };
 
-// Empty periods the chart can also be scrolled to: before the first entry and after today.
-const PADDING: Record<Period, number> = { year: 3, month: 24, week: 52, day: 90 };
-
 // Spec 6: one bar (or three) per period, all in the main currency at today's rate. In the expense / income view a
 // bar is split by category or by tag, biggest part at the bottom. By tag an entry counts in full in each of its tags
 // (as on Home), so such a bar can be taller than the period's total; the screen says so.
@@ -42,8 +39,8 @@ export const useChartBuckets = (filter: AccountFilter, granularity: Period, mode
     };
     const earliest = entries.reduce((min, tx) => (tx.date < min ? tx.date : min), today);
     const latest = entries.reduce((max, tx) => (tx.date > max ? tx.date : max), today);
-    const first = shift(periodContaining(granularity, earliest, firstDay), -PADDING[granularity]);
-    const last = shift(periodContaining(granularity, latest, firstDay), PADDING[granularity]);
+    const first = periodContaining(granularity, earliest, firstDay);
+    const last = periodContaining(granularity, latest, firstDay);
     const todayStart = periodContaining(granularity, today, firstDay).start;
 
     const buckets: (Bucket & { stackMap: Map<string, number> })[] = [];
