@@ -27,9 +27,10 @@ export function Button({ title, onPress, variant = "primary", icon, loading, dis
     danger: { bg: colors.danger, pressed: colors.dangerPressed, fg: colors.onDanger, border: colors.danger },
     text: { bg: "transparent", pressed: colors.selected, fg: colors.text, border: "transparent" },
   }[variant];
+  // Inactive look: the whole button (fill, border, label) fades together, so no bright edge is left around it.
   const dimmed = muted || disabled;
-  const bg = variant === "primary" && dimmed ? colors.accentMuted : palette.bg;
-  const fg = variant === "primary" && dimmed ? colors.onAccentMuted : palette.fg;
+  const bg = palette.bg;
+  const fg = palette.fg;
 
   return (
     <Pressable
@@ -47,7 +48,7 @@ export function Button({ title, onPress, variant = "primary", icon, loading, dis
           paddingHorizontal: spacing.lg,
           alignItems: "center",
           justifyContent: "center",
-          opacity: disabled ? 0.5 : 1,
+          opacity: dimmed ? 0.45 : 1,
         },
         style,
       ]}
