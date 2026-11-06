@@ -3,6 +3,8 @@ import { KeyboardAvoidingView, Platform, Pressable, ScrollView, View } from "rea
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ApiError } from "@/api/client";
 import { useAuth } from "@/auth/AuthProvider";
+import { pendingChangesOfOtherAccount } from "@/data/DataProvider";
+import { useDialog } from "@/components/AppDialog";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTheme } from "@/theme/ThemeProvider";
 import { radius, spacing } from "@/theme/tokens";
@@ -22,6 +24,7 @@ export default function LoginScreen() {
   const { t } = useI18n();
   const insets = useSafeAreaInsets();
   const { signIn, signUp, endedReason } = useAuth();
+  const dialog = useDialog();
   const passwordRef = useRef<TextInputHandle>(null);
   const confirmRef = useRef<TextInputHandle>(null);
 
@@ -53,6 +56,18 @@ export default function LoginScreen() {
     setSubmitted(true);
     setServerError(null);
     if (invalid) return;
+
+    // Spec 3.3: changes another account made offline would be erased by signing in here. Ask first.
+    const unsent = await pendingChangesOfOtherAccount(email);
+    if (unsent > 0) {
+      const ok = await dialog.confirm({
+        title: t("auth.otherAccountTitle"),
+        message: t("auth.otherAccountMessage", { count: unsent }),
+        confirmText: t("auth.continueAnyway"),
+        destructive: true,
+      });
+      if (!ok) return;
+    }
 
     setLoading(true);
     try {

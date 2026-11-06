@@ -8,6 +8,7 @@ import {
   setSessionEndedHandler,
 } from "@/api/client";
 import type { AuthPayload, User, UserPatch } from "@/api/types";
+import { wipeLocal } from "@/data/store";
 import { readJson, writeJson } from "@/storage/json";
 import { storage } from "@/storage/storage";
 import { getDeviceInfo } from "./device";
@@ -127,6 +128,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const deleteAccount = useCallback(async () => {
     await api.del("/me");
+    await wipeLocal();
     setEndedReason(null);
     await forgetUser();
   }, [forgetUser]);

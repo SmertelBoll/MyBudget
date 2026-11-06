@@ -8,6 +8,7 @@ import { useTheme } from "@/theme/ThemeProvider";
 import { radius, spacing } from "@/theme/tokens";
 import { AppText } from "./AppText";
 import { Avatar } from "./Avatar";
+import { SyncIndicator } from "./SyncIndicator";
 
 type Icon = keyof typeof MaterialCommunityIcons.glyphMap;
 
@@ -90,6 +91,10 @@ export function DrawerContent({ state, navigation }: DrawerContentComponentProps
           );
         })}
       </DrawerContentScrollView>
+
+      <View style={{ paddingBottom: insets.bottom, borderTopWidth: 1, borderTopColor: colors.selected }}>
+        <SyncIndicator />
+      </View>
     </View>
   );
 }

@@ -75,15 +75,19 @@ export function SelectField({ label, value, options, onChange, placeholder, sear
       </Pressable>
 
       <Modal visible={open} animationType="slide" onRequestClose={close} statusBarTranslucent>
-        <View style={{ flex: 1, backgroundColor: colors.background, paddingTop: insets.top }}>
+        <View style={{ flex: 1, backgroundColor: colors.background }}>
+          {/* Same shape as ScreenHeader: the header color runs up under the status bar. */}
           <View
             style={{
               flexDirection: "row",
               alignItems: "center",
               gap: spacing.sm,
               paddingHorizontal: spacing.sm,
-              paddingVertical: spacing.sm,
+              paddingTop: insets.top + spacing.sm,
+              paddingBottom: spacing.sm,
               backgroundColor: colors.surface,
+              borderBottomLeftRadius: radius.lg,
+              borderBottomRightRadius: radius.lg,
             }}
           >
             <Pressable onPress={close} hitSlop={8} accessibilityRole="button" accessibilityLabel={t("common.close")} style={{ padding: spacing.sm }}>
