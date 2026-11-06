@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Modal, Pressable, View } from "react-native";
+import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTheme } from "@/theme/ThemeProvider";
 import { radius, spacing } from "@/theme/tokens";
@@ -189,6 +190,8 @@ function PromptView({ dialog, onClose }: { dialog: PromptOptions; onClose: (valu
 
   return (
     <Modal transparent animationType="fade" onRequestClose={() => onClose(null)} statusBarTranslucent>
+      {/* The dialog moves up with the keyboard, so the field is never under it. */}
+      <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
       <Pressable onPress={() => onClose(null)} style={{ flex: 1, backgroundColor: colors.scrim, justifyContent: "center", padding: spacing.lg }}>
         <Pressable onPress={() => {}} style={{ backgroundColor: colors.surface, borderRadius: radius.md, padding: spacing.lg, gap: spacing.md }}>
           <AppText variant="heading">{dialog.title}</AppText>
@@ -212,6 +215,7 @@ function PromptView({ dialog, onClose }: { dialog: PromptOptions; onClose: (valu
           </View>
         </Pressable>
       </Pressable>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }

@@ -104,7 +104,8 @@ export default function RecurringFormScreen() {
   const { toInput } = useMoney();
 
   const [initial] = useState<FormValues>(() => {
-    const fallbackAccount = user?.settings.defaultAccountId ?? accounts.find((account) => account.isActive)?.id ?? null;
+    // As on the entry form: only the default account from Settings (spec 13.1), otherwise none chosen yet.
+    const fallbackAccount = accounts.find((account) => account.id === user?.settings.defaultAccountId && account.isActive)?.id ?? null;
     return {
       type: existing?.type ?? type ?? user?.settings.focus ?? "expense",
       name: existing?.name ?? "",

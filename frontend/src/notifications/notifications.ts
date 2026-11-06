@@ -20,6 +20,12 @@ if (supported) {
   });
 }
 
+// Android 13+ only shows the permission prompt once the app has a notification channel, so it's created first.
+const ensureChannel = async () => {
+  if (Platform.OS !== "android") return;
+  await Notifications.setNotificationChannelAsync(CHANNEL, { name: "Payments and reminders", importance: AndroidImportance.HIGH });
+};
+
 export const notificationsAllowed = async () => {
   if (!supported) return false;
   return (await Notifications.getPermissionsAsync()).granted;
@@ -29,6 +35,7 @@ export const notificationsAllowed = async () => {
 // settings, spec 4.5).
 export const requestNotificationPermission = async () => {
   if (!supported) return false;
+  await ensureChannel();
   const current = await Notifications.getPermissionsAsync();
   if (current.granted) return true;
   if (!current.canAskAgain) return false;
@@ -53,9 +60,7 @@ export const rescheduleNotifications = (payments: Recurring[], reminders: Remind
 
 const rebuild = async (payments: Recurring[], reminders: Reminder[], texts: NotificationTexts) => {
   if (!(await notificationsAllowed())) return;
-  if (Platform.OS === "android") {
-    await Notifications.setNotificationChannelAsync(CHANNEL, { name: "Payments and reminders", importance: AndroidImportance.HIGH });
-  }
+  await ensureChannel();
   const from = todayLocal();
   const to = addDays(from, WINDOW_DAYS);
   const now = Date.now();

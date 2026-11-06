@@ -1,5 +1,7 @@
 import { useState } from "react";
-import { Pressable, ScrollView, View } from "react-native";
+import { Pressable, View } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
+import { KEYBOARD_GAP } from "@/utils/keyboard";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import type { RepeatRule } from "@/data/types";
 import { useI18n } from "@/i18n/I18nProvider";
@@ -74,7 +76,7 @@ function CustomEditor({
 
   return (
     <FullScreenModal visible title={t("repeat.customTitle")} onClose={onClose}>
-      <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ padding: spacing.md, gap: spacing.lg }}>
+      <KeyboardAwareScrollView bottomOffset={KEYBOARD_GAP} keyboardShouldPersistTaps="handled" contentContainerStyle={{ padding: spacing.md, gap: spacing.lg }}>
         <SegmentedSwitch
           options={[
             { value: "builder", label: t("repeat.builder") },
@@ -163,7 +165,7 @@ function CustomEditor({
         )}
 
         <Button title={t("common.ok")} onPress={() => onDone(rule)} disabled={!valid} />
-      </ScrollView>
+      </KeyboardAwareScrollView>
     </FullScreenModal>
   );
 }

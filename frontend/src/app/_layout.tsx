@@ -20,8 +20,9 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      {/* Lets forms scroll the focused field above the keyboard (screens draw edge-to-edge on Android). */}
-      <KeyboardProvider>
+      {/* Lets forms scroll the focused field above the keyboard. The app draws edge-to-edge (behind the status and
+          navigation bars); said explicitly, because in Expo Go the provider can't detect it and would paint the bars solid. */}
+      <KeyboardProvider statusBarTranslucent navigationBarTranslucent preserveEdgeToEdge>
       <AuthProvider>
         <UserScopedProviders ready={fontsLoaded || Boolean(fontError)}>
           <RootNavigator />
