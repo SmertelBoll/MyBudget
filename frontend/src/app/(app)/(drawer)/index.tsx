@@ -1,12 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Platform, Pressable, View } from "react-native";
 import { FlatList, GestureDetector, usePanGesture } from "react-native-gesture-handler";
-import { router, useNavigation } from "expo-router";
+import { useNavigation } from "expo-router";
 import type { EntryType } from "@/api/types";
 import { useAuth } from "@/auth/AuthProvider";
-import { categoryName } from "@/data/categories";
 import { useCollection } from "@/data/hooks";
-import { NO_TAG, groupEntries, usePeriodEntries, type AccountFilter, type Group } from "@/data/stats";
+import { groupEntries, usePeriodEntries, type AccountFilter, type Group } from "@/data/stats";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTheme } from "@/theme/ThemeProvider";
 import { radius, spacing } from "@/theme/tokens";
@@ -22,7 +21,7 @@ import { PeriodChart } from "@/components/PeriodChart";
 import { PeriodSwitcher } from "@/components/PeriodSwitcher";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import { SegmentedSwitch } from "@/components/SegmentedSwitch";
-import { StatsRow, type StatsChild } from "@/components/StatsRow";
+import { GroupRow, TAG_ICON, openLog, useGroupLook } from "@/components/GroupRow";
 
 // Finger travel that folds the chart (moving up) or, with the list at its top, opens it (pulling down further).
 const FOLD_DRAG = 20;
@@ -31,27 +30,6 @@ const OPEN_DRAG = 40;
 const WEB_COLLAPSE_AT = 24;
 // Android reports the top of a list as 0.3 and the like, not exactly 0.
 const TOP_TOLERANCE = 2;
-// Tags are grey for now (no colors of their own); "no tag" has its own color. The icon and its part of the chart
-// always use the same color.
-const NO_TAG_COLOR = "#6D7FA3";
-const TAG_ICON = "pound";
-const NO_TAG_ICON = "tag-off-outline";
-
-// Opens the log with what Home shows now (spec 11), optionally narrowed to one category and / or tag.
-export const logsParams = (
-  type: EntryType,
-  filter: AccountFilter,
-  range: PeriodRange,
-  only: { category?: string; tag?: string } = {}
-) => ({
-  type,
-  accounts: filter?.join(",") ?? "",
-  kind: range.kind,
-  start: range.start,
-  end: range.end,
-  ...only,
-});
-
 // Screen 2. Home: the chosen accounts' balance, Expenses / Income, a period with its chart, and the period's sums
 // by category or by tag.
 export default function HomeScreen() {
@@ -61,7 +39,6 @@ export default function HomeScreen() {
   const { user } = useAuth();
   const bottomSpace = useBottomSpace();
   const settings = user?.settings;
-  const categories = useCollection("categories");
   const tags = useCollection("tags");
   const accounts = useCollection("accounts");
 
@@ -117,51 +94,11 @@ export default function HomeScreen() {
   const fingerDrag = useRef({ changed: false });
 
   const entries = usePeriodEntries(type, filter, range);
-  const categoryById = useMemo(() => new Map(categories.map((category) => [category.id, category])), [categories]);
-  const tagById = useMemo(() => new Map(tags.map((tag) => [tag.id, tag])), [tags]);
-  const { total, groups } = useMemo(() => groupEntries(entries, by, new Set(tagById.keys())), [entries, by, tagById]);
+  const knownTagIds = useMemo(() => tags.map((tag) => tag.id), [tags]);
+  const { total, groups } = useMemo(() => groupEntries(entries, by, new Set(knownTagIds)), [entries, by, knownTagIds]);
 
-  const look = (group: Group, index: number) => {
-    if (by === "tag") {
-      const tag = tagById.get(group.id);
-      return { icon: tag ? TAG_ICON : NO_TAG_ICON, color: tag ? colors.iconIdle : NO_TAG_COLOR, title: tag?.name ?? t("home.noTag") };
-    }
-    const category = categoryById.get(group.id);
-    return {
-      icon: category?.icon ?? "help",
-      color: category?.color ?? colors.iconIdle,
-      title: category ? categoryName(category, t) : "?",
-    };
-  };
-
-  const breakdownOf = (group: Group): StatsChild[] => {
-    if (by === "category") {
-      // Only "no tag" inside: nothing to open.
-      if (group.children.every((child) => child.id === NO_TAG)) return [];
-      return group.children.map((child) => {
-        const tag = tagById.get(child.id);
-        return { id: child.id, icon: tag ? TAG_ICON : NO_TAG_ICON, title: tag?.name ?? t("home.noTag"), amount: money(child.amount, baseCurrency, true) };
-      });
-    }
-    return group.children.map((child) => {
-      const category = categoryById.get(child.id);
-      return { id: child.id, icon: category?.icon ?? "help", title: category ? categoryName(category, t) : "?", amount: money(child.amount, baseCurrency, true) };
-    });
-  };
-
-  const limitOf = (group: Group) => {
-    if (by !== "category" || range.kind !== "month") return undefined;
-    const planned = categoryById.get(group.id)?.plannedMonthly;
-    if (!planned) return undefined;
-    return {
-      used: group.amount / planned,
-      text: t("home.planned", { spent: money(group.amount, baseCurrency), planned: money(planned, baseCurrency) }),
-    };
-  };
-
-  const segments = groups.map((group, index) => {
-    return { id: group.id, value: group.amount, color: look(group, index).color };
-  });
+  const { look } = useGroupLook(by);
+  const segments = groups.map((group) => ({ id: group.id, value: group.amount, color: look(group.id).color }));
 
   const pan = usePanGesture({
     runOnJS: true,
@@ -220,9 +157,6 @@ export default function HomeScreen() {
     if (!drag.changed && collapsedRef.current && atTop && (broughtUp || pulledAtTop)) setCollapsed(false);
   };
 
-  const openLog = (only?: { category?: string; tag?: string }) =>
-    router.push({ pathname: "/logs", params: logsParams(type, filter, range, only) });
-
   const toggle = (id: string) =>
     setExpanded((current) => {
       const next = new Set(current);
@@ -239,7 +173,7 @@ export default function HomeScreen() {
           <IconButton
             icon="receipt-text-outline"
             label={t("logs.open")}
-            onPress={() => openLog()}
+            onPress={() => openLog(type, filter, range)}
           />
         }
       >
@@ -315,26 +249,17 @@ export default function HomeScreen() {
           clampScroll();
         }}
         scrollEventThrottle={32}
-        renderItem={({ item, index }) => {
-          const { icon, color, title } = look(item, index);
-          return (
-            <StatsRow
-              icon={icon}
-              color={color}
-              title={title}
-              share={item.share}
-              amount={money(item.amount, baseCurrency)}
-              breakdown={breakdownOf(item)}
-              expanded={expanded.has(item.id)}
-              onToggle={() => toggle(item.id)}
-              onPress={() => openLog(by === "category" ? { category: item.id } : { tag: item.id })}
-              onChildPress={(childId) =>
-                openLog(by === "category" ? { category: item.id, tag: childId } : { tag: item.id, category: childId })
-              }
-              limit={limitOf(item)}
-            />
-          );
-        }}
+        renderItem={({ item }) => (
+          <GroupRow
+            group={item}
+            by={by}
+            type={type}
+            filter={filter}
+            range={range}
+            expanded={expanded.has(item.id)}
+            onToggle={() => toggle(item.id)}
+          />
+        )}
       />
       </View>
       </GestureDetector>

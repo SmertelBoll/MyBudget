@@ -12,7 +12,9 @@ import { useMoney } from "@/utils/useMoney";
 import { AppSheet } from "./AppSheet";
 import { AppText } from "./AppText";
 import { Button } from "./Button";
+import { IconButton } from "./IconButton";
 import { IconCircle } from "./IconCircle";
+import type { IconName } from "@/constants/appearance";
 
 export const TOTAL_ICON = "sack";
 
@@ -80,6 +82,7 @@ export function AccountFilterSelect({
   onChange,
   showBalance,
   compact,
+  iconOnly,
 }: {
   value: AccountFilter;
   onChange: (filter: AccountFilter) => void;
@@ -87,6 +90,8 @@ export function AccountFilterSelect({
   showBalance?: boolean;
   // Smaller balance, for a lower header.
   compact?: boolean;
+  // Just a round icon button (Charts header); a dot marks a narrowed selection.
+  iconOnly?: boolean;
 }) {
   const { colors } = useTheme();
   const { t } = useI18n();
@@ -114,6 +119,21 @@ export function AccountFilterSelect({
 
   return (
     <>
+      {iconOnly ? (
+        <View>
+          <IconButton
+            icon={(single?.icon ?? TOTAL_ICON) as IconName}
+            label={`${t("home.selectAccounts")}: ${title}`}
+            onPress={() => {
+              setDraft(value);
+              setOpen(true);
+            }}
+          />
+          {chosen?.length ? (
+            <View pointerEvents="none" style={{ position: "absolute", top: 2, right: 2, width: 10, height: 10, borderRadius: 5, backgroundColor: colors.accent }} />
+          ) : null}
+        </View>
+      ) : (
       <Pressable
         onPress={() => {
           setDraft(value);
@@ -132,6 +152,7 @@ export function AccountFilterSelect({
         </View>
         {showBalance && <AppText variant={compact ? "title" : "display"}>{money(balance, totals.currency)}</AppText>}
       </Pressable>
+      )}
 
       <AppSheet visible={open} title={t("home.selectAccounts")} onClose={() => setOpen(false)}>
         <ScrollView style={{ maxHeight: 420 }} contentContainerStyle={{ gap: spacing.xs }}>

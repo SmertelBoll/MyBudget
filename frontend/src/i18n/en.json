@@ -336,6 +336,18 @@
   "logs.sortDate": "Date",
   "logs.sortAmount": "Amount",
 
+  "charts.general": "General",
+  "charts.byYear": "by year",
+  "charts.byMonth": "by month",
+  "charts.byWeek": "by week",
+  "charts.byDay": "by day",
+  "charts.income": "income",
+  "charts.expenses": "expenses",
+  "charts.profit": "profit",
+  "charts.loss": "loss",
+  "charts.empty": "No entries yet",
+  "charts.hint": "Tap a bar to see that period",
+
   "currency.AED": "United Arab Emirates Dirham",
   "currency.AFN": "Afghan Afghani",
   "currency.ALL": "Albanian Lek",
