@@ -199,9 +199,14 @@ export default function HomeScreen() {
     const drag = listDrag.current;
     if (!drag.active) return;
     drag.maxY = Math.max(drag.maxY, y);
-    if (!drag.changed && !collapsedRef.current && y - drag.startY > FOLD_DRAG) {
+    if (drag.changed) return;
+    if (!collapsedRef.current && y - drag.startY > FOLD_DRAG) {
       drag.changed = true;
       setCollapsed(true);
+    } else if (collapsedRef.current && drag.startY > TOP_TOLERANCE && y <= TOP_TOLERANCE) {
+      // The finger brought the rows back up to the very top: open right away, not when it lets go.
+      drag.changed = true;
+      setCollapsed(false);
     }
   };
 
@@ -209,8 +214,9 @@ export default function HomeScreen() {
     listDrag.current = { active: true, startY: y, maxY: y, changed: false };
   };
 
-  // Let go at the very top: the rows were either brought back up to it, or pulled down while already there (Android
-  // shows that as overscroll, without scroll events). A fling that only coasts to the top doesn't count: pull again.
+  // Pulled down while the rows were already at the very top: Android shows that as overscroll and sends no scroll
+  // events, so the end of the drag is the first moment it can be seen. A fling that only coasts to the top doesn't
+  // count: pull again.
   const onListDragEnd = (y: number) => {
     const drag = listDrag.current;
     drag.active = false;
@@ -314,7 +320,7 @@ export default function HomeScreen() {
           sizes.current.layout = event.nativeEvent.layout.height;
           clampScroll();
         }}
-        scrollEventThrottle={32}
+        scrollEventThrottle={16}
         renderItem={({ item, index }) => {
           const { icon, color, title } = look(item, index);
           return (
