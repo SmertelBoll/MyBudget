@@ -18,29 +18,30 @@ import { ListRow } from "@/components/ListRow";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import type { IconName } from "@/constants/appearance";
 
-// Compact action: icon and label side by side, so the block above the list stays short.
+// Square yellow icon with the label under it, as on the reference screenshot (screen 5.1).
 function ActionButton({ icon, label, onPress }: { icon: IconName; label: string; onPress: () => void }) {
   const { colors } = useTheme();
   return (
-    <Pressable
-      onPress={onPress}
-      accessibilityRole="button"
-      style={({ pressed }) => ({
-        flex: 1,
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "center",
-        gap: spacing.sm,
-        minHeight: 44,
-        paddingHorizontal: spacing.sm,
-        borderRadius: radius.md,
-        backgroundColor: pressed ? colors.accentPressed : colors.accent,
-      })}
-    >
-      <MaterialCommunityIcons name={icon} size={22} color={colors.onAccent} />
-      <AppText variant="label" color={colors.onAccent} numberOfLines={1}>
-        {label}
-      </AppText>
+    <Pressable onPress={onPress} accessibilityRole="button" style={{ flex: 1, alignItems: "center", gap: spacing.xs }}>
+      {({ pressed }) => (
+        <>
+          <View
+            style={{
+              width: 56,
+              height: 56,
+              borderRadius: radius.md,
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: pressed ? colors.accentPressed : colors.accent,
+            }}
+          >
+            <MaterialCommunityIcons name={icon} size={28} color={colors.onAccent} />
+          </View>
+          <AppText variant="label" style={{ textAlign: "center" }} numberOfLines={1}>
+            {label}
+          </AppText>
+        </>
+      )}
     </Pressable>
   );
 }
