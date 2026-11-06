@@ -36,6 +36,13 @@ export const saveCategory = async (fields: CategoryFields, translatedName: strin
     return category;
   }
 
+  // "Other" keeps everything but its color (the server enforces the same).
+  if (existing.isSystemOther) {
+    const category: Category = { ...existing, color: fields.color };
+    await saveEntity("categories", category);
+    return category;
+  }
+
   const category: Category = {
     ...existing,
     name,

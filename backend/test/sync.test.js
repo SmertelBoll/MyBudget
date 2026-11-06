@@ -137,6 +137,24 @@ describe("business rules", () => {
     assert.equal(forged.body.results[0].status, "applied");
     const created = await http.get("/categories/cat-new", anna.accessToken);
     assert.equal(created.body.item.isSystemOther, false);
+
+    // Only the color (and order) of "Other" can change.
+    const edit = await push(anna, [
+      {
+        collection: "categories",
+        id: other.id,
+        op: "upsert",
+        data: { name: "Renamed", type: other.type, icon: "star", color: "#123456", plannedMonthly: 500, sortOrder: 9 },
+      },
+    ]);
+    assert.equal(edit.body.results[0].status, "applied");
+    const after = await http.get(`/categories/${other.id}`, anna.accessToken);
+    assert.equal(after.body.item.color, "#123456");
+    assert.equal(after.body.item.sortOrder, 9);
+    assert.equal(after.body.item.name, null);
+    assert.equal(after.body.item.nameKey, "category.other");
+    assert.equal(after.body.item.icon, other.icon);
+    assert.equal(after.body.item.plannedMonthly, null);
   });
 
   it("keeps tag names unique regardless of case", async () => {

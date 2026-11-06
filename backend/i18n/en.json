@@ -226,6 +226,7 @@
   "categories.name": "Category name",
   "categories.nameRequired": "Enter a category name",
   "categories.type": "Type",
+  "categories.otherLocked": "Entries of deleted categories land here, so only its color can be changed",
   "categories.limit": "Monthly limit",
   "categories.noLimit": "No limit",
   "categories.limitHint": "Optional. With the Month period, Home shows spending against it",

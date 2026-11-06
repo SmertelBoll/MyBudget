@@ -62,6 +62,7 @@ function CategoryForm({ initial, existingId }: { initial: FormValues; existingId
   const dialog = useDialog();
   const { baseCurrency } = useMoney();
   const existing = useRecord("categories", existingId);
+  const locked = Boolean(existing?.isSystemOther);
 
   const [values, setValues] = useState(initial);
   const [submitted, setSubmitted] = useState(false);
@@ -129,24 +130,37 @@ function CategoryForm({ initial, existingId }: { initial: FormValues; existingId
       />
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
         <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ padding: spacing.md, gap: spacing.lg, paddingBottom: bottomSpace }}>
-          <View style={{ flexDirection: "row", alignItems: "flex-end", gap: spacing.md }}>
-            <View style={{ paddingBottom: showNameError ? 22 : 2 }}>
+          {locked ? (
+            // "Other" is the fallback for deleted categories: only its color can change.
+            <View style={{ flexDirection: "row", alignItems: "center", gap: spacing.md }}>
               <IconCircle icon={values.icon} color={values.color} size={48} />
+              <View style={{ flex: 1, gap: 2 }}>
+                <AppText variant="title">{values.name}</AppText>
+                <AppText variant="caption" secondary>
+                  {t("categories.otherLocked")}
+                </AppText>
+              </View>
             </View>
-            <View style={{ flex: 1 }}>
-              <TextField
-                label={t("categories.name")}
-                value={values.name}
-                onChangeText={(text) => set("name", text)}
-                onBlur={() => setTouchedName(true)}
-                error={showNameError ? nameError : undefined}
-                maxLength={50}
-                autoFocus={!existing}
-              />
+          ) : (
+            <View style={{ flexDirection: "row", alignItems: "flex-end", gap: spacing.md }}>
+              <View style={{ paddingBottom: showNameError ? 22 : 2 }}>
+                <IconCircle icon={values.icon} color={values.color} size={48} />
+              </View>
+              <View style={{ flex: 1 }}>
+                <TextField
+                  label={t("categories.name")}
+                  value={values.name}
+                  onChangeText={(text) => set("name", text)}
+                  onBlur={() => setTouchedName(true)}
+                  error={showNameError ? nameError : undefined}
+                  maxLength={50}
+                  autoFocus={!existing}
+                />
+              </View>
             </View>
-          </View>
+          )}
 
-          {existing ? (
+          {locked ? null : existing ? (
             // The type can't change after creation (spec 7.2): shown as text.
             <View style={{ gap: spacing.xs }}>
               <AppText variant="label">{t("categories.type")}</AppText>
@@ -166,28 +180,32 @@ function CategoryForm({ initial, existingId }: { initial: FormValues; existingId
             </View>
           )}
 
-          <View style={{ backgroundColor: colors.surface, borderRadius: radius.md, padding: spacing.md, gap: spacing.xs }}>
-            <AppText variant="label">{t("categories.limit")}</AppText>
-            <AmountInput
-              value={values.limit}
-              onChangeText={(text) => set("limit", text)}
-              currency={baseCurrency}
-              placeholder={t("categories.noLimit")}
-              error={limitError ?? undefined}
-              size="normal"
-            />
-            <AppText variant="caption" secondary>
-              {t("categories.limitHint")}
-            </AppText>
-          </View>
+          {!locked && (
+            <View style={{ backgroundColor: colors.surface, borderRadius: radius.md, padding: spacing.md, gap: spacing.xs }}>
+              <AppText variant="label">{t("categories.limit")}</AppText>
+              <AmountInput
+                value={values.limit}
+                onChangeText={(text) => set("limit", text)}
+                currency={baseCurrency}
+                placeholder={t("categories.noLimit")}
+                error={limitError ?? undefined}
+                size="normal"
+              />
+              <AppText variant="caption" secondary>
+                {t("categories.limitHint")}
+              </AppText>
+            </View>
+          )}
 
-          <IconPicker
-            label={t("accounts.icon")}
-            sections={values.type === "expense" ? EXPENSE_ICON_SECTIONS : INCOME_ICON_SECTIONS}
-            value={values.icon}
-            color={values.color}
-            onChange={(icon) => set("icon", icon)}
-          />
+          {!locked && (
+            <IconPicker
+              label={t("accounts.icon")}
+              sections={values.type === "expense" ? EXPENSE_ICON_SECTIONS : INCOME_ICON_SECTIONS}
+              value={values.icon}
+              color={values.color}
+              onChange={(icon) => set("icon", icon)}
+            />
+          )}
 
           <ColorPicker label={t("accounts.color")} value={values.color} onChange={(color) => set("color", color)} />
         </ScrollView>
