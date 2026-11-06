@@ -1,5 +1,6 @@
 import { useState, type Ref } from "react";
-import { TextInput, View } from "react-native";
+import { Pressable, TextInput, View } from "react-native";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTheme } from "@/theme/ThemeProvider";
 import { fonts, spacing } from "@/theme/tokens";
@@ -13,6 +14,8 @@ type Props = {
   value: string;
   onChangeText: (text: string) => void;
   currency: string;
+  // Makes the currency tappable (screen 4: the entry can be in another currency than the account).
+  onCurrencyPress?: () => void;
   // Faint suggestion shown while the field is empty (converted amount, spec 4.3).
   placeholder?: string;
   error?: string;
@@ -35,6 +38,7 @@ export function AmountInput({
   value,
   onChangeText,
   currency,
+  onCurrencyPress,
   placeholder,
   error,
   autoFocus,
@@ -87,7 +91,19 @@ export function AmountInput({
             borderBottomColor: error ? colors.danger : colors.selected,
           }}
         />
-        <AppText style={{ fontFamily: fonts.medium, fontSize: textSize * 0.75 }}>{currency}</AppText>
+        <Pressable
+          onPress={onCurrencyPress}
+          disabled={!onCurrencyPress}
+          hitSlop={8}
+          accessibilityRole={onCurrencyPress ? "button" : undefined}
+          accessibilityLabel={onCurrencyPress ? t("amount.changeCurrency") : undefined}
+          style={{ flexDirection: "row", alignItems: "center" }}
+        >
+          <AppText style={{ fontFamily: fonts.medium, fontSize: textSize * 0.75 }} color={onCurrencyPress ? colors.text : undefined}>
+            {currency}
+          </AppText>
+          {onCurrencyPress && <MaterialCommunityIcons name="menu-down" size={22} color={colors.textSecondary} />}
+        </Pressable>
         {action !== "none" && (
           <IconButton
             icon={action === "calculator" ? "calculator-variant-outline" : "swap-vertical"}

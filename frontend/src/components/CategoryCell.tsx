@@ -44,8 +44,17 @@ export function CategoryCell({
         opacity: picked ? 0.85 : 1,
       })}
     >
-      <View style={{ transform: [{ scale: picked ? 1.1 : 1 }] }}>
-        <IconCircle icon={icon} color={color} size={56} />
+      {/* Chosen: a round ring around the round icon (no square frame). */}
+      <View
+        style={{
+          padding: 3,
+          borderRadius: 34,
+          borderWidth: 2,
+          borderColor: selected ? colors.accent : "transparent",
+          transform: [{ scale: picked ? 1.1 : 1 }],
+        }}
+      >
+        <IconCircle icon={icon} color={color} size={52} />
       </View>
       <AppText variant="caption" numberOfLines={1} style={{ textAlign: "center" }} color={selected ? colors.text : undefined}>
         {label}

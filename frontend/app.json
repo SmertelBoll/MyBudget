@@ -37,7 +37,14 @@
       ],
       "expo-secure-store",
       "expo-localization",
-      "expo-sqlite"
+      "expo-sqlite",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "MyBudget uses your photos to attach receipts to entries.",
+          "cameraPermission": "MyBudget uses the camera to photograph receipts for entries."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

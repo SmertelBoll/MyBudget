@@ -207,6 +207,7 @@ export const wipeLocal = async ({ keepMeta = false } = {}) => {
     db.withTransactionAsync(async () => {
       await db.runAsync("DELETE FROM entities");
       await db.runAsync("DELETE FROM outbox");
+      await db.runAsync("DELETE FROM photos");
       if (!keepMeta) await db.runAsync("DELETE FROM meta");
     })
   );

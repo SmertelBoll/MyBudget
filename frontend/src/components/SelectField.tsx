@@ -19,28 +19,26 @@ export type SelectOption = {
   trailing?: string;
 };
 
-type Props = {
-  label: string;
+type Row = SelectOption | { divider: true };
+
+type ModalProps = {
+  title: string;
   value: string | null;
   options: SelectOption[];
   onChange: (value: string) => void;
-  placeholder?: string;
+  onClose: () => void;
   searchLabel?: string;
   // Shown first, above a divider (e.g. popular and recently used currencies); hidden while searching.
   pinned?: string[];
 };
 
-type Row = SelectOption | { divider: true };
-
-// A field that opens a searchable list: languages, currencies... (spec 2.9, 4.2 "list with search").
-export function SelectField({ label, value, options, onChange, placeholder, searchLabel, pinned }: Props) {
+// The searchable list on its own, for screens that open it from something other than a field (the currency
+// next to an amount).
+export function SelectModal({ title, value, options, onChange, onClose, searchLabel, pinned }: ModalProps) {
   const { colors } = useTheme();
   const { t } = useI18n();
   const insets = useSafeAreaInsets();
-  const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
-
-  const selected = options.find((option) => option.value === value);
 
   const rows = useMemo<Row[]>(() => {
     const needle = query.trim().toLowerCase();
@@ -57,10 +55,60 @@ export function SelectField({ label, value, options, onChange, placeholder, sear
     return [...top, { divider: true }, ...rest];
   }, [options, query, pinned]);
 
-  const close = () => {
-    setOpen(false);
-    setQuery("");
-  };
+  return (
+    <FullScreenModal visible title={title} onClose={onClose}>
+      <View style={{ padding: spacing.md }}>
+        <TextField
+          label={searchLabel ?? t("common.search")}
+          value={query}
+          onChangeText={setQuery}
+          autoCapitalize="none"
+          autoCorrect={false}
+          autoFocus
+        />
+      </View>
+
+      <FlatList
+        data={rows}
+        keyExtractor={(row) => ("divider" in row ? "--divider--" : row.value)}
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={{ paddingBottom: insets.bottom + spacing.lg }}
+        ListEmptyComponent={
+          <AppText secondary style={{ textAlign: "center", padding: spacing.lg }}>
+            {t("common.nothingFound")}
+          </AppText>
+        }
+        renderItem={({ item }) =>
+          "divider" in item ? (
+            <View style={{ height: 1, backgroundColor: colors.selected, marginHorizontal: spacing.md, marginVertical: spacing.xs }} />
+          ) : (
+            <OptionRow
+              title={item.label}
+              subtitle={item.subtitle}
+              trailing={item.trailing}
+              selected={item.value === value}
+              onPress={() => {
+                onChange(item.value);
+                onClose();
+              }}
+            />
+          )
+        }
+      />
+    </FullScreenModal>
+  );
+}
+
+type Props = Omit<ModalProps, "title" | "onClose"> & {
+  label: string;
+  placeholder?: string;
+};
+
+// A field that opens a searchable list: languages, currencies... (spec 2.9, 4.2 "list with search").
+export function SelectField({ label, value, options, onChange, placeholder, searchLabel, pinned }: Props) {
+  const { colors } = useTheme();
+  const [open, setOpen] = useState(false);
+  const selected = options.find((option) => option.value === value);
 
   return (
     <View style={{ gap: spacing.xs }}>
@@ -88,46 +136,17 @@ export function SelectField({ label, value, options, onChange, placeholder, sear
         <MaterialCommunityIcons name="chevron-down" size={22} color={colors.textSecondary} />
       </Pressable>
 
-      <FullScreenModal visible={open} title={label} onClose={close}>
-        <View style={{ padding: spacing.md }}>
-          <TextField
-            label={searchLabel ?? t("common.search")}
-            value={query}
-            onChangeText={setQuery}
-            autoCapitalize="none"
-            autoCorrect={false}
-            autoFocus
-          />
-        </View>
-
-        <FlatList
-          data={rows}
-          keyExtractor={(row) => ("divider" in row ? "--divider--" : row.value)}
-          keyboardShouldPersistTaps="handled"
-          contentContainerStyle={{ paddingBottom: insets.bottom + spacing.lg }}
-          ListEmptyComponent={
-            <AppText secondary style={{ textAlign: "center", padding: spacing.lg }}>
-              {t("common.nothingFound")}
-            </AppText>
-          }
-          renderItem={({ item }) =>
-            "divider" in item ? (
-              <View style={{ height: 1, backgroundColor: colors.selected, marginHorizontal: spacing.md, marginVertical: spacing.xs }} />
-            ) : (
-              <OptionRow
-                title={item.label}
-                subtitle={item.subtitle}
-                trailing={item.trailing}
-                selected={item.value === value}
-                onPress={() => {
-                  onChange(item.value);
-                  close();
-                }}
-              />
-            )
-          }
+      {open && (
+        <SelectModal
+          title={label}
+          value={value}
+          options={options}
+          onChange={onChange}
+          onClose={() => setOpen(false)}
+          searchLabel={searchLabel}
+          pinned={pinned}
         />
-      </FullScreenModal>
+      )}
     </View>
   );
 }

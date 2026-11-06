@@ -48,16 +48,18 @@ type Method = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 const send = async <T,>(method: Method, path: string, body?: unknown, token?: string | null): Promise<T> => {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
+  // Photos go up as multipart: fetch sets that Content-Type (with the boundary) itself.
+  const isForm = typeof FormData !== "undefined" && body instanceof FormData;
   let res: Response;
   try {
     res = await fetch(BASE_URL + path, {
       method,
       headers: {
         Accept: "application/json",
-        ...(body !== undefined && { "Content-Type": "application/json" }),
+        ...(body !== undefined && !isForm && { "Content-Type": "application/json" }),
         ...(token && { Authorization: `Bearer ${token}` }),
       },
-      body: body === undefined ? undefined : JSON.stringify(body),
+      body: body === undefined ? undefined : isForm ? (body as FormData) : JSON.stringify(body),
       signal: controller.signal,
     });
   } catch {

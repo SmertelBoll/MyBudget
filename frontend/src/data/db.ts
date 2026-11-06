@@ -28,6 +28,14 @@ const MIGRATIONS = [
     value TEXT NOT NULL
   );
   `,
+  // Transaction photos taken on this device: where the file is, and whether the server has it yet (spec 2.10).
+  `
+  CREATE TABLE IF NOT EXISTS photos (
+    id TEXT PRIMARY KEY,
+    uri TEXT NOT NULL,
+    uploaded INTEGER NOT NULL DEFAULT 0
+  );
+  `,
 ];
 
 const migrate = async (db: SQLite.SQLiteDatabase) => {

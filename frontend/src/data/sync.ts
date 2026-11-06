@@ -11,6 +11,7 @@ import {
   wipeLocal,
   type RemoteChange,
 } from "./store";
+import { uploadPendingPhotos } from "./photos";
 import type { Collection } from "./types";
 
 // Spec 4.1: the outbox goes up in batches, then everything changed on the server since our cursor comes down.
@@ -125,6 +126,8 @@ const runOnce = async () => {
   setState({ status: "syncing", errorCode: null });
   try {
     const rejected: { collection: Collection; id: string }[] = [];
+    // Photos first, so a transaction never reaches other devices pointing at a photo the server doesn't have.
+    await uploadPendingPhotos();
     await push(rejected);
     await pull();
     await reconcile(rejected);

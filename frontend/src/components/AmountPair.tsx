@@ -22,6 +22,7 @@ export function AmountPair({
   topError,
   bottomError,
   autoFocus,
+  onTopCurrencyPress,
 }: {
   top: string;
   bottom: string;
@@ -34,6 +35,7 @@ export function AmountPair({
   topError?: string;
   bottomError?: string;
   autoFocus?: boolean;
+  onTopCurrencyPress?: () => void;
 }) {
   const { toInput } = useMoney();
   const [focused, setFocused] = useState<Side>("top");
@@ -56,6 +58,7 @@ export function AmountPair({
         value={top}
         onChangeText={onChangeTop}
         currency={topCurrency}
+        onCurrencyPress={onTopCurrencyPress}
         placeholder={topSuggestion}
         error={topError}
         autoFocus={autoFocus}
