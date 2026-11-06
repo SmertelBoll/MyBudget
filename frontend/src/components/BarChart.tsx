@@ -189,8 +189,9 @@ function Bars({ buckets, todayIndex, granularity, mode, colorOf, selection, onSe
   const settleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   // Where the list last came to rest; the scale and the years follow it (and new data), not the moving list.
   const [restX, setRestX] = useState(startX);
-  // The plate stays with its bar only until the list moves.
-  const [plate, setPlate] = useState<{ x: number; y: number; text: string } | null>(null);
+  // The plate stays with its bar only until the list moves. Only where the bar was is kept: its height and sum are
+  // read from the current data, so they stay right when the bars change (categories <-> tags, a new scale).
+  const [plate, setPlate] = useState<{ x: number; index: number; part: BarPart } | null>(null);
 
   // Bars at least half on screen.
   const first = Math.max(0, Math.ceil(restX / itemWidth - 0.5));
@@ -230,12 +231,25 @@ function Bars({ buckets, todayIndex, granularity, mode, colorOf, selection, onSe
         onSelect(null);
         return;
       }
-      const bar = heightFor(Math.abs(value), peak);
-      setPlate({ x: index * itemWidth - scrollX.current + barCenter, y: BAR_AREA - bar - 34, text: money(value, baseCurrency, true) });
+      setPlate({ x: index * itemWidth - scrollX.current + barCenter, index, part });
       onSelect({ index, part });
     },
-    [peak, itemWidth, money, baseCurrency, onSelect]
+    [itemWidth, onSelect]
   );
+
+  // Shown only while it still belongs to the selected bar.
+  const plateShown = plate && selection && plate.index === selection.index && plate.part === selection.part ? plate : null;
+  const plateBucket = plateShown ? buckets[plateShown.index] : undefined;
+  const plateValue = !plateBucket
+    ? 0
+    : mode !== "general"
+      ? stackSum(plateBucket)
+      : plateShown!.part === "income"
+        ? plateBucket.income
+        : plateShown!.part === "expense"
+          ? plateBucket.expense
+          : plateBucket.income - plateBucket.expense;
+  const plateTop = BAR_AREA - heightFor(Math.abs(plateValue), peak) - 34;
 
   const renderItem = ({ item, index }: { item: Bucket; index: number }) => (
     <BarItem
@@ -261,8 +275,11 @@ function Bars({ buckets, todayIndex, granularity, mode, colorOf, selection, onSe
         renderItem={renderItem}
         getItemLayout={(_, index) => ({ length: itemWidth, offset: itemWidth * index, index })}
         initialScrollIndex={startIndex}
-        initialNumToRender={Math.ceil(viewport / itemWidth) + 2}
-        windowSize={5}
+        // Bars are cheap: keep plenty ready on both sides so a fast fling never shows empty space.
+        initialNumToRender={Math.ceil(viewport / itemWidth) * 3}
+        maxToRenderPerBatch={40}
+        updateCellsBatchingPeriod={16}
+        windowSize={21}
         extraData={[peak, selection]}
         onScrollBeginDrag={() => setPlate(null)}
         onScroll={(event) => {
@@ -271,14 +288,14 @@ function Bars({ buckets, todayIndex, granularity, mode, colorOf, selection, onSe
         }}
         scrollEventThrottle={32}
       />
-      {plate && (
+      {plateShown && (
         <View
           pointerEvents="none"
-          style={{ position: "absolute", top: Math.max(0, plate.y), left: Math.min(Math.max(0, plate.x - 60), viewport - 120), width: 120, alignItems: "center" }}
+          style={{ position: "absolute", top: Math.max(0, plateTop), left: Math.min(Math.max(0, plateShown.x - 60), viewport - 120), width: 120, alignItems: "center" }}
         >
           <View style={{ paddingHorizontal: spacing.sm, paddingVertical: 4, borderRadius: radius.md, backgroundColor: colors.text }}>
             <AppText variant="label" color={colors.background} numberOfLines={1}>
-              {plate.text}
+              {money(plateValue, baseCurrency, true)}
             </AppText>
           </View>
         </View>

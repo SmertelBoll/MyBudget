@@ -152,7 +152,7 @@ export default function ChartsScreen() {
 
           <BarChart
             // A new size, view or set of accounts starts again at the newest periods.
-            key={`${granularity}-${mode}-${by}-${filter?.join(",") ?? "all"}`}
+            key={`${granularity}-${mode}-${filter?.join(",") ?? "all"}`}
             buckets={buckets}
             todayIndex={todayIndex}
             granularity={granularity}
@@ -175,12 +175,14 @@ export default function ChartsScreen() {
                   label={t(by === "category" ? "home.byTags" : "home.byCategories")}
                   size={40}
                   onPress={() => {
+                    // Same periods, other split: the chosen bar and the scroll position stay.
                     setBy(by === "category" ? "tag" : "category");
-                    reset();
+                    setExpanded(new Set());
                   }}
                 />
                 {by === "tag" && (
-                  <AppText variant="caption" secondary style={{ flex: 1, textAlign: "right" }}>
+                  // Android's balanced line breaking splits it into even lines in any language.
+                  <AppText variant="caption" secondary textBreakStrategy="balanced" style={{ flex: 1, textAlign: "right" }}>
                     {t("charts.tagsDuplicated")}
                   </AppText>
                 )}
