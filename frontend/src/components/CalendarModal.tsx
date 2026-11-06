@@ -15,10 +15,13 @@ const SWIPE_DISTANCE = 50;
 export function CalendarModal({
   visible,
   value,
+  title,
   onClose,
   onChange,
 }: {
   visible: boolean;
+  // Defaults to "Choose a date"; e.g. "Start of the period" when picking a range.
+  title?: string;
   value: string;
   onClose: () => void;
   onChange: (date: string) => void;
@@ -58,7 +61,7 @@ export function CalendarModal({
   const weekdays = weekdayNames(lang, firstDay);
 
   return (
-    <FullScreenModal visible={visible} title={t("dates.pick")} onClose={onClose}>
+    <FullScreenModal visible={visible} title={title ?? t("dates.pick")} onClose={onClose}>
       <View style={{ padding: spacing.md, gap: spacing.md }} {...swipe.panHandlers}>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           <Pressable onPress={() => shift(-1)} hitSlop={8} accessibilityLabel={t("dates.previousMonth")} style={{ padding: spacing.sm }}>

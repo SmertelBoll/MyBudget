@@ -6,19 +6,36 @@ import { useTheme } from "@/theme/ThemeProvider";
 import { spacing } from "@/theme/tokens";
 
 // Round "+" pinned to the bottom of list screens (spec 5.1, 7.1, 8.1): floats, so it stays fully round.
-export function Fab({ onPress, label, icon = "plus" }: { onPress: () => void; label: string; icon?: IconName }) {
+// "corner": inside a card, at its bottom right (the "+" on Home's chart, spec 2.2).
+export function Fab({
+  onPress,
+  label,
+  icon = "plus",
+  placement = "screen",
+  size = 64,
+}: {
+  onPress: () => void;
+  label: string;
+  icon?: IconName;
+  placement?: "screen" | "corner";
+  size?: number;
+}) {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
+  const position =
+    placement === "corner"
+      ? ({ position: "absolute", right: spacing.md, bottom: spacing.md } as const)
+      : ({ position: "absolute", left: 0, right: 0, bottom: insets.bottom + spacing.md, alignItems: "center" } as const);
   return (
-    <View pointerEvents="box-none" style={{ position: "absolute", left: 0, right: 0, bottom: insets.bottom + spacing.md, alignItems: "center" }}>
+    <View pointerEvents="box-none" style={position}>
       <Pressable
         onPress={onPress}
         accessibilityRole="button"
         accessibilityLabel={label}
         style={({ pressed }) => ({
-          width: 64,
-          height: 64,
-          borderRadius: 32,
+          width: size,
+          height: size,
+          borderRadius: size / 2,
           alignItems: "center",
           justifyContent: "center",
           backgroundColor: pressed ? colors.accentPressed : colors.accent,
@@ -29,7 +46,7 @@ export function Fab({ onPress, label, icon = "plus" }: { onPress: () => void; la
           elevation: 6,
         })}
       >
-        <MaterialCommunityIcons name={icon} size={32} color={colors.onAccent} />
+        <MaterialCommunityIcons name={icon} size={size / 2} color={colors.onAccent} />
       </Pressable>
     </View>
   );

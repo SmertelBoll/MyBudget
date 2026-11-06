@@ -10,6 +10,8 @@ import { AppText } from "./AppText";
 
 type Props = {
   title?: string;
+  // Replaces the title, e.g. Home's account selector.
+  center?: ReactNode;
   // "menu" opens the side drawer (top-level screens), "back" leaves the screen (forms and nested screens).
   left?: "menu" | "back" | "none";
   // Replaces the default back action, e.g. to ask "leave without saving?" first.
@@ -20,7 +22,7 @@ type Props = {
 };
 
 // One header for every screen (spec 2.9): rounded bottom corners, safe-area aware.
-export function ScreenHeader({ title, left = "menu", onBack, right, children }: Props) {
+export function ScreenHeader({ title, center, left = "menu", onBack, right, children }: Props) {
   const { colors } = useTheme();
   const { t } = useI18n();
   const insets = useSafeAreaInsets();
@@ -54,9 +56,13 @@ export function ScreenHeader({ title, left = "menu", onBack, right, children }: 
             <MaterialCommunityIcons name={left === "menu" ? "menu" : "arrow-left"} size={26} color={colors.text} />
           </Pressable>
         )}
-        <AppText variant="title" numberOfLines={1} style={{ flex: 1, marginHorizontal: spacing.sm }}>
-          {title}
-        </AppText>
+        {center ? (
+          <View style={{ flex: 1, alignItems: "center", marginHorizontal: spacing.sm }}>{center}</View>
+        ) : (
+          <AppText variant="title" numberOfLines={1} style={{ flex: 1, marginHorizontal: spacing.sm }}>
+            {title}
+          </AppText>
+        )}
         {right}
       </View>
       {children}

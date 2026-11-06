@@ -1,7 +1,8 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Pressable, SectionList, View } from "react-native";
 import { router } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useAuth } from "@/auth/AuthProvider";
 import { useCollection } from "@/data/hooks";
 import type { Account, Transfer } from "@/data/types";
 import { useI18n } from "@/i18n/I18nProvider";
@@ -10,6 +11,10 @@ import { radius, spacing } from "@/theme/tokens";
 import { useBottomSpace } from "@/utils/useBottomSpace";
 import { addDays, formatLongDate, todayLocal } from "@/utils/dates";
 import { useMoney } from "@/utils/useMoney";
+import { currentPeriod, inPeriod, type PeriodRange } from "@/utils/periods";
+import { HeaderSearchInput } from "@/components/HeaderSearchInput";
+import { IconButton } from "@/components/IconButton";
+import { PeriodSwitcher } from "@/components/PeriodSwitcher";
 import { AppText } from "@/components/AppText";
 import { Fab } from "@/components/Fab";
 import { IconCircle } from "@/components/IconCircle";
@@ -66,22 +71,41 @@ function TransferRow({ transfer, from, to, onPress }: { transfer: Transfer; from
   );
 }
 
-// Transfer history, newest first, grouped by day; a tap opens the transfer for editing (screen 10).
-// The full logs screen with periods, search and export (screen 11) replaces this in a later stage.
+// Screen 11 for transfers: the period's transfers, newest first, grouped by day; a tap opens the transfer (screen
+// 10). Search (accounts, comment, amount) looks through every period. Export comes with the data settings.
 export default function TransfersScreen() {
   const { colors } = useTheme();
   const bottomSpace = useBottomSpace();
   const { t, lang } = useI18n();
   const transfers = useCollection("transfers");
   const accounts = useCollection("accounts");
+  const { user } = useAuth();
+  const { toInput } = useMoney();
+  const [range, setRange] = useState<PeriodRange>(() =>
+    currentPeriod(user?.settings.defaultPeriod ?? "week", user?.settings.firstDayOfWeek ?? 1)
+  );
+  const [searching, setSearching] = useState(false);
+  const [query, setQuery] = useState("");
+  const needle = query.trim().toLowerCase().replace(/,/g, ".");
 
   const byId = useMemo(() => new Map(accounts.map((account) => [account.id, account])), [accounts]);
   const sections = useMemo(() => {
-    const sorted = [...transfers].sort((a, b) => b.date.localeCompare(a.date) || b.clientCreatedAt.localeCompare(a.clientCreatedAt));
+    const shown = transfers.filter((transfer) => {
+      if (!needle) return inPeriod(transfer.date, range);
+      const texts = [
+        byId.get(transfer.fromAccountId)?.name ?? "",
+        byId.get(transfer.toAccountId)?.name ?? "",
+        transfer.comment,
+        toInput(transfer.amountFrom),
+        toInput(transfer.amountTo),
+      ];
+      return texts.some((text) => text.toLowerCase().replace(/,/g, ".").includes(needle));
+    });
+    const sorted = [...shown].sort((a, b) => b.date.localeCompare(a.date) || b.clientCreatedAt.localeCompare(a.clientCreatedAt));
     const groups = new Map<string, typeof sorted>();
     for (const transfer of sorted) groups.set(transfer.date, [...(groups.get(transfer.date) ?? []), transfer]);
     return [...groups].map(([date, data]) => ({ date, data }));
-  }, [transfers]);
+  }, [transfers, range, needle, byId, toInput]);
 
   const today = todayLocal();
   const dayTitle = (date: string) => {
@@ -91,12 +115,34 @@ export default function TransfersScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
-      <ScreenHeader title={t("accounts.transferHistory")} left="back" />
+      <ScreenHeader
+        title={t("accounts.transferHistory")}
+        left="back"
+        center={searching ? <HeaderSearchInput value={query} onChangeText={setQuery} placeholder={t("logs.search")} /> : undefined}
+        right={
+          <IconButton
+            icon={searching ? "close" : "magnify"}
+            label={t(searching ? "common.close" : "logs.search")}
+            onPress={() => {
+              setSearching(!searching);
+              setQuery("");
+            }}
+          />
+        }
+      />
       <SectionList
         sections={sections}
         keyExtractor={(transfer) => transfer.id}
         stickySectionHeadersEnabled={false}
         contentContainerStyle={{ padding: spacing.md, gap: spacing.sm, paddingBottom: bottomSpace }}
+        keyboardShouldPersistTaps="handled"
+        ListHeaderComponent={
+          needle ? undefined : (
+            <View style={{ backgroundColor: colors.surface, borderRadius: radius.md, padding: spacing.sm }}>
+              <PeriodSwitcher value={range} onChange={setRange} />
+            </View>
+          )
+        }
         ListEmptyComponent={
           <View style={{ alignItems: "center", gap: spacing.sm, paddingVertical: spacing.xl }}>
             <MaterialCommunityIcons name="swap-horizontal" size={48} color={colors.textSecondary} />
