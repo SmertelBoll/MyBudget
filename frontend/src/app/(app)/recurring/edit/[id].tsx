@@ -252,8 +252,8 @@ function RecurringForm({ initial, existingId }: { initial: FormValues; existingI
           />
 
           <RepeatPicker value={values.rule} onChange={(rule) => set("rule", rule)} startDate={values.startDate} time={timeOrDefault(values.time, DEFAULT_TIME)} />
-          <ToggleRow label={t("recurring.autoAdd")} value={values.autoAdd} onChange={(next) => set("autoAdd", next)} />
           <ToggleRow label={t("recurring.active")} value={values.active} onChange={(on) => set("active", on)} />
+          <ToggleRow label={t("recurring.autoAdd")} value={values.autoAdd} onChange={(next) => set("autoAdd", next)} />
           <ToggleRow label={t("recurring.notify")} value={values.notify} onChange={toggleNotify} />
 
           <DateField label={t(once ? "recurring.date" : "recurring.startDate")} value={values.startDate} onChange={(date) => set("startDate", date)} />
