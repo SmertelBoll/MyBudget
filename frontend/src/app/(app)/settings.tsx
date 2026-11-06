@@ -34,7 +34,7 @@ export default function SettingsScreen() {
       <ScrollView contentContainerStyle={{ padding: spacing.md, gap: spacing.md }}>
         <AppText variant="heading">{t("settings.appearance")}</AppText>
 
-        <View style={{ backgroundColor: colors.surface, borderRadius: radius.lg, padding: spacing.md, gap: spacing.sm }}>
+        <View style={{ backgroundColor: colors.surface, borderRadius: radius.md, padding: spacing.md, gap: spacing.sm }}>
           <AppText variant="label" secondary>
             {t("settings.theme")}
           </AppText>
@@ -45,7 +45,7 @@ export default function SettingsScreen() {
           />
         </View>
 
-        <View style={{ backgroundColor: colors.surface, borderRadius: radius.lg, padding: spacing.md }}>
+        <View style={{ backgroundColor: colors.surface, borderRadius: radius.md, padding: spacing.md }}>
           <SelectField
             label={t("settings.language")}
             value={user.language}

@@ -40,7 +40,7 @@ export function Button({ title, onPress, variant = "primary", icon, loading, dis
       style={({ pressed }) => [
         {
           minHeight: 48,
-          borderRadius: radius.pill,
+          borderRadius: radius.md,
           borderWidth: 1,
           borderColor: palette.border,
           backgroundColor: pressed && !dimmed ? palette.pressed : bg,

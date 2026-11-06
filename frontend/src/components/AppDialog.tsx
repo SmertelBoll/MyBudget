@@ -79,7 +79,7 @@ function DialogView({ dialog, onClose }: { dialog: DialogState; onClose: (confir
         <Pressable
           onPress={() => {}}
           accessibilityRole="alert"
-          style={{ backgroundColor: colors.surface, borderRadius: radius.lg, padding: spacing.lg, gap: spacing.md }}
+          style={{ backgroundColor: colors.surface, borderRadius: radius.md, padding: spacing.lg, gap: spacing.md }}
         >
           <AppText variant="heading">{dialog.title}</AppText>
           {dialog.message ? <AppText secondary>{dialog.message}</AppText> : null}

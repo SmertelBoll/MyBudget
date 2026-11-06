@@ -93,11 +93,11 @@ export default function LoginScreen() {
           </AppText>
         </View>
 
-        <View style={{ backgroundColor: colors.surface, borderRadius: radius.lg, padding: spacing.lg, gap: spacing.md }}>
+        <View style={{ backgroundColor: colors.surface, borderRadius: radius.md, padding: spacing.lg, gap: spacing.md }}>
           <AppText variant="title">{t(mode === "signIn" ? "auth.signIn" : "auth.signUp")}</AppText>
 
           {notice && (
-            <View style={{ backgroundColor: colors.danger, borderRadius: radius.sm, padding: spacing.md }}>
+            <View style={{ backgroundColor: colors.danger, borderRadius: radius.md, padding: spacing.md }}>
               <AppText color={colors.onDanger}>{t(notice)}</AppText>
             </View>
           )}

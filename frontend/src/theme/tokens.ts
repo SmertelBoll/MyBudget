@@ -8,8 +8,9 @@ export const spacing = {
   xl: 32,
 } as const;
 
+// Cards and everything inside them (fields, switches, buttons, list rows) use `md`, so nested corners always match.
+// `lg` is only for the screen header's bottom edge; `pill` only for buttons floating on their own.
 export const radius = {
-  sm: 8,
   md: 14,
   lg: 24,
   pill: 999,

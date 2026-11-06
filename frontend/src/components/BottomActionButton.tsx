@@ -1,6 +1,6 @@
 import { View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { spacing } from "@/theme/tokens";
+import { radius, spacing } from "@/theme/tokens";
 import { Button } from "./Button";
 
 type Props = React.ComponentProps<typeof Button>;
@@ -20,7 +20,8 @@ export function BottomActionButton(props: Props) {
         alignItems: "center",
       }}
     >
-      <Button {...props} style={[{ minWidth: 220, minHeight: 56 }, props.style]} />
+      {/* Floats over the content, not inside a card: the one place a fully round button is kept. */}
+      <Button {...props} style={[{ minWidth: 220, minHeight: 56, borderRadius: radius.pill }, props.style]} />
     </View>
   );
 }

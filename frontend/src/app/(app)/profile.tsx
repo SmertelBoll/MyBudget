@@ -63,7 +63,7 @@ export default function ProfileScreen() {
     <View style={{ flex: 1, backgroundColor: colors.background }}>
       <ScreenHeader title={t("nav.profile")} />
       <ScrollView contentContainerStyle={{ padding: spacing.md, gap: spacing.lg }}>
-        <View style={{ alignItems: "center", gap: spacing.sm, backgroundColor: colors.surface, borderRadius: radius.lg, padding: spacing.lg }}>
+        <View style={{ alignItems: "center", gap: spacing.sm, backgroundColor: colors.surface, borderRadius: radius.md, padding: spacing.lg }}>
           <Avatar icon={user.avatar.icon} color={user.avatar.color} size={88} />
           <AppText variant="title">{user.name}</AppText>
           <AppText secondary>{user.email}</AppText>

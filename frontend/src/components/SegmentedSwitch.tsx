@@ -19,7 +19,7 @@ export function SegmentedSwitch<T extends string>({
   return (
     <View
       accessibilityRole="tablist"
-      style={{ flexDirection: "row", backgroundColor: colors.background, borderRadius: radius.pill, padding: spacing.xs }}
+      style={{ flexDirection: "row", backgroundColor: colors.background, borderRadius: radius.md, padding: spacing.xs }}
     >
       {options.map((option) => {
         const active = option.value === value;
@@ -33,7 +33,7 @@ export function SegmentedSwitch<T extends string>({
               flex: 1,
               alignItems: "center",
               paddingVertical: spacing.sm,
-              borderRadius: radius.pill,
+              borderRadius: radius.md,
               backgroundColor: active ? colors.accent : "transparent",
             }}
           >
