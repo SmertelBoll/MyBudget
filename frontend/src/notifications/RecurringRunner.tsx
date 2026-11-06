@@ -55,9 +55,11 @@ export function RecurringRunner() {
   const wantsNotifications = payments.some((payment) => payment.notify) || reminders.some((reminder) => reminder.active);
   useEffect(() => {
     if (!wantsNotifications) return;
-    requestNotificationPermission().then((granted) => {
-      if (granted) setAllowed((value) => value + 1);
-    });
+    requestNotificationPermission()
+      .then((granted) => {
+        if (granted) setAllowed((value) => value + 1);
+      })
+      .catch((error) => console.warn("notification permission:", error));
   }, [wantsNotifications]);
 
   useEffect(() => {

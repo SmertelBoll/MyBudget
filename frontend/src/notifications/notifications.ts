@@ -21,9 +21,24 @@ if (supported) {
 }
 
 // Android 13+ only shows the permission prompt once the app has a notification channel, so it's created first.
+// Every field is given a value: some native builds (Expo Go) fail while sending the new channel back to JS when one
+// of them is empty, after the channel already exists. Such a failure is therefore not a reason to stop.
+let channelReady = false;
 const ensureChannel = async () => {
-  if (Platform.OS !== "android") return;
-  await Notifications.setNotificationChannelAsync(CHANNEL, { name: "Payments and reminders", importance: AndroidImportance.HIGH });
+  if (Platform.OS !== "android" || channelReady) return;
+  try {
+    await Notifications.setNotificationChannelAsync(CHANNEL, {
+      name: "Payments and reminders",
+      description: "Regular payments and reminders",
+      importance: AndroidImportance.HIGH,
+      groupId: "mybudget",
+      vibrationPattern: [0, 250, 250, 250],
+      enableVibrate: true,
+    });
+  } catch (error) {
+    console.warn("notification channel:", error instanceof Error ? error.message : error);
+  }
+  channelReady = true;
 };
 
 export const notificationsAllowed = async () => {
