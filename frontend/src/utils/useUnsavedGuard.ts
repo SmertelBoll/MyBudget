@@ -28,6 +28,8 @@ export const useUnsavedGuard = (dirty: boolean) => {
   return useCallback(() => {
     setLeaving(true);
     disable();
+    // Opened from a link or after a restart there may be nothing to go back to.
     if (router.canGoBack()) router.back();
+    else router.replace("/");
   }, [disable]);
 };

@@ -16,6 +16,7 @@ import { todayLocal } from "@/utils/dates";
 import { parseSignedAmount } from "@/utils/money";
 import { useMoney } from "@/utils/useMoney";
 import { useUnsavedGuard } from "@/utils/useUnsavedGuard";
+import { reportWriteError } from "@/data/store";
 import { useDialog } from "@/components/AppDialog";
 import { AmountInput } from "@/components/AmountInput";
 import { AppText } from "@/components/AppText";
@@ -99,7 +100,8 @@ function AccountForm({ initial, existingId }: { initial: FormValues; existingId:
     setSubmitted(true);
     if (nameError || balance === null) return;
     setSaving(true);
-    await saveAccount(
+    // Memory is updated synchronously inside the call; the disk write finishes in the background.
+    saveAccount(
       {
         name: values.name.trim(),
         currency: values.currency,
@@ -110,7 +112,7 @@ function AccountForm({ initial, existingId }: { initial: FormValues; existingId:
       },
       balance,
       existing
-    );
+    ).catch(reportWriteError);
     leave();
   };
 

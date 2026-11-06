@@ -15,16 +15,15 @@ import { Fab } from "@/components/Fab";
 import { IconCircle } from "@/components/IconCircle";
 import { ScreenHeader } from "@/components/ScreenHeader";
 
-// From above, to below, and the amounts the same way on the right: account names get the full row width, and the
+// From above, to below (one arrow down on the left), and the amounts the same way on the right: account names get the full row width, and the
 // row stays two text lines high.
 function TransferRow({ transfer, from, to, onPress }: { transfer: Transfer; from?: Account; to?: Account; onPress: () => void }) {
   const { colors } = useTheme();
   const { money } = useMoney();
   const fromCurrency = from?.currency ?? to?.currency ?? "USD";
   const toCurrency = to?.currency ?? fromCurrency;
-  const line = (account: Account | undefined, icon: "arrow-up" | "arrow-down") => (
+  const line = (account: Account | undefined) => (
     <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
-      <MaterialCommunityIcons name={icon} size={14} color={colors.textSecondary} />
       <AppText numberOfLines={1} style={{ flexShrink: 1 }} color={account && !account.isActive ? colors.textSecondary : undefined}>
         {account?.name ?? "?"}
       </AppText>
@@ -46,10 +45,11 @@ function TransferRow({ transfer, from, to, onPress }: { transfer: Transfer; from
         backgroundColor: pressed ? colors.selected : colors.surface,
       })}
     >
-      <IconCircle icon="swap-vertical" color={colors.iconIdle} size={36} />
+      {/* One arrow from the top line (from) to the bottom one (to). */}
+      <IconCircle icon="arrow-down" color={colors.iconIdle} size={36} />
       <View style={{ flex: 1, gap: 2 }}>
-        {line(from, "arrow-up")}
-        {line(to, "arrow-down")}
+        {line(from)}
+        {line(to)}
         {transfer.comment ? (
           <AppText variant="caption" secondary numberOfLines={1}>
             {transfer.comment}

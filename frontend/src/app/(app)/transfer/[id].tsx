@@ -13,6 +13,7 @@ import { todayLocal } from "@/utils/dates";
 import { parseAmount } from "@/utils/money";
 import { useMoney } from "@/utils/useMoney";
 import { useUnsavedGuard } from "@/utils/useUnsavedGuard";
+import { reportWriteError } from "@/data/store";
 import { AccountPicker } from "@/components/AccountPicker";
 import { useDialog } from "@/components/AppDialog";
 import { AmountInput } from "@/components/AmountInput";
@@ -91,7 +92,8 @@ function TransferForm({ initial, existingId }: { initial: FormValues; existingId
     setSubmitted(true);
     if (invalid || !values.from || !values.to || !topMinor || !bottomMinor) return;
     setSaving(true);
-    await saveTransfer(
+    // Memory is updated synchronously inside the call; the disk write finishes in the background.
+    saveTransfer(
       {
         fromAccountId: values.from,
         toAccountId: values.to,
@@ -101,7 +103,7 @@ function TransferForm({ initial, existingId }: { initial: FormValues; existingId
         comment: values.comment.trim(),
       },
       existing
-    );
+    ).catch(reportWriteError);
     leave();
   };
 
@@ -115,7 +117,7 @@ function TransferForm({ initial, existingId }: { initial: FormValues; existingId
     });
     if (!ok) return;
     setSaving(true);
-    await deleteTransfer(existing.id);
+    deleteTransfer(existing.id).catch(reportWriteError);
     leave();
   };
 

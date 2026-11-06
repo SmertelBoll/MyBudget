@@ -54,8 +54,12 @@ const toRow = (entity: AnyEntity) => {
 
 // Local create/edit (spec 4.1): saved on the device at once, queued for the server. An earlier unsent edit of the
 // same record is replaced, so only the latest version is sent.
+// Screens see the change immediately (memory first); the SQLite write follows in the write queue, which keeps the
+// order of writes, and sync is only nudged once the row and its outbox entry are on disk.
 export const saveEntity = async <C extends Collection>(collection: C, entity: EntityMap[C]) => {
   const { id, json } = toRow(entity);
+  records.get(collection)!.set(id, entity);
+  refresh([collection]);
   await serialWrite((db) =>
     db.withTransactionAsync(async () => {
       await db.runAsync("INSERT OR REPLACE INTO entities (collection, id, data) VALUES (?, ?, ?)", collection, id, json);
@@ -63,16 +67,20 @@ export const saveEntity = async <C extends Collection>(collection: C, entity: En
       await db.runAsync("INSERT INTO outbox (collection, id, op, data) VALUES (?, ?, 'upsert', ?)", collection, id, json);
     })
   );
-  records.get(collection)!.set(id, entity);
-  refresh([collection]);
   changeListener?.();
 };
 
+// For writes a screen doesn't wait for: the change is already visible, so a failed disk write is only logged.
+export const reportWriteError = (error: unknown) => console.error("local write failed:", error);
+
 export const removeEntity = (collection: Collection, id: string) => removeEntities(collection, [id]);
 
-// Several deletions in one transaction and one re-render (e.g. an account's transactions).
+// Several deletions in one transaction and one re-render (e.g. an account's transactions). Memory first, as above.
 export const removeEntities = async (collection: Collection, ids: string[]) => {
   if (!ids.length) return;
+  const map = records.get(collection)!;
+  ids.forEach((id) => map.delete(id));
+  refresh([collection]);
   await serialWrite((db) =>
     db.withTransactionAsync(async () => {
       for (const id of ids) {
@@ -82,9 +90,6 @@ export const removeEntities = async (collection: Collection, ids: string[]) => {
       }
     })
   );
-  const map = records.get(collection)!;
-  ids.forEach((id) => map.delete(id));
-  refresh([collection]);
   changeListener?.();
 };
 
