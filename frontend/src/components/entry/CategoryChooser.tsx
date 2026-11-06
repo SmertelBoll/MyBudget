@@ -42,9 +42,7 @@ export function CategoryChooser({
 
   return (
     <View style={{ gap: spacing.xs }}>
-      <AppText variant="label" color={error ? colors.danger : undefined}>
-        {t("entry.category")}
-      </AppText>
+      <AppText variant="label">{t("entry.category")}</AppText>
       <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
         {inline.map((category) => (
           <CategoryCell

@@ -1,10 +1,9 @@
 import { Pressable, View } from "react-native";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useTheme } from "@/theme/ThemeProvider";
 import { spacing } from "@/theme/tokens";
 import { AppText } from "./AppText";
 
-// A pickable row: name on the left, an optional code on the right (currencies), a check mark when chosen.
+// A pickable row: name on the left, an optional code on the right (currencies); the chosen row is highlighted.
 export function OptionRow({
   title,
   subtitle,
@@ -46,7 +45,6 @@ export function OptionRow({
           {trailing}
         </AppText>
       ) : null}
-      <MaterialCommunityIcons name="check" size={22} color={selected ? colors.text : "transparent"} />
     </Pressable>
   );
 }

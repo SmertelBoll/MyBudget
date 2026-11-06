@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { type ComponentRef, useEffect, useMemo, useRef, useState } from "react";
 import { Pressable, ScrollView, TextInput, View } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useCollection } from "@/data/hooks";
@@ -48,13 +48,33 @@ const HEADER_HEIGHT = 40;
 
 // Spec 4.6: tags as chips in two rows that scroll sideways; the last chip adds a tag. The magnifier opens a filter
 // field; "Add tag" is never filtered out and starts with what was typed. A new tag is selected at once.
-export function TagChips({ value, onChange }: { value: string[]; onChange: (tagIds: string[]) => void }) {
+// Time for the form to scroll the tags up before the keyboard opens: focusing at once makes Android jump the screen
+// to the field instead.
+const FOCUS_DELAY_MS = 300;
+
+export function TagChips({
+  value,
+  onChange,
+  onSearchOpen,
+}: {
+  value: string[];
+  onChange: (tagIds: string[]) => void;
+  // Lets the form bring this block into view first.
+  onSearchOpen?: () => void;
+}) {
   const { colors } = useTheme();
   const { t, lang } = useI18n();
   const dialog = useDialog();
   const tags = useCollection("tags");
   const [searching, setSearching] = useState(false);
   const [query, setQuery] = useState("");
+  const inputRef = useRef<ComponentRef<typeof TextInput>>(null);
+
+  useEffect(() => {
+    if (!searching) return;
+    const timer = setTimeout(() => inputRef.current?.focus(), FOCUS_DELAY_MS);
+    return () => clearTimeout(timer);
+  }, [searching]);
 
   const visible = useMemo(() => {
     const needle = query.trim().toLowerCase();
@@ -98,11 +118,11 @@ export function TagChips({ value, onChange }: { value: string[]; onChange: (tagI
       <View style={{ flexDirection: "row", alignItems: "center", gap: spacing.sm, height: HEADER_HEIGHT }}>
         {searching ? (
           <TextInput
+            ref={inputRef}
             value={query}
             onChangeText={setQuery}
             placeholder={t("tags.search")}
             placeholderTextColor={colors.textSecondary}
-            autoFocus
             style={{
               flex: 1,
               height: HEADER_HEIGHT,
@@ -125,7 +145,8 @@ export function TagChips({ value, onChange }: { value: string[]; onChange: (tagI
           label={t(searching ? "common.close" : "tags.search")}
           size={36}
           onPress={() => {
-            setSearching((current) => !current);
+            if (!searching) onSearchOpen?.();
+            setSearching(!searching);
             setQuery("");
           }}
         />

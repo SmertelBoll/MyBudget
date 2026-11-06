@@ -4,6 +4,7 @@ import type { User } from "@/api/types";
 import { loadRates } from "./rates";
 import { countOutbox, getMeta, loadAll, setMeta, wipeLocal } from "./store";
 import { requestSync, startSync, stopSync } from "./sync";
+import { loadLastUsedDate } from "./transactions";
 
 const SYNC_EVERY_MS = 60 * 1000;
 
@@ -32,6 +33,7 @@ export function DataProvider({ user, children }: { user: User; children: ReactNo
     (async () => {
       await bindUser(user);
       await loadAll();
+      await loadLastUsedDate();
       await startSync();
       loadRates();
       if (cancelled) return;

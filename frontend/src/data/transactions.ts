@@ -1,5 +1,5 @@
 import { newId } from "./accounts";
-import { removeEntity, saveEntity } from "./store";
+import { getMeta, removeEntity, saveEntity, setMeta } from "./store";
 import type { Recurring, Transaction } from "./types";
 
 export type TransactionFields = Pick<
@@ -49,14 +49,22 @@ export const createOneTimePayment = async (
     lastGeneratedAt: null,
   };
   await saveEntity("recurring", payment);
+  rememberDate(fields.date);
   return payment;
 };
 
-// Spec 4.5: the third date button offers the date the user last added an entry for, until the app restarts.
+// Spec 4.5: the third date button offers the date the user last added an entry (or a one-time payment) for. Kept
+// in the local meta table, so it survives a restart; cleared with the rest of the local data on a user switch.
+const LAST_DATE_KEY = "lastEntryDate";
 let lastUsedDate: string | null = null;
 
 const rememberDate = (date: string) => {
   lastUsedDate = date;
+  setMeta({ [LAST_DATE_KEY]: date }).catch(() => {});
+};
+
+export const loadLastUsedDate = async () => {
+  lastUsedDate = await getMeta(LAST_DATE_KEY);
 };
 
 export const getLastUsedDate = () => lastUsedDate;

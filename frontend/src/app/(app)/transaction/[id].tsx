@@ -323,7 +323,12 @@ function TransactionForm({ initial, existingId }: { initial: FormValues; existin
 
           <DateChips value={values.date} onChange={(date) => set("date", date)} />
 
-          <TagChips value={values.tagIds} onChange={(tagIds) => set("tagIds", tagIds)} />
+          {/* Tags sit near the end of the form: scrolling to the end brings the search field up before the keyboard. */}
+          <TagChips
+            value={values.tagIds}
+            onChange={(tagIds) => set("tagIds", tagIds)}
+            onSearchOpen={() => scrollRef.current?.scrollToEnd({ animated: true })}
+          />
 
           {/* Settings can hide these; data already saved in them is kept (spec 4.6). */}
           {user?.settings.showComment !== false && (
