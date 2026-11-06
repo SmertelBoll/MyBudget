@@ -1,5 +1,6 @@
 import { useMemo, useRef, useState } from "react";
-import { FlatList, Platform, Pressable, View } from "react-native";
+import { Platform, Pressable, View } from "react-native";
+import { FlatList, GestureDetector, usePanGesture } from "react-native-gesture-handler";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import type { EntryType } from "@/api/types";
@@ -24,7 +25,11 @@ import { ScreenHeader } from "@/components/ScreenHeader";
 import { SegmentedSwitch } from "@/components/SegmentedSwitch";
 import { StatsRow, type StatsChild } from "@/components/StatsRow";
 
-const COLLAPSE_AT = 24;
+// Finger travel that folds the chart (moving up) or, with the list at its top, opens it (pulling down further).
+const FOLD_DRAG = 20;
+const OPEN_DRAG = 40;
+// Web: a mouse wheel has no finger, so there the list's own scroll position decides.
+const WEB_COLLAPSE_AT = 24;
 // Tags are grey for now (no colors of their own); "no tag" has its own color. The icon and its part of the chart
 // always use the same color.
 const NO_TAG_COLOR = "#6D7FA3";
@@ -73,9 +78,10 @@ export default function HomeScreen() {
   const [by, setBy] = useState<"category" | "tag">("category");
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [collapsed, setCollapsed] = useState(false);
-  // One fold or unfold per gesture: while the finger stays down the chart never flips back and forth. "pulled" =
-  // the list was moved back towards its top by the user (not just shifted by the chart changing size).
-  const gesture = useRef({ active: false, changed: false, pulled: false, lastY: 0 });
+  // Where the list is scrolled to, and the current drag: at most one fold or open per drag, and where the finger
+  // was when the list reached its top (pulling past that point opens the chart).
+  const scrollY = useRef(0);
+  const drag = useRef<{ changed: boolean; topAt: number | null }>({ changed: false, topAt: null });
 
   const entries = usePeriodEntries(type, filter, range);
   const categoryById = useMemo(() => new Map(categories.map((category) => [category.id, category])), [categories]);
@@ -124,27 +130,48 @@ export default function HomeScreen() {
     return { id: group.id, value: group.amount, color: look(group, index).color };
   });
 
-  const setChartCollapsed = (next: boolean) => {
-    if (next === collapsed || gesture.current.changed) return;
-    // Wheel / mouse scrolling on the web has no gestures to lock.
-    if (Platform.OS !== "web") gesture.current.changed = true;
-    setCollapsed(next);
-  };
+  // Spec 2.2, 2.8. The finger is watched next to the list's own scrolling, so it works the same with one row or a
+  // hundred: moving it up folds the chart; once the list is at its very top, pulling further down opens it.
+  const pan = usePanGesture({
+    runOnJS: true,
+    // A drag over a row must not also count as a tap on it.
+    cancelsJSResponder: true,
+    activeOffsetY: [-8, 8],
+    failOffsetX: [-24, 24],
+    onActivate: (event) => {
+      // Already at the top when the finger went down: the pull counts from there.
+      drag.current = { changed: false, topAt: scrollY.current <= 0 ? 0 : null };
+      follow(event.translationY);
+    },
+    onUpdate: (event) => follow(event.translationY),
+  });
 
-  // Spec 2.2, 2.8: scrolling the list up folds the chart into a bar; scrolling back to the very top opens it. With
-  // few rows the list does not scroll at all: then a vertical swipe on the chart block (or a tap on the bar) does it.
-  const onScrollY = (y: number) => {
-    const current = gesture.current;
-    if (y < current.lastY) current.pulled = true;
-    current.lastY = y;
-    if (y > COLLAPSE_AT) setChartCollapsed(true);
-    else if (y <= 0 && current.pulled && (current.active || Platform.OS === "web")) setChartCollapsed(false);
-  };
-  // Let go at the top after pulling the list down (or a fling that stopped there): open the chart.
-  const onScrollSettled = (y: number) => {
-    const { changed, pulled } = gesture.current;
-    gesture.current = { active: false, changed: false, pulled: false, lastY: y };
-    if (!changed && pulled && y <= 0 && collapsed) setCollapsed(false);
+  function follow(dy: number) {
+    const current = drag.current;
+    if (current.changed) return;
+    if (!collapsed) {
+      if (dy < -FOLD_DRAG) {
+        current.changed = true;
+        setCollapsed(true);
+      }
+      return;
+    }
+    if (scrollY.current > 0) {
+      current.topAt = null;
+      return;
+    }
+    current.topAt ??= dy;
+    if (dy - current.topAt > OPEN_DRAG) {
+      current.changed = true;
+      setCollapsed(false);
+    }
+  }
+
+  const onListScroll = (y: number) => {
+    scrollY.current = y;
+    if (Platform.OS !== "web") return;
+    if (y > WEB_COLLAPSE_AT && !collapsed) setCollapsed(true);
+    else if (y <= 0 && collapsed) setCollapsed(false);
   };
 
   const openLog = (only?: { category?: string; tag?: string }) =>
@@ -193,31 +220,32 @@ export default function HomeScreen() {
               <PeriodChart segments={segments} label={money(total, baseCurrency)} collapsed={collapsed} />
             </Pressable>
           </PeriodSwitcher>
-          {/* Categories / tags: a small switch in the free corner, so the rows keep the room below. */}
-          <View
-            accessibilityRole="tablist"
-            style={{
+          {/* Categories / tags: a small switch in the free corner, so the rows keep the room below. A tap anywhere on
+              it switches to the other one. */}
+          <Pressable
+            onPress={() => {
+              setBy(by === "category" ? "tag" : "category");
+              setExpanded(new Set());
+            }}
+            hitSlop={8}
+            accessibilityRole="switch"
+            accessibilityLabel={`${t("home.byCategories")} / ${t("home.byTags")}`}
+            accessibilityState={{ checked: by === "tag" }}
+            style={({ pressed }) => ({
               position: "absolute",
               left: spacing.md,
               bottom: spacing.md,
               flexDirection: "row",
               padding: 3,
               borderRadius: radius.md,
-              backgroundColor: colors.background,
-            }}
+              backgroundColor: pressed ? colors.selected : colors.background,
+            })}
           >
             {BY_OPTIONS.map((option) => {
               const active = option.value === by;
               return (
-                <Pressable
+                <View
                   key={option.value}
-                  onPress={() => {
-                    setBy(option.value);
-                    setExpanded(new Set());
-                  }}
-                  accessibilityRole="tab"
-                  accessibilityLabel={t(option.label)}
-                  accessibilityState={{ selected: active }}
                   style={{
                     width: 38,
                     height: 32,
@@ -228,16 +256,19 @@ export default function HomeScreen() {
                   }}
                 >
                   <MaterialCommunityIcons name={option.icon} size={18} color={active ? colors.onAccent : colors.text} />
-                </Pressable>
+                </View>
               );
             })}
-          </View>
+          </Pressable>
           <Fab placement="corner" label={t("entry.addTitle")} onPress={() => openNewTransaction(type)} size={52} />
         </View>
       </View>
 
+      <GestureDetector gesture={pan}>
+      <View style={{ flex: 1 }}>
       <FlatList
         data={groups}
+        simultaneousWith={pan}
         keyExtractor={(group) => group.id}
         contentContainerStyle={{ paddingHorizontal: spacing.md, gap: spacing.sm, paddingBottom: bottomSpace }}
         showsVerticalScrollIndicator={false}
@@ -246,16 +277,7 @@ export default function HomeScreen() {
             {t("home.empty")}
           </AppText>
         }
-        onScrollBeginDrag={(event) => {
-          gesture.current = { active: true, changed: false, pulled: false, lastY: event.nativeEvent.contentOffset.y };
-        }}
-        onScrollEndDrag={(event) => {
-          // A fling continues and ends in onMomentumScrollEnd; a plain release ends here.
-          const velocity = event.nativeEvent.velocity?.y ?? 0;
-          if (Math.abs(velocity) < 0.05) onScrollSettled(event.nativeEvent.contentOffset.y);
-        }}
-        onMomentumScrollEnd={(event) => onScrollSettled(event.nativeEvent.contentOffset.y)}
-        onScroll={(event) => onScrollY(event.nativeEvent.contentOffset.y)}
+        onScroll={(event) => onListScroll(event.nativeEvent.contentOffset.y)}
         scrollEventThrottle={32}
         renderItem={({ item, index }) => {
           const { icon, color, title } = look(item, index);
@@ -278,6 +300,8 @@ export default function HomeScreen() {
           );
         }}
       />
+      </View>
+      </GestureDetector>
     </View>
   );
 }
