@@ -1,3 +1,4 @@
+import dns from "dns";
 import * as dotenv from "dotenv";
 dotenv.config({ quiet: true });
 
@@ -6,6 +7,11 @@ const list = (value) =>
     .split(",")
     .map((item) => item.trim())
     .filter(Boolean);
+
+// Local development only: some Windows setups (a local DNS proxy at 127.0.0.1) answer normal lookups but not the SRV
+// query a mongodb+srv:// address needs, and the connection fails with "querySrv ECONNREFUSED".
+const dnsServers = list(process.env.DNS_SERVERS);
+if (dnsServers.length) dns.setServers(dnsServers);
 
 export const config = {
   env: process.env.NODE_ENV || "development",
