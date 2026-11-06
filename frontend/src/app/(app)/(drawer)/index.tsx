@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Platform, Pressable, View } from "react-native";
 import { FlatList, GestureDetector, usePanGesture } from "react-native-gesture-handler";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { router, useNavigation } from "expo-router";
 import type { EntryType } from "@/api/types";
 import { useAuth } from "@/auth/AuthProvider";
@@ -37,10 +36,6 @@ const TOP_TOLERANCE = 2;
 const NO_TAG_COLOR = "#6D7FA3";
 const TAG_ICON = "pound";
 const NO_TAG_ICON = "tag-off-outline";
-const BY_OPTIONS = [
-  { value: "category", icon: "shape-outline", label: "home.byCategories" },
-  { value: "tag", icon: "pound", label: "home.byTags" },
-] as const;
 
 // Opens the log with what Home shows now (spec 11), optionally narrowed to one category and / or tag.
 export const logsParams = (
@@ -102,7 +97,24 @@ export default function HomeScreen() {
   // Where the list is scrolled to, and the current drag: at most one fold or open per drag, and where the finger
   // was when the list reached its top (pulling past that point opens the chart).
   const scrollY = useRef(0);
-  const drag = useRef<{ changed: boolean; topAt: number | null }>({ changed: false, topAt: null });
+  const drag = useRef({ changed: false, topAt: null as number | null, startedAt: 0, lastY: 0, scrolling: false });
+  // When the list gets shorter (the chart folds, Categories -> Tags, another period) Android moves it back without a
+  // scroll event, so the position is also corrected from the list's sizes.
+  const sizes = useRef({ content: 0, layout: 0 });
+  const clampScroll = () => {
+    const max = Math.max(0, sizes.current.content - sizes.current.layout);
+    if (scrollY.current > max) scrollY.current = max;
+  };
+  const toTop = () => {
+    scrollY.current = 0;
+    listRef.current?.scrollToOffset({ offset: 0, animated: false });
+  };
+  // The finger's drag and the list's own scrolling both start a gesture; whichever comes second must not reset it.
+  const startDrag = () => {
+    const now = Date.now();
+    if (now - drag.current.startedAt < 400) return;
+    drag.current = { ...drag.current, changed: false, topAt: scrollY.current <= TOP_TOLERANCE ? 0 : null, startedAt: now };
+  };
 
   const entries = usePeriodEntries(type, filter, range);
   const categoryById = useMemo(() => new Map(categories.map((category) => [category.id, category])), [categories]);
@@ -161,7 +173,7 @@ export default function HomeScreen() {
     failOffsetX: [-24, 24],
     onActivate: (event) => {
       // Already at the top when the finger went down: the pull counts from there.
-      drag.current = { changed: false, topAt: scrollY.current <= TOP_TOLERANCE ? 0 : null };
+      startDrag();
       follow(event.translationY);
     },
     onUpdate: (event) => follow(event.translationY),
@@ -188,11 +200,26 @@ export default function HomeScreen() {
     }
   }
 
+  // The list's own scrolling, for long lists: scrolled down far enough folds the chart, and coming back to the very
+  // top under the user's finger opens it (the drag above covers lists that don't scroll).
   const onListScroll = (y: number) => {
+    const current = drag.current;
+    const movingUp = y < current.lastY;
+    current.lastY = y;
     scrollY.current = y;
-    if (Platform.OS !== "web") return;
-    if (y > WEB_COLLAPSE_AT && !collapsedRef.current) setCollapsed(true);
-    else if (y <= TOP_TOLERANCE && collapsedRef.current) setCollapsed(false);
+    if (Platform.OS === "web") {
+      if (y > WEB_COLLAPSE_AT && !collapsedRef.current) setCollapsed(true);
+      else if (y <= TOP_TOLERANCE && collapsedRef.current) setCollapsed(false);
+      return;
+    }
+    if (!current.scrolling || current.changed) return;
+    if (y > WEB_COLLAPSE_AT && !collapsedRef.current) {
+      current.changed = true;
+      setCollapsed(true);
+    } else if (movingUp && y <= TOP_TOLERANCE && collapsedRef.current) {
+      current.changed = true;
+      setCollapsed(false);
+    }
   };
 
   const openLog = (only?: { category?: string; tag?: string }) =>
@@ -229,6 +256,7 @@ export default function HomeScreen() {
             onChange={(next) => {
               setType(next);
               setExpanded(new Set());
+              toTop();
             }}
           />
         </View>
@@ -236,55 +264,29 @@ export default function HomeScreen() {
 
       <View style={{ padding: spacing.md, paddingBottom: spacing.sm }}>
         <View style={{ backgroundColor: colors.surface, borderRadius: radius.md, padding: spacing.sm, paddingBottom: spacing.md }}>
-          <PeriodSwitcher value={range} onChange={setRange} onSwipeVertical={(direction) => setCollapsed(direction === "up")}>
+          <PeriodSwitcher
+            value={range}
+            onChange={(next) => {
+              setRange(next);
+              toTop();
+            }} onSwipeVertical={(direction) => setCollapsed(direction === "up")}>
             <Pressable onPress={() => setCollapsed(false)} disabled={!collapsed} accessibilityRole={collapsed ? "button" : undefined}>
               <PeriodChart segments={segments} label={money(total, baseCurrency)} collapsed={collapsed} />
             </Pressable>
           </PeriodSwitcher>
-          {/* Categories / tags: a small switch in the free corner, so the rows keep the room below. A tap anywhere on
-              it switches to the other one. */}
-          <Pressable
-            onPress={() => {
-              setBy(by === "category" ? "tag" : "category");
-              setExpanded(new Set());
-            }}
-            hitSlop={8}
-            accessibilityRole="switch"
-            accessibilityLabel={`${t("home.byCategories")} / ${t("home.byTags")}`}
-            accessibilityState={{ checked: by === "tag" }}
-            style={{ position: "absolute", left: spacing.md, bottom: spacing.md }}
-          >
-            {({ pressed }) => (
-              <View
-                style={{
-                  flexDirection: "row",
-                  padding: 3,
-                  borderRadius: radius.md,
-                  overflow: "hidden",
-                  backgroundColor: pressed ? colors.selected : colors.background,
-                }}
-              >
-            {BY_OPTIONS.map((option) => {
-              const active = option.value === by;
-              return (
-                <View
-                  key={option.value}
-                  style={{
-                    width: 38,
-                    height: 32,
-                    alignItems: "center",
-                    justifyContent: "center",
-                    borderRadius: radius.md - 3,
-                    backgroundColor: active ? colors.accent : "transparent",
-                  }}
-                >
-                  <MaterialCommunityIcons name={option.icon} size={18} color={active ? colors.onAccent : colors.text} />
-                </View>
-              );
-            })}
-              </View>
-            )}
-          </Pressable>
+          {/* Categories / tags: one small button in the free corner, showing the other view; a tap switches. */}
+          <View style={{ position: "absolute", left: spacing.md, bottom: spacing.md }}>
+            <IconButton
+              icon={by === "category" ? TAG_ICON : "shape-outline"}
+              label={t(by === "category" ? "home.byTags" : "home.byCategories")}
+              size={40}
+              onPress={() => {
+                setBy(by === "category" ? "tag" : "category");
+                setExpanded(new Set());
+                toTop();
+              }}
+            />
+          </View>
           <Fab placement="corner" label={t("entry.addTitle")} onPress={() => openNewTransaction(type)} size={52} />
         </View>
       </View>
@@ -304,6 +306,22 @@ export default function HomeScreen() {
           </AppText>
         }
         onScroll={(event) => onListScroll(event.nativeEvent.contentOffset.y)}
+        onScrollBeginDrag={(event) => {
+          startDrag();
+          drag.current.scrolling = true;
+          drag.current.lastY = event.nativeEvent.contentOffset.y;
+        }}
+        onScrollEndDrag={() => {
+          drag.current.scrolling = false;
+        }}
+        onContentSizeChange={(_, height) => {
+          sizes.current.content = height;
+          clampScroll();
+        }}
+        onLayout={(event) => {
+          sizes.current.layout = event.nativeEvent.layout.height;
+          clampScroll();
+        }}
         scrollEventThrottle={32}
         renderItem={({ item, index }) => {
           const { icon, color, title } = look(item, index);
