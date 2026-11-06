@@ -1,0 +1,38 @@
+# MyBudget — мобільний додаток
+
+Expo SDK 58 (React Native), TypeScript, Expo Router. Потрібен Node.js 22+.
+
+## Запуск
+
+```bash
+npm install
+cp .env.example .env    # EXPO_PUBLIC_API_URL — адреса бекенду
+npm start               # QR-код для Expo Go на телефоні
+npm run web             # або в браузері: http://localhost:8081
+```
+
+Бекенд має бути запущений (`cd ../backend && npm run dev`, або `npm run dev:memory` — з тимчасовою базою в пам'яті).
+На телефоні `localhost` — це сам телефон: у `.env` вкажіть адресу ПК у локальній мережі або адресу Render.
+
+Перевірки перед комітом:
+
+```bash
+npm run typecheck
+npx expo lint
+```
+
+## Структура
+
+| Папка | Що там |
+|---|---|
+| `src/app/` | екрани (кожен файл — маршрут). `(auth)` — вхід, `onboarding`, `(app)` — усе після входу з бічним меню |
+| `src/components/` | спільні компоненти (ТЗ 2.9): кнопки, поля, шапка, діалоги, Toast |
+| `src/theme/` | кольори з MovieList і токени; у компонентах кольори лише через `useTheme()` |
+| `src/i18n/` | словник: `t("ключ")`. `en.json` — копія `backend/i18n/en.json` (`npm run i18n:copy`) |
+| `src/api/` | клієнт API: access-токен у пам'яті, refresh у SecureStore, одне оновлення токена за раз |
+| `src/auth/` | стан входу; старт без інтернету з кешованим користувачем |
+| `src/storage/` | SecureStore для токенів, SQLite key-value для решти (у браузері — localStorage) |
+
+## Тексти
+
+Жодних рядків у коді: новий текст додається в `backend/i18n/en.json`, потім `npm run i18n:copy`.

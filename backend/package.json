@@ -5,13 +5,14 @@
   "type": "module",
   "main": "index.js",
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   },
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "test": "node --test --test-concurrency=1 test/",
-    "seed:i18n": "node scripts/seed-i18n.js"
+    "test": "node --test --test-concurrency=1 \"test/**/*.test.js\"",
+    "seed:i18n": "node scripts/seed-i18n.js",
+    "dev:memory": "node scripts/dev-memory.js"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
