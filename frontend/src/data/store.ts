@@ -70,6 +70,26 @@ export const saveEntity = async <C extends Collection>(collection: C, entity: En
   changeListener?.();
 };
 
+// Several records of one collection in one transaction and one re-render (reordering, moving transactions to
+// another category). Memory first, as above.
+export const saveEntities = async <C extends Collection>(collection: C, entities: EntityMap[C][]) => {
+  if (!entities.length) return;
+  const rows = entities.map(toRow);
+  const map = records.get(collection)!;
+  entities.forEach((entity) => map.set(entity.id, entity));
+  refresh([collection]);
+  await serialWrite((db) =>
+    db.withTransactionAsync(async () => {
+      for (const { id, json } of rows) {
+        await db.runAsync("INSERT OR REPLACE INTO entities (collection, id, data) VALUES (?, ?, ?)", collection, id, json);
+        await db.runAsync("DELETE FROM outbox WHERE collection = ? AND id = ? AND op = 'upsert'", collection, id);
+        await db.runAsync("INSERT INTO outbox (collection, id, op, data) VALUES (?, ?, 'upsert', ?)", collection, id, json);
+      }
+    })
+  );
+  changeListener?.();
+};
+
 // For writes a screen doesn't wait for: the change is already visible, so a failed disk write is only logged.
 export const reportWriteError = (error: unknown) => console.error("local write failed:", error);
 

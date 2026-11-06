@@ -17,17 +17,20 @@ type Props = {
   badges?: ReactNode;
   // Removed account: greyed out (spec 5.3).
   dimmed?: boolean;
+  // Lifted for moving (long press).
+  picked?: boolean;
   onPress?: () => void;
   onLongPress?: () => void;
 };
 
 // One row for accounts, categories, payments and logs (spec 2.9).
-export function ListRow({ icon, color, title, note, value, valueColor, badges, dimmed, onPress, onLongPress }: Props) {
+export function ListRow({ icon, color, title, note, value, valueColor, badges, dimmed, picked, onPress, onLongPress }: Props) {
   const { colors } = useTheme();
   return (
     <Pressable
       onPress={onPress}
       onLongPress={onLongPress}
+      delayLongPress={350}
       disabled={!onPress && !onLongPress}
       accessibilityRole={onPress ? "button" : undefined}
       style={({ pressed }) => ({
@@ -38,7 +41,8 @@ export function ListRow({ icon, color, title, note, value, valueColor, badges, d
         paddingHorizontal: spacing.md,
         paddingVertical: spacing.sm,
         borderRadius: radius.md,
-        backgroundColor: pressed ? colors.selected : colors.surface,
+        backgroundColor: picked ? colors.tonal : pressed ? colors.selected : colors.surface,
+        transform: [{ scale: picked ? 1.02 : 1 }],
       })}
     >
       <IconCircle icon={icon} color={color} dimmed={dimmed} />

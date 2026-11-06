@@ -5,6 +5,8 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { sortAccounts } from "@/data/accounts";
 import { useBalances, useTotals } from "@/data/balances";
 import { useCollection } from "@/data/hooks";
+import { moveItem } from "@/data/ordering";
+import { reportWriteError } from "@/data/store";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTheme } from "@/theme/ThemeProvider";
 import { radius, spacing } from "@/theme/tokens";
@@ -15,6 +17,7 @@ import { AppText } from "@/components/AppText";
 import { Fab } from "@/components/Fab";
 import { IconButton } from "@/components/IconButton";
 import { ListRow } from "@/components/ListRow";
+import { MoveBanner } from "@/components/MoveBanner";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import type { IconName } from "@/constants/appearance";
 
@@ -56,8 +59,20 @@ export default function AccountsScreen() {
   const balances = useBalances();
   const totals = useTotals();
   const [details, setDetails] = useState(false);
+  const [picked, setPicked] = useState<string | null>(null);
 
   const active = useMemo(() => sortAccounts(accounts.filter((account) => account.isActive)), [accounts]);
+  const pickedAccount = active.find((account) => account.id === picked);
+
+  // Long press lifts an account; tapping another puts it in that place (spec 5.1).
+  const tap = (id: string) => {
+    if (!picked) {
+      router.push({ pathname: "/account/[id]", params: { id } });
+      return;
+    }
+    if (id !== picked) moveItem("accounts", active, picked, id).catch(reportWriteError);
+    setPicked(null);
+  };
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
@@ -95,6 +110,7 @@ export default function AccountsScreen() {
           </View>
         ) : (
           <View style={{ gap: spacing.sm }}>
+            {pickedAccount && <MoveBanner name={pickedAccount.name} onCancel={() => setPicked(null)} />}
             {active.map((account) => (
               <ListRow
                 key={account.id}
@@ -114,7 +130,9 @@ export default function AccountsScreen() {
                     />
                   ) : undefined
                 }
-                onPress={() => router.push({ pathname: "/account/[id]", params: { id: account.id } })}
+                picked={account.id === picked}
+                onPress={() => tap(account.id)}
+                onLongPress={() => setPicked(account.id)}
               />
             ))}
           </View>

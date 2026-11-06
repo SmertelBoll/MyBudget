@@ -5,10 +5,12 @@ import { useTheme } from "@/theme/ThemeProvider";
 import { radius, spacing } from "@/theme/tokens";
 import { AppText } from "./AppText";
 import { Button } from "./Button";
+import { TextField } from "./TextField";
 
 // The app's only dialog (spec 2.6, no Swal):
 //   const ok = await dialog.confirm({...});      -> true / false
 //   const pick = await dialog.choose({...});     -> chosen option's value, or null when dismissed
+//   const text = await dialog.prompt({...});     -> entered text, or null when dismissed
 
 type ConfirmOptions = {
   title: string;
@@ -25,13 +27,25 @@ export type ChoiceOption = { value: string; label: string; destructive?: boolean
 
 type ChooseOptions = { title: string; message?: string; options: ChoiceOption[]; cancelText?: string };
 
+type PromptOptions = {
+  title: string;
+  label: string;
+  initial?: string;
+  maxLength?: number;
+  confirmText?: string;
+  // Returns an error message (already translated) or null; checked on confirm.
+  validate?: (value: string) => string | null;
+};
+
 type DialogState =
   | (ConfirmOptions & { kind: "confirm"; resolve: (confirmed: boolean) => void })
-  | (ChooseOptions & { kind: "choose"; resolve: (value: string | null) => void });
+  | (ChooseOptions & { kind: "choose"; resolve: (value: string | null) => void })
+  | (PromptOptions & { kind: "prompt"; resolve: (value: string | null) => void });
 
 type DialogApi = {
   confirm: (options: ConfirmOptions) => Promise<boolean>;
   choose: (options: ChooseOptions) => Promise<string | null>;
+  prompt: (options: PromptOptions) => Promise<string | null>;
 };
 
 const DialogContext = createContext<DialogApi | null>(null);
@@ -43,6 +57,7 @@ export function DialogProvider({ children }: { children: ReactNode }) {
     () => ({
       confirm: (options) => new Promise<boolean>((resolve) => setDialog({ ...options, kind: "confirm", resolve })),
       choose: (options) => new Promise<string | null>((resolve) => setDialog({ ...options, kind: "choose", resolve })),
+      prompt: (options) => new Promise<string | null>((resolve) => setDialog({ ...options, kind: "prompt", resolve })),
     }),
     []
   );
@@ -63,6 +78,7 @@ export function DialogProvider({ children }: { children: ReactNode }) {
       {children}
       {dialog?.kind === "confirm" && <DialogView key={dialog.title} dialog={dialog} onClose={close} />}
       {dialog?.kind === "choose" && <ChoiceView key={dialog.title} dialog={dialog} onClose={close} />}
+      {dialog?.kind === "prompt" && <PromptView key={dialog.title} dialog={dialog} onClose={close} />}
     </DialogContext.Provider>
   );
 }
@@ -151,6 +167,48 @@ function ChoiceView({ dialog, onClose }: { dialog: ChooseOptions; onClose: (valu
               />
             ))}
             <Button variant="text" title={dialog.cancelText ?? t("common.cancel")} onPress={() => onClose(null)} />
+          </View>
+        </Pressable>
+      </Pressable>
+    </Modal>
+  );
+}
+
+function PromptView({ dialog, onClose }: { dialog: PromptOptions; onClose: (value: string | null) => void }) {
+  const { colors } = useTheme();
+  const { t } = useI18n();
+  const [value, setValue] = useState(dialog.initial ?? "");
+  const [error, setError] = useState<string | null>(null);
+
+  const confirm = () => {
+    const trimmed = value.trim();
+    const problem = !trimmed ? t("common.required") : (dialog.validate?.(trimmed) ?? null);
+    if (problem) return setError(problem);
+    onClose(trimmed);
+  };
+
+  return (
+    <Modal transparent animationType="fade" onRequestClose={() => onClose(null)} statusBarTranslucent>
+      <Pressable onPress={() => onClose(null)} style={{ flex: 1, backgroundColor: colors.scrim, justifyContent: "center", padding: spacing.lg }}>
+        <Pressable onPress={() => {}} style={{ backgroundColor: colors.surface, borderRadius: radius.md, padding: spacing.lg, gap: spacing.md }}>
+          <AppText variant="heading">{dialog.title}</AppText>
+          <TextField
+            label={dialog.label}
+            value={value}
+            onChangeText={(text) => {
+              setValue(text);
+              setError(null);
+            }}
+            maxLength={dialog.maxLength}
+            error={error ?? undefined}
+            hint={dialog.maxLength ? `${value.length}/${dialog.maxLength}` : undefined}
+            autoFocus
+            returnKeyType="done"
+            onSubmitEditing={confirm}
+          />
+          <View style={{ flexDirection: "row", justifyContent: "flex-end", gap: spacing.sm }}>
+            <Button variant="secondary" title={t("common.cancel")} onPress={() => onClose(null)} />
+            <Button title={dialog.confirmText ?? t("common.ok")} onPress={confirm} />
           </View>
         </Pressable>
       </Pressable>
