@@ -94,13 +94,15 @@ export default function HomeScreen() {
       }),
     [navigation]
   );
-  // Where the list is scrolled to, and the current drag: at most one fold or open per drag, and where the finger
-  // was when the list reached its top (pulling past that point opens the chart).
+  // Spec 2.2, 2.8: moving the rows up folds the chart; back at the very top, moving them down further opens it.
+  // Two sources, and only one of them for a given list:
+  // - a list that scrolls: its own drag events. Android always sends them; a separate finger tracker would race the
+  //   list's scrolling for the same touch and lose part of the time.
+  // - a list that fits on screen doesn't scroll and sends nothing, so there the finger itself is followed.
   const scrollY = useRef(0);
-  const drag = useRef({ changed: false, topAt: null as number | null, startedAt: 0, lastY: 0, scrolling: false });
-  // When the list gets shorter (the chart folds, Categories -> Tags, another period) Android moves it back without a
-  // scroll event, so the position is also corrected from the list's sizes.
   const sizes = useRef({ content: 0, layout: 0 });
+  const canScroll = () => sizes.current.content > sizes.current.layout + 1;
+  // A list that got shorter is moved back by Android without a scroll event: correct the position from the sizes.
   const clampScroll = () => {
     const max = Math.max(0, sizes.current.content - sizes.current.layout);
     if (scrollY.current > max) scrollY.current = max;
@@ -109,12 +111,10 @@ export default function HomeScreen() {
     scrollY.current = 0;
     listRef.current?.scrollToOffset({ offset: 0, animated: false });
   };
-  // The finger's drag and the list's own scrolling both start a gesture; whichever comes second must not reset it.
-  const startDrag = () => {
-    const now = Date.now();
-    if (now - drag.current.startedAt < 400) return;
-    drag.current = { ...drag.current, changed: false, topAt: scrollY.current <= TOP_TOLERANCE ? 0 : null, startedAt: now };
-  };
+  // One drag of the list: where it started, how far down it went, and whether it already folded the chart.
+  const listDrag = useRef({ active: false, startY: 0, maxY: 0, changed: false });
+  // One drag of the finger over a list that doesn't scroll: at most one fold or open.
+  const fingerDrag = useRef({ changed: false });
 
   const entries = usePeriodEntries(type, filter, range);
   const categoryById = useMemo(() => new Map(categories.map((category) => [category.id, category])), [categories]);
@@ -163,8 +163,6 @@ export default function HomeScreen() {
     return { id: group.id, value: group.amount, color: look(group, index).color };
   });
 
-  // Spec 2.2, 2.8. The finger is watched next to the list's own scrolling, so it works the same with one row or a
-  // hundred: moving it up folds the chart; once the list is at its very top, pulling further down opens it.
   const pan = usePanGesture({
     runOnJS: true,
     // A drag over a row must not also count as a tap on it.
@@ -172,54 +170,54 @@ export default function HomeScreen() {
     activeOffsetY: [-8, 8],
     failOffsetX: [-24, 24],
     onActivate: (event) => {
-      // Already at the top when the finger went down: the pull counts from there.
-      startDrag();
-      follow(event.translationY);
+      fingerDrag.current.changed = false;
+      followFinger(event.translationY);
     },
-    onUpdate: (event) => follow(event.translationY),
+    onUpdate: (event) => followFinger(event.translationY),
   });
 
-  function follow(dy: number) {
-    const current = drag.current;
-    if (current.changed) return;
-    if (!collapsedRef.current) {
-      if (dy < -FOLD_DRAG) {
-        current.changed = true;
-        setCollapsed(true);
-      }
-      return;
-    }
-    if (scrollY.current > TOP_TOLERANCE) {
-      current.topAt = null;
-      return;
-    }
-    current.topAt ??= dy;
-    if (dy - current.topAt > OPEN_DRAG) {
-      current.changed = true;
+  // Only for a list that doesn't scroll (a scrolling one is handled by its own events below).
+  function followFinger(dy: number) {
+    if (canScroll() || fingerDrag.current.changed) return;
+    if (!collapsedRef.current && dy < -FOLD_DRAG) {
+      fingerDrag.current.changed = true;
+      setCollapsed(true);
+    } else if (collapsedRef.current && dy > OPEN_DRAG) {
+      fingerDrag.current.changed = true;
       setCollapsed(false);
     }
   }
 
-  // The list's own scrolling, for long lists: scrolled down far enough folds the chart, and coming back to the very
-  // top under the user's finger opens it (the drag above covers lists that don't scroll).
   const onListScroll = (y: number) => {
-    const current = drag.current;
-    const movingUp = y < current.lastY;
-    current.lastY = y;
     scrollY.current = y;
+    // Web: a mouse wheel has no drag events, so the position alone decides.
     if (Platform.OS === "web") {
       if (y > WEB_COLLAPSE_AT && !collapsedRef.current) setCollapsed(true);
       else if (y <= TOP_TOLERANCE && collapsedRef.current) setCollapsed(false);
       return;
     }
-    if (!current.scrolling || current.changed) return;
-    if (y > WEB_COLLAPSE_AT && !collapsedRef.current) {
-      current.changed = true;
+    const drag = listDrag.current;
+    if (!drag.active) return;
+    drag.maxY = Math.max(drag.maxY, y);
+    if (!drag.changed && !collapsedRef.current && y - drag.startY > FOLD_DRAG) {
+      drag.changed = true;
       setCollapsed(true);
-    } else if (movingUp && y <= TOP_TOLERANCE && collapsedRef.current) {
-      current.changed = true;
-      setCollapsed(false);
     }
+  };
+
+  const onListDragStart = (y: number) => {
+    listDrag.current = { active: true, startY: y, maxY: y, changed: false };
+  };
+
+  // Let go at the very top: the rows were either brought back up to it, or pulled down while already there (Android
+  // shows that as overscroll, without scroll events). A fling that only coasts to the top doesn't count: pull again.
+  const onListDragEnd = (y: number) => {
+    const drag = listDrag.current;
+    drag.active = false;
+    const atTop = y <= TOP_TOLERANCE;
+    const broughtUp = drag.startY > TOP_TOLERANCE;
+    const pulledAtTop = drag.maxY <= TOP_TOLERANCE;
+    if (!drag.changed && collapsedRef.current && atTop && (broughtUp || pulledAtTop)) setCollapsed(false);
   };
 
   const openLog = (only?: { category?: string; tag?: string }) =>
@@ -306,14 +304,8 @@ export default function HomeScreen() {
           </AppText>
         }
         onScroll={(event) => onListScroll(event.nativeEvent.contentOffset.y)}
-        onScrollBeginDrag={(event) => {
-          startDrag();
-          drag.current.scrolling = true;
-          drag.current.lastY = event.nativeEvent.contentOffset.y;
-        }}
-        onScrollEndDrag={() => {
-          drag.current.scrolling = false;
-        }}
+        onScrollBeginDrag={(event) => onListDragStart(event.nativeEvent.contentOffset.y)}
+        onScrollEndDrag={(event) => onListDragEnd(event.nativeEvent.contentOffset.y)}
         onContentSizeChange={(_, height) => {
           sizes.current.content = height;
           clampScroll();
