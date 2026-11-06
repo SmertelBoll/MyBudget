@@ -11,14 +11,20 @@ import { useDialog } from "../AppDialog";
 import { AppText, NO_LIGATURES } from "../AppText";
 import { IconButton } from "../IconButton";
 
-function Chip({ label, active, onPress, icon }: { label: string; active?: boolean; onPress: () => void; icon?: "plus" }) {
+type ChipProps = { label: string; active?: boolean; onPress: () => void; icon?: "plus"; hidden?: boolean };
+
+function Chip({ label, active, onPress, icon, hidden }: ChipProps) {
   const { colors } = useTheme();
   return (
     <Pressable
       onPress={onPress}
       accessibilityRole={icon ? "button" : "checkbox"}
       accessibilityState={icon ? undefined : { checked: Boolean(active) }}
+      disabled={hidden}
+      accessibilityElementsHidden={hidden}
+      importantForAccessibility={hidden ? "no-hide-descendants" : "auto"}
       style={({ pressed }) => ({
+        opacity: hidden ? 0 : 1,
         flexDirection: "row",
         alignItems: "center",
         gap: 4,
@@ -37,6 +43,8 @@ function Chip({ label, active, onPress, icon }: { label: string; active?: boolea
     </Pressable>
   );
 }
+
+const HEADER_HEIGHT = 40;
 
 // Spec 4.6: tags as chips in two rows that scroll sideways; the last chip adds a tag. The magnifier opens a filter
 // field; "Add tag" is never filtered out and starts with what was typed. A new tag is selected at once.
@@ -81,10 +89,13 @@ export function TagChips({ value, onChange }: { value: string[]; onChange: (tagI
   ];
   // Two rows: chips alternate between them, so both rows grow at the same pace.
   const rows = [chips.filter((_, index) => index % 2 === 0), chips.filter((_, index) => index % 2 === 1)];
+  // While filtering the second row may empty out: an invisible chip keeps its height, so nothing below moves.
+  if (!rows[1].length) rows[1].push(<Chip key="--spacer--" label=" " hidden onPress={() => {}} />);
 
   return (
     <View style={{ gap: spacing.sm }}>
-      <View style={{ flexDirection: "row", alignItems: "center", gap: spacing.sm, minHeight: 40 }}>
+      {/* Fixed height: switching between the title and the search field must not shift the form. */}
+      <View style={{ flexDirection: "row", alignItems: "center", gap: spacing.sm, height: HEADER_HEIGHT }}>
         {searching ? (
           <TextInput
             value={query}
@@ -94,11 +105,12 @@ export function TagChips({ value, onChange }: { value: string[]; onChange: (tagI
             autoFocus
             style={{
               flex: 1,
+              height: HEADER_HEIGHT,
               color: colors.text,
               fontFamily: fonts.regular,
               fontSize: fontSize.body,
               fontVariant: NO_LIGATURES,
-              paddingVertical: spacing.xs,
+              paddingVertical: 0,
               borderBottomWidth: 2,
               borderBottomColor: colors.selected,
             }}

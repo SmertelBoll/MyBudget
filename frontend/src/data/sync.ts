@@ -27,9 +27,11 @@ export type SyncState = {
   pending: number;
   lastSyncedAt: string | null;
   errorCode: string | null;
+  // Why the last photo upload failed (the sync itself still went through), or null.
+  photoErrorCode: string | null;
 };
 
-let state: SyncState = { status: "idle", pending: 0, lastSyncedAt: null, errorCode: null };
+let state: SyncState = { status: "idle", pending: 0, lastSyncedAt: null, errorCode: null, photoErrorCode: null };
 const listeners = new Set<() => void>();
 
 const setState = (patch: Partial<SyncState>) => {
@@ -127,7 +129,7 @@ const runOnce = async () => {
   try {
     const rejected: { collection: Collection; id: string }[] = [];
     // Photos first, so a transaction never reaches other devices pointing at a photo the server doesn't have.
-    await uploadPendingPhotos();
+    setState({ photoErrorCode: await uploadPendingPhotos() });
     await push(rejected);
     await pull();
     await reconcile(rejected);

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Pressable, View } from "react-native";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTheme } from "@/theme/ThemeProvider";
 import { radius, spacing } from "@/theme/tokens";
@@ -7,7 +8,6 @@ import { addDays, formatShortDate, todayLocal } from "@/utils/dates";
 import { getLastUsedDate } from "@/data/transactions";
 import { AppText } from "../AppText";
 import { CalendarModal } from "../CalendarModal";
-import { IconButton } from "../IconButton";
 
 // Spec 4.5: Today, Yesterday and a third button. The third is the date entries were last added for in this run of
 // the app (handy for typing in last week), or "2 days ago"; a date picked in the calendar takes its place.
@@ -60,7 +60,22 @@ export function DateChips({ value, onChange }: { value: string; onChange: (date:
             </Pressable>
           );
         })}
-        <IconButton icon="calendar-month-outline" label={t("dates.pick")} size={44} onPress={() => setCalendar(true)} />
+        {/* A full-height tile like the chips, not a small round button: easy to hit. */}
+        <Pressable
+          onPress={() => setCalendar(true)}
+          accessibilityRole="button"
+          accessibilityLabel={t("dates.pick")}
+          style={({ pressed }) => ({
+            alignSelf: "stretch",
+            width: 64,
+            alignItems: "center",
+            justifyContent: "center",
+            borderRadius: radius.md,
+            backgroundColor: pressed ? colors.selected : colors.tonal,
+          })}
+        >
+          <MaterialCommunityIcons name="calendar-month-outline" size={28} color={colors.text} />
+        </Pressable>
       </View>
       {calendar && (
         <CalendarModal

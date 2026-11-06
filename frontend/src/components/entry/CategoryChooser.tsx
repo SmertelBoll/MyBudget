@@ -62,8 +62,11 @@ export function CategoryChooser({
           accessibilityLabel={t("entry.allCategories")}
           style={{ width: "25%", alignItems: "center", gap: spacing.xs, paddingVertical: spacing.sm }}
         >
-          <View style={{ width: 62, height: 62, borderRadius: 31, alignItems: "center", justifyContent: "center", backgroundColor: colors.tonal }}>
-            <MaterialCommunityIcons name="dots-horizontal" size={28} color={colors.text} />
+          {/* Same 62 px box as a category's icon with its ring, so the labels line up; the circle itself is smaller. */}
+          <View style={{ width: 62, height: 62, alignItems: "center", justifyContent: "center" }}>
+            <View style={{ width: 40, height: 40, borderRadius: 20, alignItems: "center", justifyContent: "center", backgroundColor: colors.tonal }}>
+              <MaterialCommunityIcons name="dots-horizontal" size={22} color={colors.text} />
+            </View>
           </View>
           <AppText variant="caption">{t("entry.more")}</AppText>
         </Pressable>

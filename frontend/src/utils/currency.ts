@@ -41,15 +41,23 @@ const collatorFor = (lang: string) => {
   return collators.get(lang)!;
 };
 
+// Only these get their sign in the list: elsewhere it's either the code again or a sign several currencies share.
+const SIGN_IN_LABEL: Record<string, string> = { USD: "$", EUR: "€", GBP: "£", UAH: "₴", CNY: "¥" };
+const labelFor = (code: string, lang: string) => {
+  const name = currencyName(code, lang);
+  return SIGN_IN_LABEL[code] ? `${name} (${SIGN_IN_LABEL[code]})` : name;
+};
+
 // Spec 2.2: only currencies we have a rate for. The list comes from the cached (or bundled) rates, so it works
-// offline. Full name on the left, code on the right; alphabetical by the name the user reads.
+// offline. Full name on the left (with the sign for the best-known ones: "British Pound (£)"), code on the right;
+// alphabetical by the name the user reads.
 export const useCurrencyOptions = (): SelectOption[] => {
   const { lang } = useI18n();
   const rates = useRates();
   return useMemo(() => {
     const collator = collatorFor(lang);
     return Object.keys(rates.rates)
-      .map((code) => ({ value: code, label: currencyName(code, lang), trailing: code }))
+      .map((code) => ({ value: code, label: labelFor(code, lang), trailing: code }))
       .sort((a, b) => collator.compare(a.label, b.label));
   }, [rates, lang]);
 };
@@ -57,17 +65,23 @@ export const useCurrencyOptions = (): SelectOption[] => {
 const POPULAR = ["USD", "EUR", "GBP", "UAH"];
 const PINNED_MAX = 5;
 
-// Top of the currency list: the popular ones, then currencies the user works with (main currency, accounts,
-// newest first), at most 5 in all.
+// Top of the currency list, at most 5: currencies the user actually works with come first (entries, accounts and the
+// main currency, most recently used first), the popular ones fill whatever room is left.
 export const usePinnedCurrencies = () => {
   const { user } = useAuth();
   const baseCurrency = user?.baseCurrency;
   const accounts = useCollection("accounts");
+  const transactions = useCollection("transactions");
   return useMemo(() => {
-    const used = [...accounts]
-      .sort((a, b) => (b.updatedAt ?? "9999").localeCompare(a.updatedAt ?? "9999"))
-      .map((account) => account.currency);
-    if (baseCurrency) used.unshift(baseCurrency);
-    return [...new Set([...POPULAR, ...used])].slice(0, PINNED_MAX);
-  }, [accounts, baseCurrency]);
+    const lastUsed = new Map<string, string>();
+    const touch = (code: string, at: string | undefined) => {
+      const stamp = at ?? "";
+      if ((lastUsed.get(code) ?? "") <= stamp) lastUsed.set(code, stamp);
+    };
+    for (const entry of transactions) touch(entry.currency, entry.updatedAt ?? entry.clientCreatedAt);
+    for (const account of accounts) touch(account.currency, account.updatedAt);
+    if (baseCurrency) touch(baseCurrency, lastUsed.get(baseCurrency));
+    const used = [...lastUsed.entries()].sort((a, b) => b[1].localeCompare(a[1])).map(([code]) => code);
+    return [...new Set([...used, ...POPULAR])].slice(0, PINNED_MAX);
+  }, [accounts, transactions, baseCurrency]);
 };

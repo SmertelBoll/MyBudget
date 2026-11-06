@@ -7,6 +7,10 @@ export const notFound = (req, res) => {
 
 // eslint-disable-next-line no-unused-vars
 export const errorHandler = (err, req, res, next) => {
+  // Photo uploads fail quietly on the phone (sync keeps going), so the reason is kept in the server log.
+  if (req.method === "POST" && req.path.endsWith("/photos")) {
+    console.warn(`photo upload failed: ${err.code || err.name} ${err.message || ""}`.trim());
+  }
   if (err instanceof AppError) {
     return res.status(err.status).json({ code: err.code, ...(err.details && { details: err.details }) });
   }

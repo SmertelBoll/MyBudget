@@ -104,7 +104,6 @@ function TransactionForm({ initial, existingId }: { initial: FormValues; existin
   const dialog = useDialog();
   const toast = useToast();
   const { user } = useAuth();
-  const { baseCurrency } = useMoney();
   const rates = useRates();
   const currencyOptions = useCurrencyOptions();
   const pinnedCurrencies = usePinnedCurrencies();
@@ -187,19 +186,28 @@ function TransactionForm({ initial, existingId }: { initial: FormValues; existin
       photos: user?.settings.showPhotos === false ? (existing?.photos ?? []) : values.photos,
     };
 
-    // Spec 4.5: a future date asks how to book it (every time; the choice isn't remembered).
+    // Spec 4.5: a future date asks how to book it (every time; the choice isn't remembered). Two short questions:
+    // now or on that date, and only for "on that date" whether to remind. Closing either one keeps the form open.
     if (!existing && values.date > todayLocal()) {
-      const choice = await dialog.choose({
+      const when = await dialog.choose({
         title: t("entry.futureTitle"),
         message: t("entry.futureMessage"),
         options: [
           { value: "now", label: t("entry.futureNow") },
-          { value: "payment-notify", label: t("entry.futurePaymentNotify") },
-          { value: "payment", label: t("entry.futurePaymentSilent") },
+          { value: "later", label: t("entry.futureLater") },
         ],
       });
-      if (!choice) return;
-      if (choice !== "now") {
+      if (!when) return;
+      if (when === "later") {
+        const remind = await dialog.choose({
+          title: t("entry.futureNotifyTitle"),
+          message: t("entry.futureNotifyMessage"),
+          options: [
+            { value: "yes", label: t("entry.futureNotifyYes") },
+            { value: "no", label: t("entry.futureNotifyNo") },
+          ],
+        });
+        if (!remind) return;
         if (fields.photos.length) {
           const ok = await dialog.confirm({
             title: t("entry.photosNotMovedTitle"),
@@ -213,7 +221,7 @@ function TransactionForm({ initial, existingId }: { initial: FormValues; existin
         createOneTimePayment({
           ...fields,
           name: category ? categoryName(category, t) : t("entry.payment"),
-          notify: choice === "payment-notify",
+          notify: remind === "yes",
           accountCurrency: account.currency,
         }).catch(reportWriteError);
         toast.show(t("entry.paymentCreated"));
@@ -339,7 +347,7 @@ function TransactionForm({ initial, existingId }: { initial: FormValues; existin
           title={t("accounts.currency")}
           value={values.currency}
           options={currencyOptions}
-          pinned={[...new Set([...(account ? [account.currency] : []), baseCurrency, ...pinnedCurrencies])].slice(0, 5)}
+          pinned={[...new Set([...(account ? [account.currency] : []), ...pinnedCurrencies])].slice(0, 5)}
           onChange={(currency) => setValues((current) => ({ ...current, currency, currencyPicked: true, accountAmount: "" }))}
           onClose={() => setCurrencyOpen(false)}
         />

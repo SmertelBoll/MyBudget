@@ -62,7 +62,9 @@ const send = async <T,>(method: Method, path: string, body?: unknown, token?: st
       body: body === undefined ? undefined : isForm ? (body as FormData) : JSON.stringify(body),
       signal: controller.signal,
     });
-  } catch {
+  } catch (error) {
+    // Anything fetch throws reads as "no connection" to the user; the real reason stays visible in development.
+    if (__DEV__) console.warn(`${method} ${path} failed before a response:`, error);
     throw new ApiError(0, "common.noInternet");
   } finally {
     clearTimeout(timer);

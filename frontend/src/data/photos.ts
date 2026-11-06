@@ -62,25 +62,31 @@ const formFile = async (id: string, uri: string) => {
   if (Platform.OS === "web") {
     form.append("photo", await (await fetch(uri)).blob(), `${id}.jpg`);
   } else {
-    // React Native's FormData takes a { uri, name, type } descriptor for files.
-    form.append("photo", { uri, name: `${id}.jpg`, type: "image/jpeg" } as unknown as Blob);
+    // Expo's fetch (the global one since SDK 52) rejects React Native's { uri, name, type } descriptor; a file-system
+    // File implements Blob and is read straight from disk. The file is saved as <id>.jpg, so name and type are right.
+    form.append("photo", new File(uri));
   }
   return form;
 };
 
 // Called by sync before the outbox goes up. Re-sending an id is harmless (the server returns the existing photo).
-export const uploadPendingPhotos = async () => {
+// Never throws: a photo that fails stays pending for the next sync, and the transactions still go up (they show a
+// placeholder elsewhere until the photo arrives). Returns the last error code, or null when everything went up.
+export const uploadPendingPhotos = async (): Promise<string | null> => {
   const pending = await (await getDb()).getAllAsync<{ id: string; uri: string }>("SELECT id, uri FROM photos WHERE uploaded = 0");
+  let lastError: string | null = null;
   for (const { id, uri } of pending) {
     try {
       await api.post("/photos", await formFile(id, uri));
       await serialWrite((db) => db.runAsync("UPDATE photos SET uploaded = 1 WHERE id = ?", id));
     } catch (error) {
-      // Storage not configured on the server: keep the photo local and stop trying this round.
-      if (error instanceof ApiError && error.code === "photo.storageNotConfigured") return;
-      throw error;
+      lastError = error instanceof ApiError ? error.code : "photos.failed";
+      console.warn(`photo ${id} not uploaded:`, error instanceof ApiError ? `${error.status} ${error.code}` : error);
+      // No storage on the server or no connection: the rest would fail the same way.
+      if (error instanceof ApiError && (error.code === "photo.storageNotConfigured" || error.status === 0)) break;
     }
   }
+  return lastError;
 };
 
 export const countPendingPhotos = async () =>
