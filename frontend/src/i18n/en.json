@@ -71,6 +71,8 @@
   "common.unsavedMessage": "Your changes will be lost",
   "common.leave": "Leave",
   "common.seconds": "{{count}} s",
+  "common.nothingFound": "Nothing found",
+  "common.close": "Close",
 
   "app.tagline": "Your budget on every device",
 
@@ -84,6 +86,9 @@
   "auth.emailInvalid": "Enter a valid email",
   "auth.passwordRequired": "Enter your password",
   "auth.passwordHint": "At least 8 characters",
+  "auth.confirmPassword": "Repeat password",
+  "auth.confirmRequired": "Repeat your password",
+  "auth.passwordsDontMatch": "Passwords don't match",
   "auth.showPassword": "Show password",
   "auth.hidePassword": "Hide password",
 

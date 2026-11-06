@@ -23,7 +23,9 @@ export default function AppLayout() {
       <Drawer.Screen name="reminders" />
       <Drawer.Screen name="settings" />
       <Drawer.Screen name="support" />
-      <Drawer.Screen name="profile" options={{ hidden: true }} />
+      {/* Not in the menu list (DrawerContent draws its own items); opened from the avatar. No `hidden`: that
+          option also redirects away from the screen. */}
+      <Drawer.Screen name="profile" />
     </Drawer>
   );
 }

@@ -37,7 +37,8 @@ export function SegmentedSwitch<T extends string>({
               backgroundColor: active ? colors.accent : "transparent",
             }}
           >
-            <AppText variant="label" color={active ? colors.onAccent : colors.textSecondary}>
+            {/* Inactive options use the main text color: secondary grey was too faint on the light background. */}
+            <AppText variant="label" color={active ? colors.onAccent : colors.text}>
               {option.label}
             </AppText>
           </Pressable>

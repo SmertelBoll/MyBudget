@@ -3,13 +3,13 @@ import { ApiError } from "@/api/client";
 import type { UserPatch } from "@/api/types";
 import { useAuth } from "@/auth/AuthProvider";
 import { useI18n } from "@/i18n/I18nProvider";
-import { LANGUAGES } from "@/i18n/languages";
+import { LANGUAGE_OPTIONS } from "@/i18n/languages";
 import { useTheme, type ThemeMode } from "@/theme/ThemeProvider";
 import { radius, spacing } from "@/theme/tokens";
 import { AppText } from "@/components/AppText";
-import { OptionRow } from "@/components/OptionRow";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import { SegmentedSwitch } from "@/components/SegmentedSwitch";
+import { SelectField } from "@/components/SelectField";
 import { useToast } from "@/components/Toast";
 
 const THEMES: ThemeMode[] = ["system", "light", "dark"];
@@ -45,18 +45,13 @@ export default function SettingsScreen() {
           />
         </View>
 
-        <View style={{ backgroundColor: colors.surface, borderRadius: radius.lg, overflow: "hidden" }}>
-          <AppText variant="label" secondary style={{ padding: spacing.md, paddingBottom: spacing.xs }}>
-            {t("settings.language")}
-          </AppText>
-          {LANGUAGES.map((language) => (
-            <OptionRow
-              key={language.code}
-              title={language.nativeName}
-              selected={language.code === user.language}
-              onPress={() => save({ language: language.code })}
-            />
-          ))}
+        <View style={{ backgroundColor: colors.surface, borderRadius: radius.lg, padding: spacing.md }}>
+          <SelectField
+            label={t("settings.language")}
+            value={user.language}
+            options={LANGUAGE_OPTIONS}
+            onChange={(language) => save({ language })}
+          />
         </View>
       </ScrollView>
     </View>

@@ -8,7 +8,7 @@ import { useTheme } from "@/theme/ThemeProvider";
 import { radius, spacing } from "@/theme/tokens";
 import { AppText } from "@/components/AppText";
 import { Button } from "@/components/Button";
-import { LogoMark, LogoText } from "@/components/Logo";
+import { LogoText } from "@/components/Logo";
 import { TextField, type TextInputHandle } from "@/components/TextField";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -23,11 +23,13 @@ export default function LoginScreen() {
   const insets = useSafeAreaInsets();
   const { signIn, signUp, endedReason } = useAuth();
   const passwordRef = useRef<TextInputHandle>(null);
+  const confirmRef = useRef<TextInputHandle>(null);
 
   const [mode, setMode] = useState<Mode>("signIn");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [touched, setTouched] = useState({ email: false, password: false });
+  const [confirm, setConfirm] = useState("");
+  const [touched, setTouched] = useState({ email: false, password: false, confirm: false });
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
@@ -38,14 +40,19 @@ export default function LoginScreen() {
     : mode === "signUp" && password.length < MIN_PASSWORD
       ? "auth.passwordTooShort"
       : null;
+  // Registration only: a typo in a password nobody has seen would lock the user out.
+  const confirmError =
+    mode !== "signUp" ? null : !confirm ? "auth.confirmRequired" : confirm !== password ? "auth.passwordsDontMatch" : null;
   // Spec 2.7: errors only after leaving a field or trying to submit.
   const showEmailError = (touched.email || submitted) && emailError;
   const showPasswordError = (touched.password || submitted) && passwordError;
+  const showConfirmError = (touched.confirm || submitted) && confirmError;
+  const invalid = Boolean(emailError || passwordError || confirmError);
 
   const submit = async () => {
     setSubmitted(true);
     setServerError(null);
-    if (emailError || passwordError) return;
+    if (invalid) return;
 
     setLoading(true);
     try {
@@ -58,6 +65,8 @@ export default function LoginScreen() {
 
   const switchMode = () => {
     setMode((current) => (current === "signIn" ? "signUp" : "signIn"));
+    setConfirm("");
+    setTouched((value) => ({ ...value, confirm: false }));
     setSubmitted(false);
     setServerError(null);
   };
@@ -78,8 +87,7 @@ export default function LoginScreen() {
         }}
       >
         <View style={{ alignItems: "center", gap: spacing.md }}>
-          <LogoMark size={72} />
-          <LogoText />
+          <LogoText size={32} />
           <AppText secondary style={{ textAlign: "center" }}>
             {t("app.tagline")}
           </AppText>
@@ -119,15 +127,31 @@ export default function LoginScreen() {
             autoCapitalize="none"
             autoComplete={mode === "signIn" ? "current-password" : "new-password"}
             textContentType={mode === "signIn" ? "password" : "newPassword"}
-            returnKeyType="go"
-            onSubmitEditing={submit}
+            returnKeyType={mode === "signIn" ? "go" : "next"}
+            onSubmitEditing={mode === "signIn" ? submit : () => confirmRef.current?.focus()}
           />
+          {mode === "signUp" && (
+            <TextField
+              ref={confirmRef}
+              label={t("auth.confirmPassword")}
+              value={confirm}
+              onChangeText={setConfirm}
+              onBlur={() => setTouched((value) => ({ ...value, confirm: true }))}
+              error={showConfirmError ? t(showConfirmError) : undefined}
+              secure
+              autoCapitalize="none"
+              autoComplete="new-password"
+              textContentType="newPassword"
+              returnKeyType="go"
+              onSubmitEditing={submit}
+            />
+          )}
 
           <Button
             title={t(mode === "signIn" ? "auth.signIn" : "auth.signUp")}
             onPress={submit}
             loading={loading}
-            muted={Boolean(emailError || passwordError)}
+            muted={invalid}
           />
 
           <Pressable onPress={switchMode} hitSlop={8} style={{ alignSelf: "center", padding: spacing.sm }}>

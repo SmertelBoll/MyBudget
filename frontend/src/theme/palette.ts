@@ -42,7 +42,8 @@ const LIGHT: Palette = {
   surface: "#FAF8FF",
   selected: "#cccccc",
   text: CONTRAST_DARK,
-  textSecondary: "#696969",
+  // Darker than MovieList's #696969: on the beige background that grey was hard to read (contrast ~4.1:1).
+  textSecondary: "#555555",
 };
 
 const DARK: Palette = {

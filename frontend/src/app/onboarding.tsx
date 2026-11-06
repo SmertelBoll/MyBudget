@@ -1,18 +1,17 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { FlatList, ScrollView, View } from "react-native";
+import { ScrollView, View } from "react-native";
 import { getLocales } from "expo-localization";
 import { ApiError, api } from "@/api/client";
 import { useAuth } from "@/auth/AuthProvider";
 import { deviceLanguage, useI18n } from "@/i18n/I18nProvider";
-import { LANGUAGES } from "@/i18n/languages";
+import { LANGUAGE_OPTIONS } from "@/i18n/languages";
 import { useTheme } from "@/theme/ThemeProvider";
-import { BOTTOM_ACTION_SPACE, radius, spacing } from "@/theme/tokens";
+import { BOTTOM_ACTION_SPACE, spacing } from "@/theme/tokens";
 import { FALLBACK_CURRENCIES, currencyName } from "@/utils/currency";
 import { AppText } from "@/components/AppText";
 import { BottomActionButton } from "@/components/BottomActionButton";
-import { OptionRow } from "@/components/OptionRow";
 import { ScreenHeader } from "@/components/ScreenHeader";
-import { TextField } from "@/components/TextField";
+import { SelectField, type SelectOption } from "@/components/SelectField";
 import { useToast } from "@/components/Toast";
 
 // After the first sign-in (spec screen 1, 2.2): main currency and language. Then Home opens.
@@ -24,7 +23,6 @@ export default function OnboardingScreen() {
 
   const [currencies, setCurrencies] = useState(FALLBACK_CURRENCIES);
   const [picked, setCurrency] = useState<string | null>(null);
-  const [query, setQuery] = useState("");
   const [saving, setSaving] = useState(false);
   const languageGuessed = useRef(false);
 
@@ -46,12 +44,14 @@ export default function OnboardingScreen() {
     if (guess !== user.language) updateMe({ language: guess }).catch(() => {});
   }, [user, updateMe]);
 
-  const items = useMemo(() => {
-    const needle = query.trim().toLowerCase();
-    return currencies
-      .map((code) => ({ code, name: currencyName(code, lang) }))
-      .filter((item) => !needle || item.code.toLowerCase().includes(needle) || item.name.toLowerCase().includes(needle));
-  }, [currencies, query, lang]);
+  const currencyOptions = useMemo<SelectOption[]>(
+    () =>
+      currencies.map((code) => {
+        const name = currencyName(code, lang);
+        return { value: code, label: code, subtitle: name === code ? undefined : name };
+      }),
+    [currencies, lang]
+  );
 
   const start = async () => {
     if (!currency) {
@@ -75,63 +75,28 @@ export default function OnboardingScreen() {
         </AppText>
       </ScreenHeader>
 
-      <FlatList
-        data={items}
-        keyExtractor={(item) => item.code}
-        keyboardShouldPersistTaps="handled"
-        contentContainerStyle={{ paddingBottom: BOTTOM_ACTION_SPACE }}
-        ListHeaderComponent={
-          <View style={{ padding: spacing.md, gap: spacing.md }}>
-            <AppText variant="heading">{t("onboarding.language")}</AppText>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: spacing.sm }}>
-              {LANGUAGES.map((language) => {
-                const active = language.code === user?.language;
-                return (
-                  <AppText
-                    key={language.code}
-                    onPress={() => updateMe({ language: language.code }).catch(() => {})}
-                    accessibilityRole="radio"
-                    accessibilityState={{ selected: active }}
-                    variant="label"
-                    color={active ? colors.onAccent : colors.text}
-                    style={{
-                      backgroundColor: active ? colors.accent : colors.surface,
-                      borderRadius: radius.pill,
-                      paddingHorizontal: spacing.md,
-                      paddingVertical: spacing.sm,
-                      overflow: "hidden",
-                    }}
-                  >
-                    {language.nativeName}
-                  </AppText>
-                );
-              })}
-            </ScrollView>
+      <ScrollView contentContainerStyle={{ padding: spacing.md, gap: spacing.lg, paddingBottom: BOTTOM_ACTION_SPACE }}>
+        <SelectField
+          label={t("onboarding.language")}
+          value={user?.language ?? null}
+          options={LANGUAGE_OPTIONS}
+          onChange={(language) => updateMe({ language }).catch(() => {})}
+        />
 
-            <AppText variant="heading" style={{ marginTop: spacing.sm }}>
-              {t("onboarding.currency")}
-            </AppText>
-            <AppText variant="caption" secondary>
-              {t("onboarding.currencyHint")}
-            </AppText>
-            <TextField
-              label={t("onboarding.searchCurrency")}
-              value={query}
-              onChangeText={setQuery}
-              autoCapitalize="none"
-              autoCorrect={false}
-            />
-          </View>
-        }
-        renderItem={({ item }) => (
-          <OptionRow
-            title={item.code}
-            subtitle={item.name === item.code ? undefined : item.name}
-            selected={item.code === currency}
-            onPress={() => setCurrency(item.code)}
+        <View style={{ gap: spacing.xs }}>
+          <SelectField
+            label={t("onboarding.currency")}
+            value={currency}
+            options={currencyOptions}
+            onChange={setCurrency}
+            placeholder={t("onboarding.chooseCurrency")}
+            searchLabel={t("onboarding.searchCurrency")}
           />
-        )}
-      />
+          <AppText variant="caption" secondary>
+            {t("onboarding.currencyHint")}
+          </AppText>
+        </View>
+      </ScrollView>
 
       <BottomActionButton title={t("onboarding.start")} onPress={start} loading={saving} muted={!currency} />
     </View>
