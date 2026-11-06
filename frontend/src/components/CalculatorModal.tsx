@@ -1,11 +1,13 @@
 import { useState } from "react";
-import { Modal, Pressable, View } from "react-native";
+import { Pressable, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTheme } from "@/theme/ThemeProvider";
-import { fontSize, radius, spacing } from "@/theme/tokens";
+import { radius, spacing } from "@/theme/tokens";
 import { evaluate } from "@/utils/calc";
 import { AppText } from "./AppText";
+import { FullScreenModal } from "./FullScreenModal";
 
 const KEYS = [
   ["C", "(", ")", "÷"],
@@ -14,17 +16,16 @@ const KEYS = [
   ["1", "2", "3", "+"],
   ["%", "0", ".", "⌫"],
 ];
-const OPERATORS = new Set(["÷", "×", "−", "+", "%", "(", ")"]);
+const OPERATORS = new Set(["÷", "×", "−", "+", "%", "(", ")", "C"]);
 
-// Spec 4.2: a calculator window; "=" puts the result into the amount field. The result must be above zero.
+// Spec 4.2: the calculator on its own screen; "=" puts the result into the amount field. The result must be above
+// zero.
 export function CalculatorModal({
-  visible,
   initial,
   decimalSeparator,
   onClose,
   onResult,
 }: {
-  visible: boolean;
   initial: string;
   decimalSeparator: "." | ",";
   onClose: () => void;
@@ -32,6 +33,7 @@ export function CalculatorModal({
 }) {
   const { colors } = useTheme();
   const { t } = useI18n();
+  const insets = useSafeAreaInsets();
   const [expression, setExpression] = useState(initial);
   const [error, setError] = useState<string | null>(null);
 
@@ -52,65 +54,63 @@ export function CalculatorModal({
     onClose();
   };
 
-  return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose} statusBarTranslucent onShow={() => setExpression(initial)}>
-      <Pressable onPress={onClose} style={{ flex: 1, backgroundColor: colors.scrim, justifyContent: "center", padding: spacing.md }}>
-        <Pressable onPress={() => {}} style={{ backgroundColor: colors.surface, borderRadius: radius.md, padding: spacing.md, gap: spacing.sm }}>
-          <View style={{ minHeight: 72, justifyContent: "flex-end", alignItems: "flex-end", paddingHorizontal: spacing.sm }}>
-            <AppText variant="title" numberOfLines={2} style={{ textAlign: "right" }}>
-              {expression || "0"}
-            </AppText>
-            <AppText secondary color={error ? colors.danger : undefined}>
-              {error ?? (preview !== null && expression ? `= ${preview}` : " ")}
-            </AppText>
-          </View>
+  const keyStyle = (pressed: boolean, operator: boolean) => ({
+    flex: 1,
+    borderRadius: radius.md,
+    alignItems: "center" as const,
+    justifyContent: "center" as const,
+    backgroundColor: pressed ? colors.selected : operator ? colors.tonal : colors.surface,
+  });
 
+  return (
+    <FullScreenModal visible title={t("calculator.open")} onClose={onClose}>
+      <View style={{ flex: 1, padding: spacing.md, paddingBottom: insets.bottom + spacing.md, gap: spacing.sm }}>
+        <View style={{ flex: 1, justifyContent: "flex-end", alignItems: "flex-end", paddingHorizontal: spacing.sm, gap: spacing.xs }}>
+          <AppText variant="display" numberOfLines={3} style={{ textAlign: "right", fontSize: 40 }}>
+            {expression || "0"}
+          </AppText>
+          <AppText variant="heading" secondary color={error ? colors.danger : undefined}>
+            {error ?? (preview !== null && expression ? `= ${preview}` : " ")}
+          </AppText>
+        </View>
+
+        <View style={{ flex: 2, gap: spacing.sm }}>
           {KEYS.map((row) => (
-            <View key={row.join("")} style={{ flexDirection: "row", gap: spacing.sm }}>
+            <View key={row.join("")} style={{ flex: 1, flexDirection: "row", gap: spacing.sm }}>
               {row.map((key) => (
                 <Pressable
                   key={key}
                   onPress={() => press(key)}
                   accessibilityRole="button"
                   accessibilityLabel={key === "⌫" ? t("calculator.backspace") : key}
-                  style={({ pressed }) => ({
-                    flex: 1,
-                    height: 56,
-                    borderRadius: radius.md,
-                    alignItems: "center",
-                    justifyContent: "center",
-                    backgroundColor: pressed ? colors.selected : colors.background,
-                  })}
+                  style={({ pressed }) => keyStyle(pressed, OPERATORS.has(key))}
                 >
                   {key === "⌫" ? (
-                    <MaterialCommunityIcons name="backspace-outline" size={24} color={colors.text} />
+                    <MaterialCommunityIcons name="backspace-outline" size={28} color={colors.text} />
                   ) : (
-                    <AppText style={{ fontSize: fontSize.title }} color={OPERATORS.has(key) || key === "C" ? colors.textSecondary : colors.text}>
-                      {key === "." ? decimalSeparator : key}
-                    </AppText>
+                    <AppText style={{ fontSize: 28 }}>{key === "." ? decimalSeparator : key}</AppText>
                   )}
                 </Pressable>
               ))}
             </View>
           ))}
-
           <Pressable
             onPress={equals}
             accessibilityRole="button"
             style={({ pressed }) => ({
-              height: 56,
+              flex: 1,
               borderRadius: radius.md,
               alignItems: "center",
               justifyContent: "center",
               backgroundColor: pressed ? colors.accentPressed : colors.accent,
             })}
           >
-            <AppText style={{ fontSize: fontSize.title }} color={colors.onAccent}>
+            <AppText style={{ fontSize: 28 }} color={colors.onAccent}>
               =
             </AppText>
           </Pressable>
-        </Pressable>
-      </Pressable>
-    </Modal>
+        </View>
+      </View>
+    </FullScreenModal>
   );
 }

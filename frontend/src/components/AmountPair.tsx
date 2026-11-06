@@ -9,8 +9,8 @@ type Side = "top" | "bottom";
 
 // Spec 4.3, two currencies: the top field in the entry currency, the bottom one in the account's (for a transfer:
 // "from" and "to"). An empty field shows the faint amount converted at today's rate.
-//   The focused field has the calculator; the other one has the arrows, which fill it from the focused field.
-//   If the source field only shows a faint suggestion (nothing typed), the arrows do nothing (spec, Q7).
+//   The focused field has the calculator; the other one has the arrows. The arrows only overwrite a number that was
+//   already typed into their field; on an empty field (showing just the faint suggestion) they do nothing (Q7).
 export function AmountPair({
   top,
   bottom,
@@ -44,10 +44,10 @@ export function AmountPair({
   const bottomSuggestion = !bottom && topMinor && rate ? toInput(Math.round(topMinor * rate)) : undefined;
 
   const fillTop = () => {
-    if (bottomMinor && rate) onChangeTop(toInput(Math.round(bottomMinor / rate)));
+    if (top && bottomMinor && rate) onChangeTop(toInput(Math.round(bottomMinor / rate)));
   };
   const fillBottom = () => {
-    if (topMinor && rate) onChangeBottom(toInput(Math.round(topMinor * rate)));
+    if (bottom && topMinor && rate) onChangeBottom(toInput(Math.round(topMinor * rate)));
   };
 
   return (

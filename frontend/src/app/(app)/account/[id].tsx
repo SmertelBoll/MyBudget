@@ -9,8 +9,9 @@ import { useCollection, useRecord } from "@/data/hooks";
 import { ACCOUNT_ICON_SECTIONS, DEFAULT_ACCOUNT_ICON, DEFAULT_COLOR } from "@/constants/appearance";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTheme } from "@/theme/ThemeProvider";
-import { BOTTOM_ACTION_SPACE, radius, spacing } from "@/theme/tokens";
-import { useCurrencyOptions } from "@/utils/currency";
+import { radius, spacing } from "@/theme/tokens";
+import { useBottomSpace } from "@/utils/useBottomSpace";
+import { useCurrencyOptions, usePinnedCurrencies } from "@/utils/currency";
 import { todayLocal } from "@/utils/dates";
 import { parseSignedAmount } from "@/utils/money";
 import { useMoney } from "@/utils/useMoney";
@@ -65,12 +66,14 @@ type FormValues = {
 
 function AccountForm({ initial, existingId }: { initial: FormValues; existingId: string | null }) {
   const { colors } = useTheme();
+  const bottomSpace = useBottomSpace();
   const { t } = useI18n();
   const dialog = useDialog();
   const toast = useToast();
   const { updateMe, user } = useAuth();
   const { money } = useMoney();
   const currencyOptions = useCurrencyOptions();
+  const pinnedCurrencies = usePinnedCurrencies();
   const existing = useRecord("accounts", existingId);
   const accounts = useCollection("accounts");
   const balances = useBalances();
@@ -194,7 +197,7 @@ function AccountForm({ initial, existingId }: { initial: FormValues; existingId:
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
         <ScrollView
           keyboardShouldPersistTaps="handled"
-          contentContainerStyle={{ padding: spacing.md, gap: spacing.lg, paddingBottom: BOTTOM_ACTION_SPACE }}
+          contentContainerStyle={{ padding: spacing.md, gap: spacing.lg, paddingBottom: bottomSpace }}
         >
           <View style={{ backgroundColor: colors.surface, borderRadius: radius.md, padding: spacing.md, gap: spacing.md }}>
             <AmountInput
@@ -213,6 +216,7 @@ function AccountForm({ initial, existingId }: { initial: FormValues; existingId:
                 label={t("accounts.currency")}
                 value={values.currency}
                 options={currencyOptions}
+            pinned={pinnedCurrencies}
                 onChange={(currency) => set("currency", currency)}
               />
             )}

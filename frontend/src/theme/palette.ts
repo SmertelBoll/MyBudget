@@ -33,6 +33,10 @@ export type Palette = typeof SHARED & {
   selected: string;
   text: string;
   textSecondary: string;
+  // Circle behind icons that aren't chosen in a picker: clearly visible on `surface`, but quieter than a color.
+  iconIdle: string;
+  // Small round buttons next to values (balance details, calculator): darker than the card so they read as buttons.
+  tonal: string;
 };
 
 const LIGHT: Palette = {
@@ -44,6 +48,8 @@ const LIGHT: Palette = {
   text: CONTRAST_DARK,
   // Darker than MovieList's #696969: on the beige background that grey was hard to read (contrast ~4.1:1).
   textSecondary: "#555555",
+  iconIdle: "#a9a9a9",
+  tonal: "#d6d4ca",
 };
 
 const DARK: Palette = {
@@ -54,6 +60,8 @@ const DARK: Palette = {
   selected: "#595959",
   text: CONTRAST_LIGHT,
   textSecondary: "#999999",
+  iconIdle: "#7c8580",
+  tonal: "#4a4a4a",
 };
 
 export const getPalette = (scheme: SchemeName): Palette => (scheme === "dark" ? DARK : LIGHT);

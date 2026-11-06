@@ -5,34 +5,50 @@ import type { MaterialCommunityIcons } from "@expo/vector-icons";
 export type IconName = keyof typeof MaterialCommunityIcons.glyphMap;
 export type IconSection = { title: string; icons: IconName[] };
 
-// Section titles are dictionary keys.
+// Section titles are dictionary keys. The first 7 icons are the ones shown inline (spec 5.2).
+// The ruble sign is deliberately not offered.
 export const ACCOUNT_ICON_SECTIONS: IconSection[] = [
   {
     title: "icons.money",
     icons: [
-      "cash", "cash-multiple", "bank", "bank-outline", "credit-card", "credit-card-outline",
-      "credit-card-multiple-outline", "contactless-payment", "wallet", "wallet-outline", "piggy-bank",
-      "piggy-bank-outline", "safe", "safe-square-outline", "hand-coin", "account-cash", "treasure-chest", "gift",
+      "credit-card-outline", "cash", "bank", "piggy-bank", "wallet", "currency-uah", "safe",
+      "credit-card", "credit-card-multiple-outline", "credit-card-chip-outline", "credit-card-wireless-outline",
+      "contactless-payment", "cash-multiple", "cash-100", "cash-fast", "cash-lock", "bank-outline", "bank-transfer",
+      "wallet-outline", "wallet-travel", "wallet-membership", "wallet-giftcard", "piggy-bank-outline",
+      "safe-square-outline", "hand-coin", "hand-coin-outline", "account-cash", "sack", "sack-percent", "purse",
+      "treasure-chest", "gift-outline", "cellphone-nfc", "qrcode-scan",
     ],
   },
   {
     title: "icons.currencies",
-    icons: ["currency-usd", "currency-eur", "currency-gbp", "currency-uah", "currency-jpy", "currency-btc"],
+    icons: [
+      "currency-uah", "currency-usd", "currency-eur", "currency-gbp", "currency-jpy", "currency-cny",
+      "currency-inr", "currency-krw", "currency-try", "currency-kzt", "currency-ils",
+    ],
   },
   {
     title: "icons.investments",
-    icons: ["chart-line", "finance", "gold", "diamond-stone", "bitcoin", "ethereum", "litecoin"],
+    icons: ["chart-line", "chart-areaspline", "finance", "trending-up", "gold", "diamond-stone", "bitcoin", "currency-btc", "ethereum", "currency-eth", "litecoin"],
   },
   {
-    title: "icons.other",
-    icons: ["briefcase", "home-city", "cellphone", "apple", "google"],
+    title: "icons.purposes",
+    icons: [
+      "home", "home-city", "car", "airplane", "school", "shield-check", "heart", "baby-face-outline",
+      "account-group", "briefcase-outline", "store", "shopping", "cellphone",
+    ],
   },
 ];
 
 export const DEFAULT_ACCOUNT_ICON: IconName = "credit-card-outline";
 
-// The row shown under the form (spec 5.2); "more" opens the full palette.
-export const QUICK_COLORS = ["#42a5f5", "#66bb6a", "#ffa726", "#ef5350", "#ab47bc", "#26a69a", "#8d6e63"];
+// Fill the quick rows under the form until the user has used enough colors of their own (spec 5.2).
+export const QUICK_COLORS = [
+  "#42a5f5", "#66bb6a", "#ffa726", "#ef5350", "#ab47bc", "#26a69a", "#8d6e63",
+  "#ffca28", "#ec407a", "#5c6bc0", "#26c6da", "#9ccc65", "#78909c", "#ff7043",
+];
+
+// Two rows of seven.
+export const QUICK_COLOR_COUNT = 14;
 
 export const DEFAULT_COLOR = QUICK_COLORS[0];
 

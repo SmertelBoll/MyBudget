@@ -6,7 +6,7 @@ import { Button } from "./Button";
 type Props = React.ComponentProps<typeof Button>;
 
 // Pinned to the bottom of the screen, independent of scrolling (spec 2.7). Content above it needs
-// paddingBottom: BOTTOM_ACTION_SPACE so the last item stays reachable.
+// paddingBottom: useBottomSpace() so the last item stays reachable.
 export function BottomActionButton(props: Props) {
   const insets = useSafeAreaInsets();
   return (

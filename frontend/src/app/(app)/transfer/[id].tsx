@@ -7,7 +7,8 @@ import { rateBetween, useRates } from "@/data/rates";
 import { deleteTransfer, saveTransfer } from "@/data/transfers";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTheme } from "@/theme/ThemeProvider";
-import { BOTTOM_ACTION_SPACE, spacing } from "@/theme/tokens";
+import { spacing } from "@/theme/tokens";
+import { useBottomSpace } from "@/utils/useBottomSpace";
 import { todayLocal } from "@/utils/dates";
 import { parseAmount } from "@/utils/money";
 import { useMoney } from "@/utils/useMoney";
@@ -53,6 +54,7 @@ export default function TransferFormScreen() {
 
 function TransferForm({ initial, existingId }: { initial: FormValues; existingId: string | null }) {
   const { colors } = useTheme();
+  const bottomSpace = useBottomSpace();
   const { t } = useI18n();
   const dialog = useDialog();
   const rates = useRates();
@@ -131,7 +133,7 @@ function TransferForm({ initial, existingId }: { initial: FormValues; existingId
         }
       />
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
-        <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ padding: spacing.md, gap: spacing.lg, paddingBottom: BOTTOM_ACTION_SPACE }}>
+        <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ padding: spacing.md, gap: spacing.lg, paddingBottom: bottomSpace }}>
           <AccountPicker
             label={t("transfers.from")}
             value={values.from}

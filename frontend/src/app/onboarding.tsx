@@ -6,8 +6,9 @@ import { useAuth } from "@/auth/AuthProvider";
 import { deviceLanguage, useI18n } from "@/i18n/I18nProvider";
 import { LANGUAGE_OPTIONS } from "@/i18n/languages";
 import { useTheme } from "@/theme/ThemeProvider";
-import { BOTTOM_ACTION_SPACE, spacing } from "@/theme/tokens";
-import { useCurrencyOptions } from "@/utils/currency";
+import { spacing } from "@/theme/tokens";
+import { useBottomSpace } from "@/utils/useBottomSpace";
+import { useCurrencyOptions, usePinnedCurrencies } from "@/utils/currency";
 import { AppText } from "@/components/AppText";
 import { BottomActionButton } from "@/components/BottomActionButton";
 import { ScreenHeader } from "@/components/ScreenHeader";
@@ -17,6 +18,7 @@ import { useToast } from "@/components/Toast";
 // After the first sign-in (spec screen 1, 2.2): main currency and language. Then Home opens.
 export default function OnboardingScreen() {
   const { colors } = useTheme();
+  const bottomSpace = useBottomSpace();
   const { t } = useI18n();
   const toast = useToast();
   const { user, updateMe } = useAuth();
@@ -26,6 +28,7 @@ export default function OnboardingScreen() {
   const languageGuessed = useRef(false);
 
   const currencyOptions = useCurrencyOptions();
+  const pinnedCurrencies = usePinnedCurrencies();
 
   // The phone's currency and language are preselected: most people just press "Get started".
   const localCurrency = getLocales()[0]?.currencyCode ?? null;
@@ -62,7 +65,7 @@ export default function OnboardingScreen() {
         </AppText>
       </ScreenHeader>
 
-      <ScrollView contentContainerStyle={{ padding: spacing.md, gap: spacing.lg, paddingBottom: BOTTOM_ACTION_SPACE }}>
+      <ScrollView contentContainerStyle={{ padding: spacing.md, gap: spacing.lg, paddingBottom: bottomSpace }}>
         <SelectField
           label={t("onboarding.language")}
           value={user?.language ?? null}
@@ -75,6 +78,7 @@ export default function OnboardingScreen() {
             label={t("onboarding.currency")}
             value={currency}
             options={currencyOptions}
+            pinned={pinnedCurrencies}
             onChange={setCurrency}
             placeholder={t("onboarding.chooseCurrency")}
             searchLabel={t("onboarding.searchCurrency")}

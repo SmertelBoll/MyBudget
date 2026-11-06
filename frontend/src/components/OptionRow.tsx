@@ -4,15 +4,17 @@ import { useTheme } from "@/theme/ThemeProvider";
 import { spacing } from "@/theme/tokens";
 import { AppText } from "./AppText";
 
-// A pickable row with a check mark: languages, currencies.
+// A pickable row: name on the left, an optional code on the right (currencies), a check mark when chosen.
 export function OptionRow({
   title,
   subtitle,
+  trailing,
   selected,
   onPress,
 }: {
   title: string;
   subtitle?: string;
+  trailing?: string;
   selected: boolean;
   onPress: () => void;
 }) {
@@ -28,7 +30,7 @@ export function OptionRow({
         gap: spacing.md,
         paddingVertical: spacing.md,
         paddingHorizontal: spacing.md,
-        backgroundColor: pressed ? colors.selected : "transparent",
+        backgroundColor: pressed ? colors.selected : selected ? colors.surface : "transparent",
       })}
     >
       <View style={{ flex: 1 }}>
@@ -39,7 +41,12 @@ export function OptionRow({
           </AppText>
         ) : null}
       </View>
-      {selected && <MaterialCommunityIcons name="check" size={22} color={colors.text} />}
+      {trailing ? (
+        <AppText variant="label" secondary>
+          {trailing}
+        </AppText>
+      ) : null}
+      <MaterialCommunityIcons name="check" size={22} color={selected ? colors.text : "transparent"} />
     </Pressable>
   );
 }

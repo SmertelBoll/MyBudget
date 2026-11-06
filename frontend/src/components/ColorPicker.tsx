@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Pressable, ScrollView, View, useWindowDimensions } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { COLOR_PAGES, HEX_COLOR, QUICK_COLORS } from "@/constants/appearance";
+import { COLOR_PAGES, HEX_COLOR, QUICK_COLORS, QUICK_COLOR_COUNT } from "@/constants/appearance";
+import { useCollection } from "@/data/hooks";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTheme } from "@/theme/ThemeProvider";
 import { spacing } from "@/theme/tokens";
@@ -13,6 +14,7 @@ import { contrastOn } from "./IconCircle";
 import { TextField } from "./TextField";
 
 const SWATCH = 40;
+const CELL = `${100 / 7}%` as const;
 
 function Swatch({ color, selected, onPress, size = SWATCH }: { color: string; selected: boolean; onPress: () => void; size?: number }) {
   const { colors } = useTheme();
@@ -39,6 +41,21 @@ function Swatch({ color, selected, onPress, size = SWATCH }: { color: string; se
   );
 }
 
+// Colors the user actually picked, newest first (from their accounts and categories, so they follow the account to
+// other devices), then the defaults. The current value is always in the rows.
+const useRecentColors = (value: string) => {
+  const accounts = useCollection("accounts");
+  const categories = useCollection("categories");
+  return useMemo(() => {
+    // A record saved offline has no server time yet: it's the newest.
+    const used = [...accounts, ...categories]
+      .map((record) => ({ color: record.color.toLowerCase(), at: record.updatedAt ?? "9999" }))
+      .sort((a, b) => b.at.localeCompare(a.at))
+      .map((entry) => entry.color);
+    return [...new Set([value.toLowerCase(), ...used, ...QUICK_COLORS])].slice(0, QUICK_COLOR_COUNT - 1);
+  }, [accounts, categories, value]);
+};
+
 // Spec 2.9 ColorPicker: a row of colors and "more", which opens pages of shades (swipe sideways) with a #RRGGBB
 // field on top and a confirm button at the bottom.
 export function ColorPicker({ label, value, onChange }: { label: string; value: string; onChange: (color: string) => void }) {
@@ -51,7 +68,7 @@ export function ColorPicker({ label, value, onChange }: { label: string; value: 
   const [hex, setHex] = useState(value);
   const [page, setPage] = useState(0);
 
-  const row = QUICK_COLORS.includes(value) ? QUICK_COLORS : [value, ...QUICK_COLORS.slice(0, -1)];
+  const row = useRecentColors(value);
   const hexValid = HEX_COLOR.test(hex);
 
   const openPicker = () => {
@@ -68,26 +85,30 @@ export function ColorPicker({ label, value, onChange }: { label: string; value: 
   return (
     <View style={{ gap: spacing.sm }}>
       <AppText variant="label">{label}</AppText>
-      <View style={{ flexDirection: "row", flexWrap: "wrap", gap: spacing.sm, alignItems: "center" }}>
+      {/* Two rows of seven: the recent colors, then "+" in the last cell. */}
+      <View style={{ flexDirection: "row", flexWrap: "wrap", rowGap: spacing.sm }}>
         {row.map((color) => (
-          <Swatch key={color} color={color} selected={color.toLowerCase() === value.toLowerCase()} onPress={() => onChange(color)} />
+          <View key={color} style={{ width: CELL, alignItems: "center" }}>
+            <Swatch color={color} selected={color.toLowerCase() === value.toLowerCase()} onPress={() => onChange(color)} />
+          </View>
         ))}
-        <Pressable
-          onPress={openPicker}
-          accessibilityRole="button"
-          accessibilityLabel={t("colors.more")}
-          style={{
-            width: SWATCH,
-            height: SWATCH,
-            borderRadius: SWATCH / 2,
-            borderWidth: 1.5,
-            borderColor: colors.selected,
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <MaterialCommunityIcons name="plus" size={24} color={colors.text} />
-        </Pressable>
+        <View style={{ width: CELL, alignItems: "center" }}>
+          <Pressable
+            onPress={openPicker}
+            accessibilityRole="button"
+            accessibilityLabel={t("colors.more")}
+            style={({ pressed }) => ({
+              width: SWATCH,
+              height: SWATCH,
+              borderRadius: SWATCH / 2,
+              backgroundColor: pressed ? colors.selected : colors.tonal,
+              alignItems: "center",
+              justifyContent: "center",
+            })}
+          >
+            <MaterialCommunityIcons name="plus" size={24} color={colors.text} />
+          </Pressable>
+        </View>
       </View>
 
       <FullScreenModal visible={open} title={t("colors.title")} onClose={() => setOpen(false)}>

@@ -7,38 +7,40 @@ import { useBalances, useTotals } from "@/data/balances";
 import { useCollection } from "@/data/hooks";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTheme } from "@/theme/ThemeProvider";
-import { BOTTOM_ACTION_SPACE, radius, spacing } from "@/theme/tokens";
+import { radius, spacing } from "@/theme/tokens";
+import { useBottomSpace } from "@/utils/useBottomSpace";
 import { useMoney } from "@/utils/useMoney";
 import { AppSheet } from "@/components/AppSheet";
 import { AppText } from "@/components/AppText";
 import { Fab } from "@/components/Fab";
+import { IconButton } from "@/components/IconButton";
 import { ListRow } from "@/components/ListRow";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import type { IconName } from "@/constants/appearance";
 
-function ActionTile({ icon, label, onPress }: { icon: IconName; label: string; onPress: () => void }) {
+// Compact action: icon and label side by side, so the block above the list stays short.
+function ActionButton({ icon, label, onPress }: { icon: IconName; label: string; onPress: () => void }) {
   const { colors } = useTheme();
   return (
-    <Pressable onPress={onPress} accessibilityRole="button" style={{ flex: 1, alignItems: "center", gap: spacing.sm }}>
-      {({ pressed }) => (
-        <>
-          <View
-            style={{
-              width: 64,
-              height: 64,
-              borderRadius: radius.md,
-              alignItems: "center",
-              justifyContent: "center",
-              backgroundColor: pressed ? colors.accentPressed : colors.accent,
-            }}
-          >
-            <MaterialCommunityIcons name={icon} size={32} color={colors.onAccent} />
-          </View>
-          <AppText variant="label" style={{ textAlign: "center" }}>
-            {label}
-          </AppText>
-        </>
-      )}
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      style={({ pressed }) => ({
+        flex: 1,
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: spacing.sm,
+        minHeight: 44,
+        paddingHorizontal: spacing.sm,
+        borderRadius: radius.md,
+        backgroundColor: pressed ? colors.accentPressed : colors.accent,
+      })}
+    >
+      <MaterialCommunityIcons name={icon} size={22} color={colors.onAccent} />
+      <AppText variant="label" color={colors.onAccent} numberOfLines={1}>
+        {label}
+      </AppText>
     </Pressable>
   );
 }
@@ -46,6 +48,7 @@ function ActionTile({ icon, label, onPress }: { icon: IconName; label: string; o
 // Screen 5.1.
 export default function AccountsScreen() {
   const { colors } = useTheme();
+  const bottomSpace = useBottomSpace();
   const { t } = useI18n();
   const { money } = useMoney();
   const accounts = useCollection("accounts");
@@ -58,19 +61,14 @@ export default function AccountsScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
       <ScreenHeader title={t("nav.accounts")} />
-      <ScrollView contentContainerStyle={{ padding: spacing.md, gap: spacing.md, paddingBottom: BOTTOM_ACTION_SPACE }}>
-        <View style={{ alignItems: "center", gap: spacing.xs, paddingVertical: spacing.md }}>
-          <AppText secondary>{t("accounts.total")}</AppText>
+      <ScrollView contentContainerStyle={{ padding: spacing.md, gap: spacing.md, paddingBottom: bottomSpace }}>
+        <View style={{ alignItems: "center", gap: 2 }}>
+          <AppText variant="caption" secondary>
+            {t("accounts.total")}
+          </AppText>
           <View style={{ flexDirection: "row", alignItems: "center", gap: spacing.sm }}>
             <AppText variant="display">{money(totals.included, totals.currency)}</AppText>
-            <Pressable
-              onPress={() => setDetails(true)}
-              hitSlop={8}
-              accessibilityRole="button"
-              accessibilityLabel={t("accounts.balanceDetails")}
-            >
-              <MaterialCommunityIcons name="clipboard-text-outline" size={26} color={colors.textSecondary} />
-            </Pressable>
+            <IconButton icon="clipboard-text-outline" label={t("accounts.balanceDetails")} size={36} onPress={() => setDetails(true)} />
           </View>
           {/* All money, including accounts kept out of Total (spec 5.1). */}
           <View style={{ flexDirection: "row", alignItems: "center", gap: spacing.xs }}>
@@ -81,9 +79,9 @@ export default function AccountsScreen() {
           </View>
         </View>
 
-        <View style={{ flexDirection: "row", gap: spacing.md }}>
-          <ActionTile icon="history" label={t("accounts.transferHistory")} onPress={() => router.push("/transfers")} />
-          <ActionTile icon="swap-horizontal" label={t("accounts.newTransfer")} onPress={() => router.push({ pathname: "/transfer/[id]", params: { id: "new" } })} />
+        <View style={{ flexDirection: "row", gap: spacing.sm }}>
+          <ActionButton icon="history" label={t("accounts.transferHistory")} onPress={() => router.push("/transfers")} />
+          <ActionButton icon="swap-horizontal" label={t("accounts.newTransfer")} onPress={() => router.push({ pathname: "/transfer/[id]", params: { id: "new" } })} />
         </View>
 
         {active.length === 0 ? (

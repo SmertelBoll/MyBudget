@@ -43,7 +43,7 @@ export function ListRow({ icon, color, title, note, value, valueColor, badges, d
     >
       <IconCircle icon={icon} color={color} dimmed={dimmed} />
       <View style={{ flex: 1 }}>
-        <AppText numberOfLines={1} color={dimmed ? colors.textSecondary : undefined}>
+        <AppText variant="heading" numberOfLines={1} color={dimmed ? colors.textSecondary : undefined}>
           {title}
         </AppText>
         {note ? (

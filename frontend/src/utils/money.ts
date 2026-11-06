@@ -10,6 +10,14 @@ export type MoneyFormat = {
 
 const NBSP = " ";
 
+// Our own symbols for the common currencies: the phone's JS engine (Hermes) has partial Intl data and prints
+// "UAH 1,500" where a browser prints "₴1,500". Anything not listed falls back to whatever Intl gives.
+const SYMBOLS: Record<string, string> = {
+  USD: "$", EUR: "€", GBP: "£", UAH: "₴", PLN: "zł", JPY: "¥", CNY: "¥", CHF: "Fr", CZK: "Kč", TRY: "₺",
+  KZT: "₸", INR: "₹", KRW: "₩", ILS: "₪", GEL: "₾", AZN: "₼", HUF: "Ft", RON: "lei", SEK: "kr", NOK: "kr",
+  DKK: "kr", CAD: "C$", AUD: "A$", NZD: "NZ$", BRL: "R$", MXN: "Mex$", THB: "฿", VND: "₫", PHP: "₱", NGN: "₦",
+};
+
 // "₴32,207" / "₴32 206,83". `exact` always shows cents (balance details, edit fields).
 export const formatMoney = (minor: number, currency: string, format: MoneyFormat, exact = false) => {
   const digits = format.showCents || exact ? 2 : 0;
@@ -25,8 +33,16 @@ export const formatMoney = (minor: number, currency: string, format: MoneyFormat
   } catch {
     return `${(minor / 100).toFixed(digits)} ${currency}`;
   }
+  const symbol = SYMBOLS[currency];
+  // Intl printed the code ("UAH 1,500") instead of a symbol: the space it adds after a code isn't wanted after "₴".
+  const replacedCode = Boolean(symbol) && parts.some((part) => part.type === "currency" && part.value === currency);
   return parts
-    .map((part) => {
+    .map((part, index) => {
+      if (part.type === "currency") return symbol ?? part.value;
+      if (replacedCode && part.type === "literal" && /^\s+$/.test(part.value)) {
+        const nextToCurrency = parts[index - 1]?.type === "currency" || parts[index + 1]?.type === "currency";
+        if (nextToCurrency && symbol.length === 1) return "";
+      }
       if (part.type === "decimal") return format.decimalSeparator;
       // Grouping must not look like the chosen decimal separator.
       if (part.type === "group" && part.value === format.decimalSeparator) return NBSP;
@@ -36,6 +52,7 @@ export const formatMoney = (minor: number, currency: string, format: MoneyFormat
 };
 
 export const currencySymbol = (currency: string, lang: string) => {
+  if (SYMBOLS[currency]) return SYMBOLS[currency];
   try {
     return (
       new Intl.NumberFormat(lang, { style: "currency", currency, currencyDisplay: "narrowSymbol" })

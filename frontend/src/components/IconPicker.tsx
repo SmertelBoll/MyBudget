@@ -5,7 +5,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import type { IconName, IconSection } from "@/constants/appearance";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTheme } from "@/theme/ThemeProvider";
-import { radius, spacing } from "@/theme/tokens";
+import { spacing } from "@/theme/tokens";
 import { AppText } from "./AppText";
 import { FullScreenModal } from "./FullScreenModal";
 import { IconCircle } from "./IconCircle";
@@ -38,15 +38,9 @@ function IconCell({
         paddingVertical: spacing.sm,
       }}
     >
-      <View
-        style={{
-          padding: 3,
-          borderRadius: radius.md,
-          borderWidth: 2,
-          borderColor: selected ? colors.accent : "transparent",
-        }}
-      >
-        <IconCircle icon={icon} color={selected ? color : colors.selected} size={56} />
+      {/* The chosen icon takes the account's color and grows a little; the others stay neutral. */}
+      <View style={{ height: 60, justifyContent: "center" }}>
+        <IconCircle icon={icon} color={selected ? color : colors.iconIdle} size={selected ? 60 : 52} />
       </View>
     </Pressable>
   );
@@ -72,7 +66,8 @@ export function IconPicker({
   const insets = useSafeAreaInsets();
   const [open, setOpen] = useState(false);
 
-  const all = sections.flatMap((section) => section.icons);
+  // An icon may sit in two sections (e.g. the hryvnia in Money and Currencies); inline it appears once.
+  const all = [...new Set(sections.flatMap((section) => section.icons))];
   const inline = all.slice(0, INLINE);
   if (!inline.includes(value as IconName) && all.includes(value as IconName)) {
     inline[INLINE - 1] = value as IconName;
