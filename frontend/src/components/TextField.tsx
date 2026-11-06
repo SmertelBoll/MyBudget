@@ -28,7 +28,7 @@ export function TextField({ ref, label, error, hint, secure, onFocus, onBlur, st
 
   return (
     <View style={{ gap: spacing.xs }}>
-      <AppText variant="label" secondary>
+      <AppText variant="label">
         {label}
       </AppText>
       <View

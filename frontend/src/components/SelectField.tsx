@@ -50,7 +50,7 @@ export function SelectField({ label, value, options, onChange, placeholder, sear
 
   return (
     <View style={{ gap: spacing.xs }}>
-      <AppText variant="label" secondary>
+      <AppText variant="label">
         {label}
       </AppText>
       <Pressable

@@ -35,7 +35,7 @@ export default function SettingsScreen() {
         <AppText variant="heading">{t("settings.appearance")}</AppText>
 
         <View style={{ backgroundColor: colors.surface, borderRadius: radius.md, padding: spacing.md, gap: spacing.sm }}>
-          <AppText variant="label" secondary>
+          <AppText variant="label">
             {t("settings.theme")}
           </AppText>
           <SegmentedSwitch
