@@ -1,6 +1,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { AppState } from "react-native";
 import type { User } from "@/api/types";
+import { loadRates } from "./rates";
 import { countOutbox, getMeta, loadAll, setMeta, wipeLocal } from "./store";
 import { requestSync, startSync, stopSync } from "./sync";
 
@@ -32,6 +33,7 @@ export function DataProvider({ user, children }: { user: User; children: ReactNo
       await bindUser(user);
       await loadAll();
       await startSync();
+      loadRates();
       if (cancelled) return;
       setReadyFor(user.id);
       requestSync();

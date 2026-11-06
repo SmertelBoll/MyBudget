@@ -68,15 +68,22 @@ export const saveEntity = async <C extends Collection>(collection: C, entity: En
   changeListener?.();
 };
 
-export const removeEntity = async (collection: Collection, id: string) => {
+export const removeEntity = (collection: Collection, id: string) => removeEntities(collection, [id]);
+
+// Several deletions in one transaction and one re-render (e.g. an account's transactions).
+export const removeEntities = async (collection: Collection, ids: string[]) => {
+  if (!ids.length) return;
   await serialWrite((db) =>
     db.withTransactionAsync(async () => {
-      await db.runAsync("DELETE FROM entities WHERE collection = ? AND id = ?", collection, id);
-      await db.runAsync("DELETE FROM outbox WHERE collection = ? AND id = ?", collection, id);
-      await db.runAsync("INSERT INTO outbox (collection, id, op) VALUES (?, ?, 'delete')", collection, id);
+      for (const id of ids) {
+        await db.runAsync("DELETE FROM entities WHERE collection = ? AND id = ?", collection, id);
+        await db.runAsync("DELETE FROM outbox WHERE collection = ? AND id = ?", collection, id);
+        await db.runAsync("INSERT INTO outbox (collection, id, op) VALUES (?, ?, 'delete')", collection, id);
+      }
     })
   );
-  records.get(collection)!.delete(id);
+  const map = records.get(collection)!;
+  ids.forEach((id) => map.delete(id));
   refresh([collection]);
   changeListener?.();
 };

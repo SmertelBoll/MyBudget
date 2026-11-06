@@ -4,7 +4,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTheme } from "@/theme/ThemeProvider";
 import { fontSize, fonts, radius, spacing } from "@/theme/tokens";
-import { AppText } from "./AppText";
+import { AppText, NO_LIGATURES } from "./AppText";
 
 export type TextInputHandle = ComponentRef<typeof TextInput>;
 
@@ -39,6 +39,8 @@ export function TextField({ ref, label, error, hint, secure, onFocus, onBlur, st
           borderRadius: radius.md,
           borderWidth: 1.5,
           borderColor,
+          // Android paints its autofill highlight on the input itself; clipping keeps it inside the rounded border.
+          overflow: "hidden",
         }}
       >
         <TextInput
@@ -61,6 +63,7 @@ export function TextField({ ref, label, error, hint, secure, onFocus, onBlur, st
               color: colors.text,
               fontFamily: fonts.regular,
               fontSize: fontSize.body,
+              fontVariant: NO_LIGATURES,
             },
             style,
           ]}

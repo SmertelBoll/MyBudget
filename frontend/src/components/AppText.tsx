@@ -1,8 +1,10 @@
-import { Text, type TextProps } from "react-native";
+import { Text, type TextProps, type TextStyle } from "react-native";
 import { useTheme } from "@/theme/ThemeProvider";
 import { fontSize, fonts } from "@/theme/tokens";
 
-type Variant = "display" | "title" | "heading" | "body" | "label" | "caption";
+export const NO_LIGATURES: TextStyle["fontVariant"] = ["no-common-ligatures"];
+
+type Variant ="display" | "title" | "heading" | "body" | "label" | "caption";
 
 const VARIANTS = {
   display: { fontFamily: fonts.semibold, fontSize: fontSize.display },
@@ -23,7 +25,12 @@ export function AppText({ variant = "body", secondary, color, style, ...rest }: 
   const { colors } = useTheme();
   return (
     <Text
-      style={[VARIANTS[variant], { color: color ?? (secondary ? colors.textSecondary : colors.text) }, style]}
+      style={[
+        VARIANTS[variant],
+        // Rubik joins "fi"/"fl" into one glyph; in titles like "Profile" that reads as a typo.
+        { color: color ?? (secondary ? colors.textSecondary : colors.text), fontVariant: NO_LIGATURES },
+        style,
+      ]}
       {...rest}
     />
   );

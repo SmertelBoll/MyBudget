@@ -1,41 +1,36 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ScrollView, View } from "react-native";
 import { getLocales } from "expo-localization";
-import { ApiError, api } from "@/api/client";
+import { ApiError } from "@/api/client";
 import { useAuth } from "@/auth/AuthProvider";
 import { deviceLanguage, useI18n } from "@/i18n/I18nProvider";
 import { LANGUAGE_OPTIONS } from "@/i18n/languages";
 import { useTheme } from "@/theme/ThemeProvider";
 import { BOTTOM_ACTION_SPACE, spacing } from "@/theme/tokens";
-import { FALLBACK_CURRENCIES, currencyName } from "@/utils/currency";
+import { useCurrencyOptions } from "@/utils/currency";
 import { AppText } from "@/components/AppText";
 import { BottomActionButton } from "@/components/BottomActionButton";
 import { ScreenHeader } from "@/components/ScreenHeader";
-import { SelectField, type SelectOption } from "@/components/SelectField";
+import { SelectField } from "@/components/SelectField";
 import { useToast } from "@/components/Toast";
 
 // After the first sign-in (spec screen 1, 2.2): main currency and language. Then Home opens.
 export default function OnboardingScreen() {
   const { colors } = useTheme();
-  const { t, lang } = useI18n();
+  const { t } = useI18n();
   const toast = useToast();
   const { user, updateMe } = useAuth();
 
-  const [currencies, setCurrencies] = useState(FALLBACK_CURRENCIES);
   const [picked, setCurrency] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const languageGuessed = useRef(false);
 
-  useEffect(() => {
-    api
-      .get<{ currencies: string[] }>("/currencies", { auth: false })
-      .then((res) => setCurrencies(res.currencies))
-      .catch(() => {});
-  }, []);
+  const currencyOptions = useCurrencyOptions();
 
   // The phone's currency and language are preselected: most people just press "Get started".
   const localCurrency = getLocales()[0]?.currencyCode ?? null;
-  const currency = picked ?? (localCurrency && currencies.includes(localCurrency) ? localCurrency : null);
+  const currency =
+    picked ?? (localCurrency && currencyOptions.some((option) => option.value === localCurrency) ? localCurrency : null);
 
   useEffect(() => {
     if (languageGuessed.current || !user) return;
@@ -44,14 +39,6 @@ export default function OnboardingScreen() {
     if (guess !== user.language) updateMe({ language: guess }).catch(() => {});
   }, [user, updateMe]);
 
-  const currencyOptions = useMemo<SelectOption[]>(
-    () =>
-      currencies.map((code) => {
-        const name = currencyName(code, lang);
-        return { value: code, label: code, subtitle: name === code ? undefined : name };
-      }),
-    [currencies, lang]
-  );
 
   const start = async () => {
     if (!currency) {

@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Modal, Pressable, View } from "react-native";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTheme } from "@/theme/ThemeProvider";
@@ -6,7 +6,9 @@ import { radius, spacing } from "@/theme/tokens";
 import { AppText } from "./AppText";
 import { Button } from "./Button";
 
-// The app's only dialog (spec 2.6, no Swal): const ok = await dialog.confirm({...}).
+// The app's only dialog (spec 2.6, no Swal):
+//   const ok = await dialog.confirm({...});      -> true / false
+//   const pick = await dialog.choose({...});     -> chosen option's value, or null when dismissed
 
 type ConfirmOptions = {
   title: string;
@@ -19,35 +21,53 @@ type ConfirmOptions = {
   countdown?: { seconds: number; autoConfirm: boolean };
 };
 
-type DialogState = ConfirmOptions & { resolve: (confirmed: boolean) => void };
+export type ChoiceOption = { value: string; label: string; destructive?: boolean };
 
-const DialogContext = createContext<{ confirm: (options: ConfirmOptions) => Promise<boolean> } | null>(null);
+type ChooseOptions = { title: string; message?: string; options: ChoiceOption[]; cancelText?: string };
+
+type DialogState =
+  | (ConfirmOptions & { kind: "confirm"; resolve: (confirmed: boolean) => void })
+  | (ChooseOptions & { kind: "choose"; resolve: (value: string | null) => void });
+
+type DialogApi = {
+  confirm: (options: ConfirmOptions) => Promise<boolean>;
+  choose: (options: ChooseOptions) => Promise<string | null>;
+};
+
+const DialogContext = createContext<DialogApi | null>(null);
 
 export function DialogProvider({ children }: { children: ReactNode }) {
   const [dialog, setDialog] = useState<DialogState | null>(null);
 
-  const confirm = useCallback(
-    (options: ConfirmOptions) => new Promise<boolean>((resolve) => setDialog({ ...options, resolve })),
+  const api = useMemo<DialogApi>(
+    () => ({
+      confirm: (options) => new Promise<boolean>((resolve) => setDialog({ ...options, kind: "confirm", resolve })),
+      choose: (options) => new Promise<string | null>((resolve) => setDialog({ ...options, kind: "choose", resolve })),
+    }),
     []
   );
 
+  // Confirm dialogs get true/false; choice dialogs the option's value, or null for "cancel".
   const close = useCallback(
-    (confirmed: boolean) => {
-      dialog?.resolve(confirmed);
+    (result: boolean | string | null) => {
+      if (!dialog) return;
+      if (dialog.kind === "confirm") dialog.resolve(result === true);
+      else dialog.resolve(typeof result === "string" ? result : null);
       setDialog(null);
     },
     [dialog]
   );
 
   return (
-    <DialogContext.Provider value={{ confirm }}>
+    <DialogContext.Provider value={api}>
       {children}
-      {dialog && <DialogView key={dialog.title} dialog={dialog} onClose={close} />}
+      {dialog?.kind === "confirm" && <DialogView key={dialog.title} dialog={dialog} onClose={close} />}
+      {dialog?.kind === "choose" && <ChoiceView key={dialog.title} dialog={dialog} onClose={close} />}
     </DialogContext.Provider>
   );
 }
 
-function DialogView({ dialog, onClose }: { dialog: DialogState; onClose: (confirmed: boolean) => void }) {
+function DialogView({ dialog, onClose }: { dialog: ConfirmOptions; onClose: (confirmed: boolean) => void }) {
   const { colors } = useTheme();
   const { t } = useI18n();
   const [left, setLeft] = useState(dialog.countdown?.seconds ?? 0);
@@ -98,6 +118,39 @@ function DialogView({ dialog, onClose }: { dialog: DialogState; onClose: (confir
                 disabled={waiting}
               />
             )}
+          </View>
+        </Pressable>
+      </Pressable>
+    </Modal>
+  );
+}
+
+function ChoiceView({ dialog, onClose }: { dialog: ChooseOptions; onClose: (value: string | null) => void }) {
+  const { colors } = useTheme();
+  const { t } = useI18n();
+  return (
+    <Modal transparent animationType="fade" onRequestClose={() => onClose(null)} statusBarTranslucent>
+      <Pressable
+        onPress={() => onClose(null)}
+        style={{ flex: 1, backgroundColor: colors.scrim, justifyContent: "center", padding: spacing.lg }}
+      >
+        <Pressable
+          onPress={() => {}}
+          accessibilityRole="alert"
+          style={{ backgroundColor: colors.surface, borderRadius: radius.md, padding: spacing.lg, gap: spacing.md }}
+        >
+          <AppText variant="heading">{dialog.title}</AppText>
+          {dialog.message ? <AppText secondary>{dialog.message}</AppText> : null}
+          <View style={{ gap: spacing.sm }}>
+            {dialog.options.map((option) => (
+              <Button
+                key={option.value}
+                variant={option.destructive ? "danger" : "secondary"}
+                title={option.label}
+                onPress={() => onClose(option.value)}
+              />
+            ))}
+            <Button variant="text" title={dialog.cancelText ?? t("common.cancel")} onPress={() => onClose(null)} />
           </View>
         </Pressable>
       </Pressable>
