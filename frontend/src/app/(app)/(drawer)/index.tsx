@@ -1,8 +1,8 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Platform, Pressable, View } from "react-native";
 import { FlatList, GestureDetector, usePanGesture } from "react-native-gesture-handler";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { router } from "expo-router";
+import { router, useNavigation } from "expo-router";
 import type { EntryType } from "@/api/types";
 import { useAuth } from "@/auth/AuthProvider";
 import { categoryName } from "@/data/categories";
@@ -30,6 +30,8 @@ const FOLD_DRAG = 20;
 const OPEN_DRAG = 40;
 // Web: a mouse wheel has no finger, so there the list's own scroll position decides.
 const WEB_COLLAPSE_AT = 24;
+// Android reports the top of a list as 0.3 and the like, not exactly 0.
+const TOP_TOLERANCE = 2;
 // Tags are grey for now (no colors of their own); "no tag" has its own color. The icon and its part of the chart
 // always use the same color.
 const NO_TAG_COLOR = "#6D7FA3";
@@ -77,7 +79,26 @@ export default function HomeScreen() {
   const [range, setRange] = useState<PeriodRange>(() => currentPeriod(settings?.defaultPeriod ?? "week", settings?.firstDayOfWeek ?? 1));
   const [by, setBy] = useState<"category" | "tag">("category");
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsedState] = useState(false);
+  // The gesture's callbacks can outlive the render they were made in, so they read the latest value from here.
+  const collapsedRef = useRef(false);
+  const setCollapsed = (next: boolean) => {
+    collapsedRef.current = next;
+    setCollapsedState(next);
+  };
+  const listRef = useRef<FlatList<Group>>(null);
+  const navigation = useNavigation();
+
+  // Home always comes back with the chart open and the list at its top (spec 2.2).
+  useEffect(
+    () =>
+      navigation.addListener("blur", () => {
+        setCollapsed(false);
+        // The list reports the new position (0) through onScroll.
+        listRef.current?.scrollToOffset({ offset: 0, animated: false });
+      }),
+    [navigation]
+  );
   // Where the list is scrolled to, and the current drag: at most one fold or open per drag, and where the finger
   // was when the list reached its top (pulling past that point opens the chart).
   const scrollY = useRef(0);
@@ -140,7 +161,7 @@ export default function HomeScreen() {
     failOffsetX: [-24, 24],
     onActivate: (event) => {
       // Already at the top when the finger went down: the pull counts from there.
-      drag.current = { changed: false, topAt: scrollY.current <= 0 ? 0 : null };
+      drag.current = { changed: false, topAt: scrollY.current <= TOP_TOLERANCE ? 0 : null };
       follow(event.translationY);
     },
     onUpdate: (event) => follow(event.translationY),
@@ -149,14 +170,14 @@ export default function HomeScreen() {
   function follow(dy: number) {
     const current = drag.current;
     if (current.changed) return;
-    if (!collapsed) {
+    if (!collapsedRef.current) {
       if (dy < -FOLD_DRAG) {
         current.changed = true;
         setCollapsed(true);
       }
       return;
     }
-    if (scrollY.current > 0) {
+    if (scrollY.current > TOP_TOLERANCE) {
       current.topAt = null;
       return;
     }
@@ -170,8 +191,8 @@ export default function HomeScreen() {
   const onListScroll = (y: number) => {
     scrollY.current = y;
     if (Platform.OS !== "web") return;
-    if (y > WEB_COLLAPSE_AT && !collapsed) setCollapsed(true);
-    else if (y <= 0 && collapsed) setCollapsed(false);
+    if (y > WEB_COLLAPSE_AT && !collapsedRef.current) setCollapsed(true);
+    else if (y <= TOP_TOLERANCE && collapsedRef.current) setCollapsed(false);
   };
 
   const openLog = (only?: { category?: string; tag?: string }) =>
@@ -231,16 +252,18 @@ export default function HomeScreen() {
             accessibilityRole="switch"
             accessibilityLabel={`${t("home.byCategories")} / ${t("home.byTags")}`}
             accessibilityState={{ checked: by === "tag" }}
-            style={({ pressed }) => ({
-              position: "absolute",
-              left: spacing.md,
-              bottom: spacing.md,
-              flexDirection: "row",
-              padding: 3,
-              borderRadius: radius.md,
-              backgroundColor: pressed ? colors.selected : colors.background,
-            })}
+            style={{ position: "absolute", left: spacing.md, bottom: spacing.md }}
           >
+            {({ pressed }) => (
+              <View
+                style={{
+                  flexDirection: "row",
+                  padding: 3,
+                  borderRadius: radius.md,
+                  overflow: "hidden",
+                  backgroundColor: pressed ? colors.selected : colors.background,
+                }}
+              >
             {BY_OPTIONS.map((option) => {
               const active = option.value === by;
               return (
@@ -259,6 +282,8 @@ export default function HomeScreen() {
                 </View>
               );
             })}
+              </View>
+            )}
           </Pressable>
           <Fab placement="corner" label={t("entry.addTitle")} onPress={() => openNewTransaction(type)} size={52} />
         </View>
@@ -267,6 +292,7 @@ export default function HomeScreen() {
       <GestureDetector gesture={pan}>
       <View style={{ flex: 1 }}>
       <FlatList
+        ref={listRef}
         data={groups}
         simultaneousWith={pan}
         keyExtractor={(group) => group.id}
