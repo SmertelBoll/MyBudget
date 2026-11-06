@@ -60,7 +60,7 @@ function Choice({ icon, color, title, subtitle, selected, highlight, onPress }: 
       <MaterialCommunityIcons
         name={selected ? "checkbox-marked-circle" : "checkbox-blank-circle-outline"}
         size={24}
-        color={selected ? colors.accent : colors.textSecondary}
+        color={selected ? colors.mark : colors.textSecondary}
       />
       <IconCircle icon={icon} color={color} size={40} />
       <View style={{ flex: 1 }}>
@@ -130,7 +130,7 @@ export function AccountFilterSelect({
             }}
           />
           {chosen?.length ? (
-            <View pointerEvents="none" style={{ position: "absolute", top: 2, right: 2, width: 10, height: 10, borderRadius: 5, backgroundColor: colors.accent }} />
+            <View pointerEvents="none" style={{ position: "absolute", top: 2, right: 2, width: 10, height: 10, borderRadius: 5, backgroundColor: colors.mark }} />
           ) : null}
         </View>
       ) : (

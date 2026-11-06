@@ -157,7 +157,7 @@ export function ColorPicker({ label, value, onChange }: { label: string; value: 
                 width: 8,
                 height: 8,
                 borderRadius: 4,
-                backgroundColor: index === page ? colors.accent : colors.selected,
+                backgroundColor: index === page ? colors.mark : colors.selected,
               }}
             />
           ))}

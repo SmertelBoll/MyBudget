@@ -50,7 +50,7 @@ export function CategoryCell({
           padding: 3,
           borderRadius: 34,
           borderWidth: 2,
-          borderColor: selected ? colors.accent : "transparent",
+          borderColor: selected ? colors.mark : "transparent",
           transform: [{ scale: picked ? 1.1 : 1 }],
         }}
       >

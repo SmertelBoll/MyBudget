@@ -11,9 +11,12 @@ export type ChartMode = "general" | EntryType;
 export type Stack = { id: string; value: number };
 export type Bucket = { range: PeriodRange; income: number; expense: number; stacks: Stack[] };
 
-// Spec 6: one bar (or three) per period, from the first entry to today, all in the main currency at today's rate.
-// In the expense / income view a bar is split by category, or by tag; an entry with several tags is shared evenly
-// between them so the bar still adds up to the period's total.
+// Empty periods the chart can also be scrolled to: before the first entry and after today.
+const PADDING: Record<Period, number> = { year: 3, month: 24, week: 52, day: 90 };
+
+// Spec 6: one bar (or three) per period, all in the main currency at today's rate. In the expense / income view a
+// bar is split by category or by tag, biggest part at the bottom. By tag an entry counts in full in each of its tags
+// (as on Home), so such a bar can be taller than the period's total; the screen says so.
 export const useChartBuckets = (filter: AccountFilter, granularity: Period, mode: ChartMode, by: "category" | "tag") => {
   const transactions = useCollection("transactions");
   const accounts = useCollection("accounts");
@@ -28,19 +31,28 @@ export const useChartBuckets = (filter: AccountFilter, granularity: Period, mode
     const allowed = filter ? new Set(filter) : null;
     const accountById = new Map(accounts.map((account) => [account.id, account]));
     const knownTags = new Set(tags.map((tag) => tag.id));
-    const entries = transactions.filter((tx) => tx.date <= today && (!allowed || allowed.has(tx.accountId)));
+    const entries = transactions.filter((tx) => !allowed || allowed.has(tx.accountId));
 
+    const shift = (range: PeriodRange, steps: number) => {
+      let current = range;
+      for (let i = 0; i < Math.abs(steps); i++) {
+        current = periodContaining(granularity, steps < 0 ? addDays(current.start, -1) : addDays(current.end, 1), firstDay);
+      }
+      return current;
+    };
     const earliest = entries.reduce((min, tx) => (tx.date < min ? tx.date : min), today);
+    const latest = entries.reduce((max, tx) => (tx.date > max ? tx.date : max), today);
+    const first = shift(periodContaining(granularity, earliest, firstDay), -PADDING[granularity]);
+    const last = shift(periodContaining(granularity, latest, firstDay), PADDING[granularity]);
+    const todayStart = periodContaining(granularity, today, firstDay).start;
+
     const buckets: (Bucket & { stackMap: Map<string, number> })[] = [];
     const index = new Map<string, number>();
-    for (let range = periodContaining(granularity, earliest, firstDay); range.start <= today; ) {
+    for (let range = first; range.start <= last.start; range = shift(range, 1)) {
       index.set(range.start, buckets.length);
       buckets.push({ range, income: 0, expense: 0, stacks: [], stackMap: new Map() });
-      range = periodContaining(granularity, addDays(range.end, 1), firstDay);
     }
 
-    // Stacks are ordered the same way in every bar: the biggest group over all time at the bottom.
-    const overall = new Map<string, number>();
     for (const tx of entries) {
       const bucket = buckets[index.get(periodContaining(granularity, tx.date, firstDay).start) ?? -1];
       if (!bucket) continue;
@@ -49,27 +61,23 @@ export const useChartBuckets = (filter: AccountFilter, granularity: Period, mode
       else bucket.expense += value;
       if (mode === "general" || tx.type !== mode) continue;
       const ids = by === "category" ? [tx.categoryId] : tx.tagIds.filter((id) => knownTags.has(id));
-      const parts = ids.length ? ids : [NO_TAG];
-      for (const id of parts) {
-        const share = value / parts.length;
-        bucket.stackMap.set(id, (bucket.stackMap.get(id) ?? 0) + share);
-        overall.set(id, (overall.get(id) ?? 0) + share);
-      }
+      for (const id of ids.length ? ids : [NO_TAG]) bucket.stackMap.set(id, (bucket.stackMap.get(id) ?? 0) + value);
     }
-    const rank = new Map([...overall].sort((a, b) => b[1] - a[1]).map(([id], position) => [id, position]));
-    return buckets.map(({ stackMap, ...bucket }) => ({
-      ...bucket,
-      stacks: [...stackMap]
-        .map(([id, value]) => ({ id, value }))
-        .sort((a, b) => (rank.get(a.id) ?? 0) - (rank.get(b.id) ?? 0)),
-    }));
+
+    return {
+      todayIndex: index.get(todayStart) ?? buckets.length - 1,
+      buckets: buckets.map(({ stackMap, ...bucket }) => ({
+        ...bucket,
+        // column-reverse in the bar: the first stack is drawn at the bottom.
+        stacks: [...stackMap].map(([id, value]) => ({ id, value })).sort((a, b) => b.value - a.value),
+      })),
+    };
   }, [transactions, accounts, tags, rates, base, firstDay, filter, granularity, mode, by]);
 };
 
+// Height of a stacked bar: the sum of its parts (by tag that can be more than the period's total).
+export const stackSum = (bucket: Bucket) => bucket.stacks.reduce((sum, stack) => sum + stack.value, 0);
+
 // The value a bar is scaled by: for the general view the tallest of its three bars.
 export const bucketPeak = (bucket: Bucket, mode: ChartMode) =>
-  mode === "general"
-    ? Math.max(bucket.income, bucket.expense, Math.abs(bucket.income - bucket.expense))
-    : mode === "income"
-      ? bucket.income
-      : bucket.expense;
+  mode === "general" ? Math.max(bucket.income, bucket.expense, Math.abs(bucket.income - bucket.expense)) : stackSum(bucket);

@@ -24,7 +24,7 @@ export function TextField({ ref, label, error, hint, secure, onFocus, onBlur, st
   const [focused, setFocused] = useState(false);
   const [hidden, setHidden] = useState(true);
 
-  const borderColor = error ? colors.danger : focused ? colors.accent : colors.selected;
+  const borderColor = error ? colors.danger : focused ? colors.mark : colors.selected;
 
   return (
     <View style={{ gap: spacing.xs }}>

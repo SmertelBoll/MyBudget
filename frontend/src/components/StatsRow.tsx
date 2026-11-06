@@ -78,7 +78,7 @@ export function StatsRow({
           {limit && (
             <View style={{ gap: 2 }}>
               <View style={{ height: 6, borderRadius: 3, backgroundColor: colors.selected, overflow: "hidden" }}>
-                <View style={{ width: `${Math.min(limit.used, 1) * 100}%`, height: 6, backgroundColor: over ? colors.danger : colors.accent }} />
+                <View style={{ width: `${Math.min(limit.used, 1) * 100}%`, height: 6, backgroundColor: over ? colors.danger : colors.mark }} />
               </View>
               <AppText variant="caption" color={over ? colors.danger : colors.textSecondary}>
                 {limit.text}

@@ -22,7 +22,7 @@ export function HeaderSearchInput({ value, onChangeText, placeholder }: { value:
         fontVariant: NO_LIGATURES,
         paddingVertical: spacing.xs,
         borderBottomWidth: 2,
-        borderBottomColor: colors.accent,
+        borderBottomColor: colors.mark,
       }}
     />
   );

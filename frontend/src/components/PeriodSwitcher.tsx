@@ -99,7 +99,7 @@ export function PeriodSwitcher({
               <AppText variant="label" color={active ? colors.text : colors.textSecondary}>
                 {t(LABELS[kind])}
               </AppText>
-              <View style={{ height: 3, alignSelf: "stretch", borderRadius: 2, backgroundColor: active ? colors.accent : "transparent" }} />
+              <View style={{ height: 3, alignSelf: "stretch", borderRadius: 2, backgroundColor: active ? colors.mark : "transparent" }} />
             </Pressable>
           );
         })}

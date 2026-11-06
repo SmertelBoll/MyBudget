@@ -38,6 +38,9 @@ export type Palette = typeof SHARED & {
   iconIdle: string;
   // Small round buttons next to values (balance details, calculator): darker than the card so they read as buttons.
   tonal: string;
+  // Thin highlights: the line under a chosen tab, rings, check marks, a focused field. Yellow reads well on the dark
+  // theme but disappears on the light one, where these are near-black instead. Filled yellow areas stay `accent`.
+  mark: string;
 };
 
 const LIGHT: Palette = {
@@ -51,6 +54,7 @@ const LIGHT: Palette = {
   textSecondary: "#555555",
   iconIdle: "#a9a9a9",
   tonal: "#d6d4ca",
+  mark: CONTRAST_DARK,
 };
 
 const DARK: Palette = {
@@ -63,6 +67,7 @@ const DARK: Palette = {
   textSecondary: "#999999",
   iconIdle: "#7c8580",
   tonal: "#4a4a4a",
+  mark: SHARED.accent,
 };
 
 export const getPalette = (scheme: SchemeName): Palette => (scheme === "dark" ? DARK : LIGHT);

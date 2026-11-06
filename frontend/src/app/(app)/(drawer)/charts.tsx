@@ -65,7 +65,7 @@ export default function ChartsScreen() {
   const [selection, setSelection] = useState<BarSelection | null>(null);
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
 
-  const buckets = useChartBuckets(filter, granularity, mode, by);
+  const { buckets, todayIndex } = useChartBuckets(filter, granularity, mode, by);
   const { look } = useGroupLook(by);
 
   // Any other view of the chart starts without a selection.
@@ -144,7 +144,7 @@ export default function ChartsScreen() {
                   <AppText variant="label" color={active ? colors.text : colors.textSecondary}>
                     {t(option.label)}
                   </AppText>
-                  <View style={{ height: 3, alignSelf: "stretch", borderRadius: 2, backgroundColor: active ? colors.accent : "transparent" }} />
+                  <View style={{ height: 3, alignSelf: "stretch", borderRadius: 2, backgroundColor: active ? colors.mark : "transparent" }} />
                 </Pressable>
               );
             })}
@@ -154,6 +154,7 @@ export default function ChartsScreen() {
             // A new size, view or set of accounts starts again at the newest periods.
             key={`${granularity}-${mode}-${by}-${filter?.join(",") ?? "all"}`}
             buckets={buckets}
+            todayIndex={todayIndex}
             granularity={granularity}
             mode={mode}
             colorOf={(id) => look(id).color}
@@ -168,7 +169,7 @@ export default function ChartsScreen() {
             {mode === "general" ? (
               <Legend />
             ) : (
-              <View style={{ flexDirection: "row", justifyContent: "flex-end" }}>
+              <View style={{ flexDirection: "row", alignItems: "center", gap: spacing.sm }}>
                 <IconButton
                   icon={by === "category" ? TAG_ICON : "shape-outline"}
                   label={t(by === "category" ? "home.byTags" : "home.byCategories")}
@@ -178,6 +179,11 @@ export default function ChartsScreen() {
                     reset();
                   }}
                 />
+                {by === "tag" && (
+                  <AppText variant="caption" secondary style={{ flex: 1, textAlign: "right" }}>
+                    {t("charts.tagsDuplicated")}
+                  </AppText>
+                )}
               </View>
             )}
           </View>
