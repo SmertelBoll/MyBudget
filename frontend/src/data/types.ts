@@ -88,6 +88,8 @@ export type Recurring = Base & {
   tagIds: string[];
   comment: string;
   notify: boolean;
+  // Missing on payments saved before it existed: treat as active (isActivePayment).
+  active?: boolean;
   lastGeneratedAt: string | null;
 };
 

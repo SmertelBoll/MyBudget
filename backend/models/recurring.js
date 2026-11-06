@@ -20,6 +20,8 @@ const RecurringSchema = syncedSchema({
   tagIds: { type: [String], default: [] },
   comment: { type: String, default: "" },
   notify: { type: Boolean, default: true },
+  // Off: the payment is paused (no entries, confirmations or notifications).
+  active: { type: Boolean, default: true },
   lastGeneratedAt: { type: String, default: null },
 });
 

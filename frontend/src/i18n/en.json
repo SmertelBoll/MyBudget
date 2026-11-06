@@ -373,6 +373,8 @@
   "recurring.next": "Next",
   "recurring.finished": "Finished",
   "recurring.notify": "Notify me",
+  "recurring.active": "Active",
+  "recurring.paused": "Paused",
   "recurring.oneTime": "One-time",
   "recurring.regular": "Regular",
   "repeat.once": "Once",

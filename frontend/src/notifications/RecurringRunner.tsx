@@ -43,7 +43,7 @@ export function RecurringRunner() {
   useEffect(() => {
     let soonest = Infinity;
     for (const payment of payments) {
-      if (!payment.autoAdd) continue;
+      if (!payment.autoAdd || payment.active === false) continue;
       const next = nextOccurrence(payment);
       if (!next) continue;
       const day = parseLocalDate(next.date);
@@ -56,7 +56,8 @@ export function RecurringRunner() {
   }, [payments]);
 
   // Something wants notifications: ask the system once (it remembers the answer).
-  const wantsNotifications = payments.some((payment) => payment.notify) || reminders.some((reminder) => reminder.active);
+  const wantsNotifications =
+    payments.some((payment) => payment.notify && payment.active !== false) || reminders.some((reminder) => reminder.active);
   useEffect(() => {
     if (!wantsNotifications) return;
     requestNotificationPermission()

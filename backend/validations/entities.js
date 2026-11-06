@@ -101,6 +101,8 @@ export const entitySchemas = {
     tagIds,
     comment,
     notify: z.boolean().default(true),
+    // Paused payments add nothing, ask nothing and notify about nothing until switched back on.
+    active: z.boolean().default(true),
     lastGeneratedAt: localDate.nullable().default(null),
   }),
   reminders: z.object({

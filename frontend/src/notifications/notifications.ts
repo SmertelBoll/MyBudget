@@ -109,7 +109,7 @@ const rebuild = async (payments: Recurring[], reminders: Reminder[], texts: Noti
   // url: the screen a tap on the notification opens (payments waiting for confirmation -> the payments list).
   const planned: { id: string; when: number; url?: string; content: { title: string; body: string } }[] = [];
   for (const payment of payments) {
-    if (!payment.notify) continue;
+    if (!payment.notify || payment.active === false) continue;
     for (const occurrence of occurrencesBetween(payment, from, to, 40)) {
       planned.push({
         id: `p:${payment.id}:${occurrence.date}T${occurrence.time}`,

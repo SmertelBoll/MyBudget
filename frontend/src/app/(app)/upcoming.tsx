@@ -53,6 +53,8 @@ export default function UpcomingScreen() {
   const items = useMemo(() => {
     const all: Item[] = [];
     for (const payment of payments) {
+      // Paused payments won't happen.
+      if (payment.active === false) continue;
       const value = convert(payment.amount, payment.currency, baseCurrency, rates) ?? payment.amount;
       for (const occurrence of occurrencesBetween(payment, range.start, range.end)) all.push({ payment, occurrence, value });
     }

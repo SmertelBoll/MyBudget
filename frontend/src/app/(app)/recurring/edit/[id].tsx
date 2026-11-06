@@ -53,6 +53,7 @@ type FormValues = {
   tagIds: string[];
   comment: string;
   notify: boolean;
+  active: boolean;
 };
 
 // Optional end of a repeating payment: "No end" until a date is picked; the cross takes it away again.
@@ -120,6 +121,7 @@ export default function RecurringFormScreen() {
       tagIds: existing?.tagIds ?? [],
       comment: existing?.comment ?? "",
       notify: existing?.notify ?? true,
+      active: existing?.active ?? true,
     };
   });
 
@@ -189,6 +191,7 @@ function RecurringForm({ initial, existingId }: { initial: FormValues; existingI
         tagIds: values.tagIds,
         comment: values.comment.trim(),
         notify: values.notify,
+        active: values.active,
       },
       existing
     ).catch(reportWriteError);
@@ -250,6 +253,7 @@ function RecurringForm({ initial, existingId }: { initial: FormValues; existingI
 
           <RepeatPicker value={values.rule} onChange={(rule) => set("rule", rule)} startDate={values.startDate} time={timeOrDefault(values.time, DEFAULT_TIME)} />
           <ToggleRow label={t("recurring.autoAdd")} value={values.autoAdd} onChange={(next) => set("autoAdd", next)} />
+          <ToggleRow label={t("recurring.active")} value={values.active} onChange={(on) => set("active", on)} />
           <ToggleRow label={t("recurring.notify")} value={values.notify} onChange={toggleNotify} />
 
           <DateField label={t(once ? "recurring.date" : "recurring.startDate")} value={values.startDate} onChange={(date) => set("startDate", date)} />

@@ -4,7 +4,7 @@ import { router } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useCollection } from "@/data/hooks";
 import { convert, useRates } from "@/data/rates";
-import { pendingPayments, setRecurringNotify, settlePending, type PendingPayment } from "@/data/recurring";
+import { isActivePayment, pendingPayments, setRecurringActive, settlePending, type PendingPayment } from "@/data/recurring";
 import { reportWriteError } from "@/data/store";
 import type { Recurring } from "@/data/types";
 import { useI18n } from "@/i18n/I18nProvider";
@@ -28,22 +28,30 @@ import { ToggleRow } from "@/components/ToggleRow";
 
 const signed = (payment: Recurring, text: string) => `${payment.type === "expense" ? "−" : "+"}${text}`;
 
-function PaymentRow({ payment, next, onToggleNotify }: { payment: Recurring; next: Occurrence | null; onToggleNotify: (on: boolean) => void }) {
+// The switch turns the payment on and off: a paused one adds, asks and notifies nothing.
+function PaymentRow({ payment, next, onToggleActive }: { payment: Recurring; next: Occurrence | null; onToggleActive: (on: boolean) => void }) {
   const { colors } = useTheme();
   const { t, lang } = useI18n();
   const { money } = useMoney();
   const once = payment.rule.kind === "once";
+  const active = isActivePayment(payment);
   return (
     <Pressable
       onPress={() => router.push({ pathname: "/recurring/[id]", params: { id: payment.id } })}
       accessibilityRole="button"
-      style={({ pressed }) => ({ padding: spacing.md, gap: 4, borderRadius: radius.md, backgroundColor: pressed ? colors.selected : colors.surface })}
+      style={({ pressed }) => ({
+        padding: spacing.md,
+        gap: 4,
+        borderRadius: radius.md,
+        backgroundColor: pressed ? colors.selected : colors.surface,
+        opacity: active ? 1 : 0.55,
+      })}
     >
       <View style={{ flexDirection: "row", alignItems: "center", gap: spacing.sm }}>
         <AppText variant="heading" numberOfLines={1} style={{ flex: 1 }}>
           {payment.name}
         </AppText>
-        <ToggleRow label={t("recurring.notify")} value={payment.notify} onChange={onToggleNotify} hideLabel />
+        <ToggleRow label={t("recurring.active")} value={active} onChange={onToggleActive} hideLabel />
       </View>
       <AppText variant="title" color={payment.type === "income" ? colors.text : colors.textSecondary}>
         {signed(payment, money(payment.amount, payment.currency))}
@@ -51,7 +59,7 @@ function PaymentRow({ payment, next, onToggleNotify }: { payment: Recurring; nex
       <View style={{ flexDirection: "row", alignItems: "center", gap: spacing.xs }}>
         <MaterialCommunityIcons name="calendar-clock" size={16} color={colors.textSecondary} />
         <AppText variant="caption" secondary style={{ flex: 1, textTransform: "capitalize" }} numberOfLines={1}>
-          {next ? `${formatLongDate(next.date, lang)}, ${next.time}` : t("recurring.finished")}
+          {!active ? t("recurring.paused") : next ? `${formatLongDate(next.date, lang)}, ${next.time}` : t("recurring.finished")}
         </AppText>
         <MaterialCommunityIcons
           name={once ? "repeat-once" : "repeat"}
@@ -121,9 +129,9 @@ export default function RecurringScreen() {
     });
   }, [payments, query, sort, baseCurrency, rates, now]);
 
-  const toggleNotify = async (payment: Recurring, on: boolean) => {
-    setRecurringNotify(payment, on).catch(reportWriteError);
-    if (on && !(await requestNotificationPermission())) toast.show(t("recurring.notificationsOff"), { kind: "error" });
+  const toggleActive = async (payment: Recurring, on: boolean) => {
+    setRecurringActive(payment, on).catch(reportWriteError);
+    if (on && payment.notify && !(await requestNotificationPermission())) toast.show(t("recurring.notificationsOff"), { kind: "error" });
   };
 
   const settle = (item: PendingPayment, confirm: boolean) => {
@@ -183,7 +191,7 @@ export default function RecurringScreen() {
             <AppText secondary>{t(query ? "logs.noResults" : "recurring.empty")}</AppText>
           </View>
         }
-        renderItem={({ item }) => <PaymentRow payment={item.payment} next={item.next} onToggleNotify={(on) => toggleNotify(item.payment, on)} />}
+        renderItem={({ item }) => <PaymentRow payment={item.payment} next={item.next} onToggleActive={(on) => toggleActive(item.payment, on)} />}
       />
       <Fab label={t("recurring.add")} onPress={() => router.push({ pathname: "/recurring/edit/[id]", params: { id: "new" } })} />
     </View>

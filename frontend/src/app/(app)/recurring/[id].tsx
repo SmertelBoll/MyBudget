@@ -3,7 +3,7 @@ import { ScrollView, View } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 import { categoryName } from "@/data/categories";
 import { useCollection, useRecord } from "@/data/hooks";
-import { deleteRecurring, setRecurringNotify } from "@/data/recurring";
+import { deleteRecurring, isActivePayment, setRecurringActive, setRecurringNotify } from "@/data/recurring";
 import { reportWriteError } from "@/data/store";
 import { useI18n } from "@/i18n/I18nProvider";
 import { requestNotificationPermission } from "@/notifications/notifications";
@@ -75,10 +75,11 @@ export default function RecurringDetailsScreen() {
         <View style={{ padding: spacing.md, gap: spacing.lg, borderRadius: radius.md, backgroundColor: colors.surface }}>
           <Field label={t("recurring.name")}>{payment.name}</Field>
           <Field label={t("recurring.type")}>{t(payment.type === "expense" ? "entries.expense" : "entries.incomeOne")}</Field>
+          <ToggleRow label={t("recurring.active")} value={isActivePayment(payment)} onChange={(on) => setRecurringActive(payment, on).catch(reportWriteError)} />
           <ToggleRow label={t("recurring.notify")} value={payment.notify} onChange={toggleNotify} />
           <Field label={t("recurring.repeat")}>{describeRule(payment.rule, t, lang)}</Field>
           <Field label={t("recurring.autoAdd")}>{t(payment.autoAdd ? "common.yes" : "common.no")}</Field>
-          <Field label={t("recurring.next")}>{next ? `${formatLongDate(next.date, lang)}, ${next.time}` : t("recurring.finished")}</Field>
+          <Field label={t("recurring.next")}>{!isActivePayment(payment) ? t("recurring.paused") : next ? `${formatLongDate(next.date, lang)}, ${next.time}` : t("recurring.finished")}</Field>
           {payment.endDate ? <Field label={t("recurring.endDate")}>{formatLongDate(payment.endDate, lang)}</Field> : null}
           <Field label={t("entry.account")}>
             <View style={{ flexDirection: "row", alignItems: "center", gap: spacing.sm }}>

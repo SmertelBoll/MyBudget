@@ -4,6 +4,9 @@ import { newId } from "./accounts";
 import { getSnapshot, removeEntities, removeEntity, saveEntities, saveEntity } from "./store";
 import type { Recurring, Reminder, Transaction } from "./types";
 
+// A payment switched off in the list (or one saved before the switch existed, which counts as on).
+export const isActivePayment = (payment: Recurring) => payment.active !== false;
+
 // Spec 8.4. Automatic payments become ordinary entries on their day; missed days (the app wasn't opened) are filled
 // in at the next start, up to 60 days back. Each generated entry's id is made from the payment and the occurrence,
 // so a second run, or another device doing the same, writes the same record instead of a duplicate.
@@ -50,7 +53,7 @@ export const processDuePayments = async () => {
     // A one-time payment has nothing left to do once its entry exists: it goes away.
     const finished: string[] = [];
     for (const payment of getSnapshot("recurring")) {
-      if (!payment.autoAdd) continue;
+      if (!payment.autoAdd || !isActivePayment(payment)) continue;
       const due = dueOccurrences(payment, payment.lastGeneratedAt);
       if (!due.length) continue;
       for (const occurrence of due) {
@@ -76,7 +79,7 @@ export const processDuePayments = async () => {
 export type PendingPayment = { payment: Recurring; occurrence: Occurrence };
 export const pendingPayments = (payments: Recurring[], now: Date | number = new Date()): PendingPayment[] =>
   payments
-    .filter((payment) => !payment.autoAdd)
+    .filter((payment) => !payment.autoAdd && isActivePayment(payment))
     .flatMap((payment) => dueOccurrences(payment, payment.lastGeneratedAt, 60, now).map((occurrence) => ({ payment, occurrence })))
     .sort((a, b) => `${a.occurrence.date} ${a.occurrence.time}`.localeCompare(`${b.occurrence.date} ${b.occurrence.time}`));
 
@@ -109,6 +112,7 @@ export const saveRecurring = async (fields: RecurringFields, existing?: Recurrin
     id: existing?.id ?? newId(),
     lastGeneratedAt: existing ? (scheduleChanged ? laterOf(existing.lastGeneratedAt, addDays(todayLocal(), -1)) : existing.lastGeneratedAt) : null,
   };
+  if (existing && !isActivePayment(existing) && isActivePayment(payment)) payment.lastGeneratedAt = resumedFrom(payment);
   // A new payment that starts in the past only counts from today on.
   if (!existing && payment.startDate < todayLocal()) payment.lastGeneratedAt = addDays(todayLocal(), -1);
   await saveEntity("recurring", payment);
@@ -121,6 +125,16 @@ const laterOf = (a: string | null, b: string) => (!a || b > a ? b : a);
 export const deleteRecurring = (id: string) => removeEntity("recurring", id);
 
 export const setRecurringNotify = (payment: Recurring, notify: boolean) => saveEntity("recurring", { ...payment, notify });
+
+// Switching a payment back on starts from now: what fell into the pause is neither added nor asked about.
+const resumedFrom = (payment: Recurring) => {
+  const today = todayLocal();
+  const next = nextOccurrence(payment);
+  return laterOf(payment.lastGeneratedAt, next && next.date === today ? addDays(today, -1) : today);
+};
+
+export const setRecurringActive = (payment: Recurring, active: boolean) =>
+  saveEntity("recurring", { ...payment, active, ...(active && !isActivePayment(payment) && { lastGeneratedAt: resumedFrom(payment) }) });
 
 // ---- reminders (screen 9) -----------------------------------------------------------------------------------------
 
