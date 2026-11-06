@@ -14,8 +14,9 @@ const percent = (share: number) => {
   return `${Math.round(value)}%`;
 };
 
-// Home (spec 2.3): a category (or tag) with its share and sum for the period; tapping opens the sums by tag (or by
-// category). With a monthly limit and the month period, a bar shows how much of it is used (screen 7).
+// Home (spec 2.3): a category (or tag) with its share and sum for the period. The arrow opens the sums by tag (or by
+// category); tapping the row or one of those lines opens its entries. With a monthly limit and the month period, a bar
+// shows how much of it is used (screen 7).
 export function StatsRow({
   icon,
   color,
@@ -25,6 +26,8 @@ export function StatsRow({
   breakdown,
   expanded,
   onToggle,
+  onPress,
+  onChildPress,
   limit,
 }: {
   icon: string;
@@ -36,6 +39,8 @@ export function StatsRow({
   breakdown: StatsChild[];
   expanded: boolean;
   onToggle: () => void;
+  onPress: () => void;
+  onChildPress: (childId: string) => void;
   limit?: { used: number; text: string };
 }) {
   const { colors } = useTheme();
@@ -45,19 +50,19 @@ export function StatsRow({
 
   return (
     <View style={{ borderRadius: radius.md, overflow: "hidden", backgroundColor: colors.surface }}>
+      {/* The row and its arrow are side by side, not one inside the other: two separate buttons. */}
+      <View style={{ flexDirection: "row", alignItems: "center" }}>
       <Pressable
-        onPress={openable ? onToggle : undefined}
-        disabled={!openable}
-        accessibilityRole={openable ? "button" : undefined}
-        accessibilityState={openable ? { expanded } : undefined}
-        accessibilityHint={openable ? t(expanded ? "home.hideDetails" : "home.showDetails") : undefined}
+        onPress={onPress}
+        accessibilityRole="button"
         style={({ pressed }) => ({
+          flex: 1,
           flexDirection: "row",
           alignItems: "center",
           gap: spacing.sm,
           paddingVertical: spacing.md,
           paddingLeft: spacing.md,
-          paddingRight: spacing.sm,
+          paddingRight: spacing.xs,
           backgroundColor: pressed ? colors.selected : "transparent",
         })}
       >
@@ -83,30 +88,52 @@ export function StatsRow({
         <AppText variant="heading" style={{ minWidth: 72, textAlign: "right" }}>
           {amount}
         </AppText>
-        <View style={{ width: 22, alignItems: "center" }}>
-          {openable && <MaterialCommunityIcons name={expanded ? "chevron-up" : "chevron-down"} size={22} color={colors.textSecondary} />}
-        </View>
       </Pressable>
+        {openable ? (
+          <Pressable
+            onPress={onToggle}
+            hitSlop={10}
+            accessibilityRole="button"
+            accessibilityState={{ expanded }}
+            accessibilityLabel={t(expanded ? "home.hideDetails" : "home.showDetails")}
+            style={({ pressed }) => ({
+              marginRight: spacing.sm,
+              width: 28,
+              height: 28,
+              borderRadius: 14,
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: pressed ? colors.selected : colors.tonal,
+            })}
+          >
+            <MaterialCommunityIcons name={expanded ? "chevron-up" : "chevron-down"} size={20} color={colors.text} />
+          </Pressable>
+        ) : (
+          <View style={{ width: 28 + spacing.sm }} />
+        )}
+      </View>
       {expanded &&
         breakdown.map((child) => (
-          <View
+          <Pressable
             key={child.id}
-            style={{
+            onPress={() => onChildPress(child.id)}
+            accessibilityRole="button"
+            style={({ pressed }) => ({
               flexDirection: "row",
               alignItems: "center",
               gap: spacing.md,
               paddingVertical: spacing.sm,
               paddingLeft: spacing.md + 10,
-              paddingRight: spacing.md + 22 + spacing.md,
-              backgroundColor: colors.tonal,
-            }}
+              paddingRight: spacing.sm + 28 + spacing.sm,
+              backgroundColor: pressed ? colors.selected : colors.tonal,
+            })}
           >
             <MaterialCommunityIcons name={child.icon as "pound"} size={18} color={colors.textSecondary} />
             <AppText numberOfLines={1} style={{ flex: 1 }}>
               {child.title}
             </AppText>
             <AppText>{child.amount}</AppText>
-          </View>
+          </Pressable>
         ))}
     </View>
   );

@@ -7,17 +7,18 @@ import { useAuth } from "@/auth/AuthProvider";
 import { categoryName } from "@/data/categories";
 import { useCollection } from "@/data/hooks";
 import { useRates } from "@/data/rates";
-import { filterTransactions, inBaseCurrency, type AccountFilter } from "@/data/stats";
+import { NO_TAG, filterTransactions, inBaseCurrency, type AccountFilter } from "@/data/stats";
 import type { Transaction } from "@/data/types";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTheme } from "@/theme/ThemeProvider";
 import { radius, spacing } from "@/theme/tokens";
-import { addDays, formatLongDate, todayLocal } from "@/utils/dates";
+import { addDays, formatLongDate, formatShortDate, todayLocal } from "@/utils/dates";
 import { openNewTransaction, openTransaction } from "@/utils/navigation";
-import { PERIOD_KINDS, currentPeriod, type PeriodKind, type PeriodRange } from "@/utils/periods";
+import { PERIOD_KINDS, currentPeriod, formatPeriod, type PeriodKind, type PeriodRange } from "@/utils/periods";
 import { useBottomSpace } from "@/utils/useBottomSpace";
 import { useMoney } from "@/utils/useMoney";
 import { AccountFilterSelect } from "@/components/AccountFilterSelect";
+import { useDialog } from "@/components/AppDialog";
 import { AppText } from "@/components/AppText";
 import { Fab } from "@/components/Fab";
 import { HeaderSearchInput } from "@/components/HeaderSearchInput";
@@ -27,7 +28,15 @@ import { PeriodSwitcher } from "@/components/PeriodSwitcher";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import { SegmentedSwitch } from "@/components/SegmentedSwitch";
 
-type Params = { type?: string; accounts?: string; kind?: string; start?: string; end?: string };
+type Params = { type?: string; accounts?: string; kind?: string; start?: string; end?: string; category?: string; tag?: string };
+
+type Sort = "date-desc" | "date-asc" | "amount-desc" | "amount-asc";
+const SORTS: { value: Sort; label: string; icon: string }[] = [
+  { value: "date-desc", label: "logs.sortDateDesc", icon: "sort-calendar-descending" },
+  { value: "date-asc", label: "logs.sortDateAsc", icon: "sort-calendar-ascending" },
+  { value: "amount-desc", label: "logs.sortAmountDesc", icon: "sort-numeric-descending" },
+  { value: "amount-asc", label: "logs.sortAmountAsc", icon: "sort-numeric-ascending" },
+];
 
 const DATE = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -39,8 +48,9 @@ const rangeFrom = (params: Params, fallback: PeriodRange): PeriodRange =>
 
 const normalize = (text: string) => text.toLowerCase().replace(/,/g, ".").replace(/\s/g, "");
 
-// Screen 11. Entries of the chosen accounts and period, newest first, grouped by day. Search (comment, category,
-// tag, account, amount) looks through every period. A tap opens the entry.
+// Screen 11. Entries of the chosen accounts and period, grouped by day (newest or oldest first) or sorted by amount.
+// Search (comment, category, tag, account, amount) looks through every period. A tap opens the entry.
+// Opened from a row on Home it shows only that category and / or tag for Home's period, with their name on top.
 export default function LogsScreen() {
   const { colors } = useTheme();
   const { t, lang } = useI18n();
@@ -63,6 +73,11 @@ export default function LogsScreen() {
   );
   const [searching, setSearching] = useState(false);
   const [query, setQuery] = useState("");
+  const [sort, setSort] = useState<Sort>("date-desc");
+  const dialog = useDialog();
+  const onlyCategory = params.category || null;
+  const onlyTag = params.tag || null;
+  const narrowed = Boolean(onlyCategory || onlyTag);
 
   const accountById = useMemo(() => new Map(accounts.map((account) => [account.id, account])), [accounts]);
   const categoryById = useMemo(() => new Map(categories.map((category) => [category.id, category])), [categories]);
@@ -71,7 +86,12 @@ export default function LogsScreen() {
   const needle = normalize(query.trim());
   const rows = useMemo(() => {
     const allTime: PeriodRange = { kind: "custom", start: "0000-01-01", end: "9999-12-31" };
-    const list = filterTransactions(transactions, { type, accountIds: filter, range: needle ? allTime : range });
+    const list = filterTransactions(transactions, { type, accountIds: filter, range: needle ? allTime : range }).filter((tx) => {
+      if (onlyCategory && tx.categoryId !== onlyCategory) return false;
+      if (!onlyTag) return true;
+      const known = tx.tagIds.filter((id) => tagById.has(id));
+      return onlyTag === NO_TAG ? known.length === 0 : known.includes(onlyTag);
+    });
     const withValue = list.map((tx) => ({ tx, value: inBaseCurrency(tx, accountById, baseCurrency, rates) }));
     if (!needle) return withValue;
     return withValue.filter(({ tx, value }) => {
@@ -87,15 +107,41 @@ export default function LogsScreen() {
       ];
       return texts.some((text) => normalize(text).includes(needle));
     });
-  }, [transactions, type, filter, range, needle, accountById, categoryById, tagById, baseCurrency, rates, t, toInput]);
+  }, [transactions, type, filter, range, needle, onlyCategory, onlyTag, accountById, categoryById, tagById, baseCurrency, rates, t, toInput]);
 
   const total = rows.reduce((sum, row) => sum + row.value, 0);
+  const byAmount = sort === "amount-desc" || sort === "amount-asc";
   const sections = useMemo(() => {
-    const sorted = [...rows].sort((a, b) => b.tx.date.localeCompare(a.tx.date) || b.tx.clientCreatedAt.localeCompare(a.tx.clientCreatedAt));
+    const direction = sort.endsWith("asc") ? -1 : 1;
+    const newestFirst = (a: (typeof rows)[number], b: (typeof rows)[number]) =>
+      b.tx.date.localeCompare(a.tx.date) || b.tx.clientCreatedAt.localeCompare(a.tx.clientCreatedAt);
+    // By amount: one list without day headers (each row shows its date instead).
+    if (sort === "amount-desc" || sort === "amount-asc") {
+      return [{ date: "", data: [...rows].sort((a, b) => direction * (b.value - a.value) || newestFirst(a, b)) }];
+    }
+    const sorted = [...rows].sort((a, b) => direction * newestFirst(a, b));
     const groups = new Map<string, typeof sorted>();
     for (const row of sorted) groups.set(row.tx.date, [...(groups.get(row.tx.date) ?? []), row]);
     return [...groups].map(([date, data]) => ({ date, data }));
-  }, [rows]);
+  }, [rows, sort]);
+
+  const currentSort = SORTS.find((option) => option.value === sort)!;
+  const chooseSort = async () => {
+    const picked = await dialog.choose({
+      title: t("logs.sort"),
+      options: SORTS.map((option) => ({ value: option.value, label: t(option.label) })),
+    });
+    if (picked) setSort(picked as Sort);
+  };
+
+  const onlyCategoryRecord = onlyCategory ? categoryById.get(onlyCategory) : undefined;
+  const tagTitle = onlyTag ? (onlyTag === NO_TAG ? t("home.noTag") : (tagById.get(onlyTag)?.name ?? "?")) : null;
+  const narrowTitle = [
+    onlyCategoryRecord ? categoryName(onlyCategoryRecord, t) : onlyCategory ? "?" : null,
+    tagTitle ? `#${tagTitle}` : null,
+  ]
+    .filter(Boolean)
+    .join(" · ");
 
   const today = todayLocal();
   const dayTitle = (date: string) => {
@@ -111,7 +157,7 @@ export default function LogsScreen() {
         icon={category?.icon ?? "help"}
         color={category?.color ?? colors.iconIdle}
         title={category ? categoryName(category, t) : "?"}
-        account={account?.name ?? "?"}
+        account={byAmount ? `${account?.name ?? "?"} · ${formatShortDate(tx.date, lang)}` : (account?.name ?? "?")}
         amount={money(value, baseCurrency, true)}
         original={tx.currency !== baseCurrency ? money(tx.amount, tx.currency, true) : undefined}
         tags={tx.tagIds.map((id) => tagById.get(id)?.name).filter((name): name is string => Boolean(name))}
@@ -129,6 +175,13 @@ export default function LogsScreen() {
         center={
           searching ? (
             <HeaderSearchInput value={query} onChangeText={setQuery} placeholder={t("logs.search")} />
+          ) : narrowed ? (
+            <View style={{ alignItems: "center" }}>
+              <AppText variant="heading" numberOfLines={1} style={{ textTransform: "uppercase" }}>
+                {narrowTitle}
+              </AppText>
+              <AppText variant="display">{money(total, baseCurrency)}</AppText>
+            </View>
           ) : (
             <View style={{ alignItems: "center" }}>
               <AppText variant="title">{t("logs.title")}</AppText>
@@ -147,7 +200,8 @@ export default function LogsScreen() {
           />
         }
       >
-        <View style={{ paddingHorizontal: spacing.md, paddingTop: spacing.xs }}>
+        {!narrowed && (
+          <View style={{ paddingHorizontal: spacing.md, paddingTop: spacing.xs }}>
           <SegmentedSwitch
             options={[
               { value: "expense", label: t("entries.expenses") },
@@ -156,7 +210,8 @@ export default function LogsScreen() {
             value={type}
             onChange={setType}
           />
-        </View>
+          </View>
+        )}
       </ScreenHeader>
 
       <SectionList
@@ -170,12 +225,28 @@ export default function LogsScreen() {
         contentContainerStyle={{ padding: spacing.md, gap: spacing.sm, paddingBottom: bottomSpace }}
         ListHeaderComponent={
           <View style={{ gap: spacing.sm }}>
-            {!needle && (
+            {!needle && !narrowed && (
               <View style={{ backgroundColor: colors.surface, borderRadius: radius.md, padding: spacing.sm }}>
                 <PeriodSwitcher value={range} onChange={setRange} />
               </View>
             )}
-            <AppText variant="heading">{t("logs.total", { amount: money(total, baseCurrency, true) })}</AppText>
+            <View style={{ flexDirection: "row", alignItems: "center", gap: spacing.sm }}>
+              {narrowed ? (
+                <View style={{ flex: 1, alignItems: "flex-start", gap: 2 }}>
+                  <AccountFilterSelect value={filter} onChange={setFilter} />
+                  {!needle && (
+                    <AppText variant="caption" secondary>
+                      {formatPeriod(range, lang)}
+                    </AppText>
+                  )}
+                </View>
+              ) : (
+                <AppText variant="heading" style={{ flex: 1 }}>
+                  {t("logs.total", { amount: money(total, baseCurrency, true) })}
+                </AppText>
+              )}
+              <IconButton icon={currentSort.icon as "sort"} label={t("logs.sort")} onPress={chooseSort} />
+            </View>
           </View>
         }
         ListEmptyComponent={
@@ -184,11 +255,13 @@ export default function LogsScreen() {
             <AppText secondary>{t(needle ? "logs.noResults" : "logs.empty")}</AppText>
           </View>
         }
-        renderSectionHeader={({ section }) => (
+        renderSectionHeader={({ section }) =>
+          !section.date ? null : (
           <AppText variant="label" secondary style={{ marginTop: spacing.sm, textTransform: "capitalize" }}>
             {dayTitle(section.date)}
           </AppText>
-        )}
+          )
+        }
         renderItem={({ item }) => renderRow(item)}
       />
       <Fab label={t("entry.addTitle")} onPress={() => openNewTransaction(type)} />

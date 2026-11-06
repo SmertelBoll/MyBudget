@@ -5,7 +5,6 @@ import { useAuth } from "@/auth/AuthProvider";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTheme } from "@/theme/ThemeProvider";
 import { spacing } from "@/theme/tokens";
-import { todayLocal } from "@/utils/dates";
 import { PERIOD_KINDS, currentPeriod, formatPeriod, isLatestPeriod, shiftPeriod, type PeriodKind, type PeriodRange } from "@/utils/periods";
 import { AppText } from "./AppText";
 import { CalendarModal } from "./CalendarModal";
@@ -36,9 +35,8 @@ export function PeriodSwitcher({
   const { t, lang } = useI18n();
   const { user } = useAuth();
   const firstDay = user?.settings.firstDayOfWeek ?? 1;
-  // Custom range: which end is being picked, and the first day once chosen.
-  const [picking, setPicking] = useState<"start" | "end" | null>(null);
-  const [rangeStart, setRangeStart] = useState(todayLocal());
+  // Custom range: one calendar, first tap = start, second = end.
+  const [picking, setPicking] = useState(false);
 
   const latest = isLatestPeriod(value);
   const step = (delta: -1 | 1) => {
@@ -46,30 +44,30 @@ export function PeriodSwitcher({
     onChange(shiftPeriod(value, delta, firstDay));
   };
 
-  // A clearly sideways move over the chart; vertical drags stay with the list.
-  const swipe = useMemo(
-    () =>
-      PanResponder.create({
-        onMoveShouldSetPanResponder: (_, gesture) => Math.abs(gesture.dx) > 20 && Math.abs(gesture.dx) > Math.abs(gesture.dy) * 1.5,
+  // A clearly sideways move anywhere over the block (tabs, title, chart); vertical drags stay with the list. The
+  // capture phase lets the gesture win over the chart's own touch handling.
+  const swipe = useMemo(() => {
+    const sideways = (dx: number, dy: number) => Math.abs(dx) > 20 && Math.abs(dx) > Math.abs(dy) * 1.5;
+    return PanResponder.create({
+        onMoveShouldSetPanResponder: (_, gesture) => sideways(gesture.dx, gesture.dy),
+        onMoveShouldSetPanResponderCapture: (_, gesture) => sideways(gesture.dx, gesture.dy),
+        onPanResponderTerminationRequest: () => false,
         onPanResponderRelease: (_, gesture) => {
           if (gesture.dx <= -SWIPE_DISTANCE && !isLatestPeriod(value)) onChange(shiftPeriod(value, 1, firstDay));
           else if (gesture.dx >= SWIPE_DISTANCE) onChange(shiftPeriod(value, -1, firstDay));
         },
-      }),
-    [value, onChange, firstDay]
-  );
+      });
+  }, [value, onChange, firstDay]);
 
   const pickKind = (kind: PeriodKind) => {
-    if (kind === "custom") {
-      setRangeStart(value.start);
-      setPicking("start");
-    } else if (kind !== value.kind) {
+    if (kind === "custom") setPicking(true);
+    else if (kind !== value.kind) {
       onChange(currentPeriod(kind, firstDay));
     }
   };
 
   return (
-    <View style={{ gap: spacing.xs }}>
+    <View style={{ gap: spacing.xs }} {...swipe.panHandlers}>
       <View accessibilityRole="tablist" style={{ flexDirection: "row", justifyContent: "space-around" }}>
         {PERIOD_KINDS.map((kind) => {
           const active = kind === value.kind;
@@ -116,33 +114,14 @@ export function PeriodSwitcher({
         </Pressable>
       </View>
 
-      {children ? <View {...swipe.panHandlers}>{children}</View> : null}
+      {children}
 
-      {picking === "start" && (
+      {picking && (
         <CalendarModal
-          key="start"
           visible
-          title={t("periods.pickStart")}
-          value={rangeStart}
-          onChange={(date) => {
-            setRangeStart(date);
-            setPicking("end");
-          }}
-          // Closing after a pick moves on to the second step; closing without one cancels.
-          onClose={() => setPicking((current) => (current === "start" ? null : current))}
-        />
-      )}
-      {picking === "end" && (
-        <CalendarModal
-          key="end"
-          visible
-          title={t("periods.pickEnd")}
-          value={rangeStart}
-          onChange={(date) => {
-            const [start, end] = date < rangeStart ? [date, rangeStart] : [rangeStart, date];
-            onChange({ kind: "custom", start, end });
-          }}
-          onClose={() => setPicking(null)}
+          value={value.start}
+          onRangeChange={(start, end) => onChange({ kind: "custom", start, end })}
+          onClose={() => setPicking(false)}
         />
       )}
     </View>

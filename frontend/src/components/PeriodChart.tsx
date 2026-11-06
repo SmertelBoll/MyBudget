@@ -63,16 +63,6 @@ export function PeriodChart({ segments, label, collapsed }: { segments: ChartSeg
                 strokeDashoffset={-start}
               />
           ))}
-          {/* Dashed ring inside, as in the reference. */}
-          <Circle
-            cx={SIZE / 2}
-            cy={SIZE / 2}
-            r={radius - STROKE / 2 - 10}
-            stroke={colors.selected}
-            strokeWidth={2}
-            strokeDasharray="6 6"
-            fill="none"
-          />
         </G>
       </Svg>
       </View>

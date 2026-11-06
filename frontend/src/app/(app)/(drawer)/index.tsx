@@ -1,9 +1,8 @@
 import { useMemo, useRef, useState } from "react";
-import { FlatList, LayoutAnimation, Platform, View } from "react-native";
+import { FlatList, Platform, View } from "react-native";
 import { router } from "expo-router";
 import type { EntryType } from "@/api/types";
 import { useAuth } from "@/auth/AuthProvider";
-import { QUICK_COLORS } from "@/constants/appearance";
 import { categoryName } from "@/data/categories";
 import { useCollection } from "@/data/hooks";
 import { NO_TAG, groupEntries, usePeriodEntries, type AccountFilter, type Group } from "@/data/stats";
@@ -25,16 +24,24 @@ import { SegmentedSwitch } from "@/components/SegmentedSwitch";
 import { StatsRow, type StatsChild } from "@/components/StatsRow";
 
 const COLLAPSE_AT = 24;
+// Tags are grey for now (no colors of their own); the chart alternates shades so its parts stay apart.
+const TAG_SHADES = ["#9E9E9E", "#757575", "#BDBDBD", "#616161", "#E0E0E0"];
 const TAG_ICON = "pound";
 const NO_TAG_ICON = "tag-off-outline";
 
-// Opens the log with what Home shows now (spec 11).
-export const logsParams = (type: EntryType, filter: AccountFilter, range: PeriodRange) => ({
+// Opens the log with what Home shows now (spec 11), optionally narrowed to one category and / or tag.
+export const logsParams = (
+  type: EntryType,
+  filter: AccountFilter,
+  range: PeriodRange,
+  only: { category?: string; tag?: string } = {}
+) => ({
   type,
   accounts: filter?.join(",") ?? "",
   kind: range.kind,
   start: range.start,
   end: range.end,
+  ...only,
 });
 
 // Screen 2. Home: the chosen accounts' balance, Expenses / Income, a period with its chart, and the period's sums
@@ -60,25 +67,27 @@ export default function HomeScreen() {
   const [by, setBy] = useState<"category" | "tag">("category");
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [collapsed, setCollapsed] = useState(false);
-  const dragging = useRef(false);
+  // The user's finger or the fling after it: only those may open the chart again at the top.
+  const userScroll = useRef(false);
+  const [listHeight, setListHeight] = useState(0);
 
   const entries = usePeriodEntries(type, filter, range);
   const categoryById = useMemo(() => new Map(categories.map((category) => [category.id, category])), [categories]);
   const tagById = useMemo(() => new Map(tags.map((tag) => [tag.id, tag])), [tags]);
   const { total, groups } = useMemo(() => groupEntries(entries, by, new Set(tagById.keys())), [entries, by, tagById]);
 
-  // Tags have no color of their own: they take the quick palette in order of size.
-  const tagColor = (id: string, index: number) => (id === NO_TAG ? colors.iconIdle : QUICK_COLORS[index % QUICK_COLORS.length]);
+  const tagColor = (index: number) => TAG_SHADES[index % TAG_SHADES.length];
 
   const look = (group: Group, index: number) => {
     if (by === "tag") {
       const tag = tagById.get(group.id);
-      return { icon: tag ? TAG_ICON : NO_TAG_ICON, color: tagColor(group.id, index), title: tag?.name ?? t("home.noTag") };
+      return { icon: tag ? TAG_ICON : NO_TAG_ICON, color: colors.iconIdle, chartColor: tagColor(index), title: tag?.name ?? t("home.noTag") };
     }
     const category = categoryById.get(group.id);
     return {
       icon: category?.icon ?? "help",
       color: category?.color ?? colors.iconIdle,
+      chartColor: undefined as string | undefined,
       title: category ? categoryName(category, t) : "?",
     };
   };
@@ -108,13 +117,17 @@ export default function HomeScreen() {
     };
   };
 
-  const segments = groups.map((group, index) => ({ id: group.id, value: group.amount, color: look(group, index).color }));
+  const segments = groups.map((group, index) => {
+    const { color, chartColor } = look(group, index);
+    return { id: group.id, value: group.amount, color: chartColor ?? color };
+  });
 
-  const setCollapsedAnimated = (next: boolean) => {
-    if (next === collapsed) return;
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    setCollapsed(next);
+  const setChartCollapsed = (next: boolean) => {
+    if (next !== collapsed) setCollapsed(next);
   };
+
+  const openLog = (only?: { category?: string; tag?: string }) =>
+    router.push({ pathname: "/logs", params: logsParams(type, filter, range, only) });
 
   const toggle = (id: string) =>
     setExpanded((current) => {
@@ -132,7 +145,7 @@ export default function HomeScreen() {
           <IconButton
             icon="receipt-text-outline"
             label={t("logs.open")}
-            onPress={() => router.push({ pathname: "/logs", params: logsParams(type, filter, range) })}
+            onPress={() => openLog()}
           />
         }
       >
@@ -163,7 +176,9 @@ export default function HomeScreen() {
       <FlatList
         data={groups}
         keyExtractor={(group) => group.id}
-        contentContainerStyle={{ paddingHorizontal: spacing.md, gap: spacing.sm, paddingBottom: bottomSpace }}
+        onLayout={(event) => setListHeight(event.nativeEvent.layout.height)}
+        // Always a little taller than the list itself, so the chart can be folded and opened even with few rows.
+        contentContainerStyle={{ paddingHorizontal: spacing.md, gap: spacing.sm, paddingBottom: bottomSpace, minHeight: listHeight + COLLAPSE_AT * 3 }}
         ListHeaderComponent={
           <SegmentedSwitch
             options={[
@@ -183,17 +198,17 @@ export default function HomeScreen() {
           </AppText>
         }
         onScrollBeginDrag={() => {
-          dragging.current = true;
+          userScroll.current = true;
         }}
-        onScrollEndDrag={() => {
-          dragging.current = false;
+        onMomentumScrollEnd={() => {
+          userScroll.current = false;
         }}
         // Spec 2.2, 2.8: scrolling the list up shrinks the chart; it opens again once the list is back at the very
         // top by the user's own move (not when the list merely gets taller as the chart shrinks).
         onScroll={(event) => {
           const y = event.nativeEvent.contentOffset.y;
-          if (y > COLLAPSE_AT) setCollapsedAnimated(true);
-          else if (y <= 0 && (dragging.current || Platform.OS === "web")) setCollapsedAnimated(false);
+          if (y > COLLAPSE_AT) setChartCollapsed(true);
+          else if (y <= 2 && (userScroll.current || Platform.OS === "web")) setChartCollapsed(false);
         }}
         scrollEventThrottle={32}
         renderItem={({ item, index }) => {
@@ -208,6 +223,10 @@ export default function HomeScreen() {
               breakdown={breakdownOf(item)}
               expanded={expanded.has(item.id)}
               onToggle={() => toggle(item.id)}
+              onPress={() => openLog(by === "category" ? { category: item.id } : { tag: item.id })}
+              onChildPress={(childId) =>
+                openLog(by === "category" ? { category: item.id, tag: childId } : { tag: item.id, category: childId })
+              }
               limit={limitOf(item)}
             />
           );

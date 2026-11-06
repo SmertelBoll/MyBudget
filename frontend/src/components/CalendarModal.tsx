@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { PanResponder, Pressable, View } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useAuth } from "@/auth/AuthProvider";
@@ -18,19 +18,47 @@ export function CalendarModal({
   title,
   onClose,
   onChange,
+  onRangeChange,
 }: {
   visible: boolean;
+  // Range mode: the first tap is the start, the second the end; both and the days between are highlighted.
   // Defaults to "Choose a date"; e.g. "Start of the period" when picking a range.
   title?: string;
   value: string;
   onClose: () => void;
-  onChange: (date: string) => void;
+  onChange?: (date: string) => void;
+  onRangeChange?: (start: string, end: string) => void;
 }) {
   const { colors } = useTheme();
   const { t, lang } = useI18n();
   const { user } = useAuth();
   const firstDay = user?.settings.firstDayOfWeek ?? 1;
   const today = todayLocal();
+
+  const rangeMode = Boolean(onRangeChange);
+  const [range, setRange] = useState<{ start: string; end: string | null } | null>(null);
+  const done = Boolean(range?.end);
+
+  // A short pause on the finished range so it's visible, then back to the screen.
+  useEffect(() => {
+    if (!range?.end) return;
+    const timer = setTimeout(() => {
+      onRangeChange?.(range.start, range.end!);
+      onClose();
+    }, 350);
+    return () => clearTimeout(timer);
+  }, [range, onRangeChange, onClose]);
+
+  const pick = (date: string) => {
+    if (!rangeMode) {
+      onChange?.(date);
+      onClose();
+      return;
+    }
+    if (done) return;
+    if (!range) setRange({ start: date, end: null });
+    else setRange(date < range.start ? { start: date, end: range.start } : { start: range.start, end: date });
+  };
 
   const initial = parseLocalDate(value);
   const [shown, setShown] = useState({ year: initial.getFullYear(), month: initial.getMonth() });
@@ -61,7 +89,7 @@ export function CalendarModal({
   const weekdays = weekdayNames(lang, firstDay);
 
   return (
-    <FullScreenModal visible={visible} title={title ?? t("dates.pick")} onClose={onClose}>
+    <FullScreenModal visible={visible} title={rangeMode ? t(range ? "periods.pickEnd" : "periods.pickStart") : (title ?? t("dates.pick"))} onClose={onClose}>
       <View style={{ padding: spacing.md, gap: spacing.md }} {...swipe.panHandlers}>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           <Pressable onPress={() => shift(-1)} hitSlop={8} accessibilityLabel={t("dates.previousMonth")} style={{ padding: spacing.sm }}>
@@ -86,15 +114,14 @@ export function CalendarModal({
         <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
           {cells.map((date, index) => {
             if (!date) return <View key={`blank-${index}`} style={{ width: `${100 / 7}%`, aspectRatio: 1 }} />;
-            const selected = date === value;
+            const edge = rangeMode ? date === range?.start || date === range?.end : date === value;
+            const between = Boolean(rangeMode && range?.end && date > range.start && date < range.end);
+            const selected = edge;
             const isToday = date === today;
             return (
               <Pressable
                 key={date}
-                onPress={() => {
-                  onChange(date);
-                  onClose();
-                }}
+                onPress={() => pick(date)}
                 accessibilityRole="button"
                 accessibilityState={{ selected }}
                 style={{ width: `${100 / 7}%`, aspectRatio: 1, padding: 3 }}
@@ -105,12 +132,12 @@ export function CalendarModal({
                     alignItems: "center",
                     justifyContent: "center",
                     borderRadius: radius.md,
-                    backgroundColor: selected ? colors.accent : "transparent",
+                    backgroundColor: selected ? colors.accent : between ? colors.accentMuted : "transparent",
                     borderWidth: isToday && !selected ? 1.5 : 0,
                     borderColor: colors.text,
                   }}
                 >
-                  <AppText color={selected ? colors.onAccent : colors.text}>{Number(date.slice(8))}</AppText>
+                  <AppText color={selected ? colors.onAccent : between ? colors.onAccentMuted : colors.text}>{Number(date.slice(8))}</AppText>
                 </View>
               </Pressable>
             );
