@@ -21,13 +21,15 @@ type Props = {
 export function Button({ title, onPress, variant = "primary", icon, loading, disabled, muted, style }: Props) {
   const { colors } = useTheme();
 
+  // Only the outlined variant has a border; filled buttons are a single shape.
   const palette = {
-    primary: { bg: colors.accent, pressed: colors.accentPressed, fg: colors.onAccent, border: colors.accent },
+    primary: { bg: colors.accent, pressed: colors.accentPressed, fg: colors.onAccent, border: null },
     secondary: { bg: "transparent", pressed: colors.selected, fg: colors.text, border: colors.selected },
-    danger: { bg: colors.danger, pressed: colors.dangerPressed, fg: colors.onDanger, border: colors.danger },
-    text: { bg: "transparent", pressed: colors.selected, fg: colors.text, border: "transparent" },
+    danger: { bg: colors.danger, pressed: colors.dangerPressed, fg: colors.onDanger, border: null },
+    text: { bg: "transparent", pressed: colors.selected, fg: colors.text, border: null },
   }[variant];
-  // Inactive look: the whole button (fill, border, label) fades together, so no bright edge is left around it.
+  // Inactive look: the whole button fades evenly. Android applies opacity to each drawn piece separately, so
+  // overlapping parts (a border over the fill) would come out brighter; offscreen compositing fades it as one image.
   const dimmed = muted || disabled;
   const bg = palette.bg;
   const fg = palette.fg;
@@ -38,12 +40,13 @@ export function Button({ title, onPress, variant = "primary", icon, loading, dis
       disabled={disabled || loading}
       accessibilityRole="button"
       accessibilityState={{ disabled: Boolean(disabled), busy: Boolean(loading) }}
+      needsOffscreenAlphaCompositing={dimmed}
       style={({ pressed }) => [
         {
           minHeight: 48,
           borderRadius: radius.md,
-          borderWidth: 1,
-          borderColor: palette.border,
+          borderWidth: palette.border ? 1 : 0,
+          borderColor: palette.border ?? undefined,
           backgroundColor: pressed && !dimmed ? palette.pressed : bg,
           paddingHorizontal: spacing.lg,
           alignItems: "center",
