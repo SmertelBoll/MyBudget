@@ -1,5 +1,5 @@
 import type { RepeatRule } from "@/data/types";
-import { addDays, parseLocalDate, toLocalDate, todayLocal } from "./dates";
+import { addDays, parseLocalDate, toLocalDate } from "./dates";
 
 // Spec 8.3, 8.4, 9: when a regular payment or a reminder happens. Everything is in the user's local time; dates are
 // "YYYY-MM-DD", times "HH:MM". Payments and reminders share this code (one parser for cron, as the spec asks).
@@ -136,14 +136,15 @@ export const occurrencesBetween = (schedule: Schedule, from: string, to: string,
   return result;
 };
 
-const nowMinute = () => {
-  const now = new Date();
+// A moment as the date and minute schedules compare against (now by default).
+export const atMinute = (now: Date | number = new Date()) => {
+  now = new Date(now);
   return { date: toLocalDate(now), time: `${pad(now.getHours())}:${pad(now.getMinutes())}` };
 };
 
 // The next occurrence that hasn't happened yet (its date and time still ahead), or null when the schedule is over.
 // Searches up to 5 years ahead (enough for any yearly rule).
-export const nextOccurrence = (schedule: Schedule, after = nowMinute()): Occurrence | null => {
+export const nextOccurrence = (schedule: Schedule, after = atMinute()): Occurrence | null => {
   const horizon = addDays(after.date, 366 * 5);
   for (let from = after.date; from <= horizon; from = addDays(from, 60)) {
     const chunk = occurrencesBetween(schedule, from, addDays(from, 59), 2000);
@@ -157,9 +158,9 @@ export const nextOccurrence = (schedule: Schedule, after = nowMinute()): Occurre
 
 // Occurrences that are due (date and time already passed) and come after `since` (exclusive), oldest first; at most
 // `maxDays` back from today (spec 8.4: missed payments are added up to 60 days back).
-export const dueOccurrences = (schedule: Schedule, since: string | null, maxDays = 60): Occurrence[] => {
-  const now = nowMinute();
-  const earliest = addDays(todayLocal(), -maxDays);
+export const dueOccurrences = (schedule: Schedule, since: string | null, maxDays = 60, at: Date | number = new Date()): Occurrence[] => {
+  const now = atMinute(at);
+  const earliest = addDays(now.date, -maxDays);
   const from = since ? addDays(since, 1) : schedule.startDate;
   return occurrencesBetween(schedule, from > earliest ? from : earliest, now.date).filter(
     (o) => o.date < now.date || o.time <= now.time

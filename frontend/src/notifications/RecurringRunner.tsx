@@ -6,7 +6,8 @@ import { useI18n } from "@/i18n/I18nProvider";
 import { formatLongDate, parseLocalDate } from "@/utils/dates";
 import { nextOccurrence } from "@/utils/schedule";
 import { useMoney } from "@/utils/useMoney";
-import { requestNotificationPermission, rescheduleNotifications } from "./notifications";
+import { router } from "expo-router";
+import { onNotificationOpened, requestNotificationPermission, rescheduleNotifications } from "./notifications";
 
 // Longest sleep before checking again (a payment edited on another device, a clock change).
 const MAX_WAIT_MS = 60 * 60 * 1000;
@@ -34,6 +35,9 @@ export function RecurringRunner() {
     });
     return () => subscription.remove();
   }, []);
+
+  // A tap on "confirm or skip in the app" opens the payments list, where the waiting ones are.
+  useEffect(() => onNotificationOpened((url) => router.push(url as "/recurring")), []);
 
   // Wake up when the next automatic payment is due.
   useEffect(() => {

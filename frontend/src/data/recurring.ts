@@ -74,10 +74,10 @@ export const processDuePayments = async () => {
 
 // Payments without auto-add whose day has come: "waiting for confirmation" (spec 8.4), oldest first.
 export type PendingPayment = { payment: Recurring; occurrence: Occurrence };
-export const pendingPayments = (payments: Recurring[]): PendingPayment[] =>
+export const pendingPayments = (payments: Recurring[], now: Date | number = new Date()): PendingPayment[] =>
   payments
     .filter((payment) => !payment.autoAdd)
-    .flatMap((payment) => dueOccurrences(payment, payment.lastGeneratedAt).map((occurrence) => ({ payment, occurrence })))
+    .flatMap((payment) => dueOccurrences(payment, payment.lastGeneratedAt, 60, now).map((occurrence) => ({ payment, occurrence })))
     .sort((a, b) => `${a.occurrence.date} ${a.occurrence.time}`.localeCompare(`${b.occurrence.date} ${b.occurrence.time}`));
 
 // Confirm adds the entry; skip only moves past it. Either way everything up to that occurrence is settled.

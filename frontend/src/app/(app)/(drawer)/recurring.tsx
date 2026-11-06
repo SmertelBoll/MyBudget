@@ -12,8 +12,9 @@ import { requestNotificationPermission } from "@/notifications/notifications";
 import { useTheme } from "@/theme/ThemeProvider";
 import { radius, spacing } from "@/theme/tokens";
 import { formatLongDate } from "@/utils/dates";
-import { nextOccurrence, type Occurrence } from "@/utils/schedule";
+import { atMinute, nextOccurrence, type Occurrence } from "@/utils/schedule";
 import { useBottomSpace } from "@/utils/useBottomSpace";
+import { useClock } from "@/utils/useClock";
 import { useMoney } from "@/utils/useMoney";
 import { AppText } from "@/components/AppText";
 import { Button } from "@/components/Button";
@@ -101,12 +102,14 @@ export default function RecurringScreen() {
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<SortValue>({ key: "date", direction: "asc" });
 
-  const pending = useMemo(() => pendingPayments(payments), [payments]);
+  // Recomputed as time passes: a payment whose time has come shows up without leaving the screen.
+  const now = useClock();
+  const pending = useMemo(() => pendingPayments(payments, now), [payments, now]);
   const rows = useMemo(() => {
     const needle = query.trim().toLowerCase();
     const list = payments
       .filter((payment) => !needle || payment.name.toLowerCase().includes(needle) || payment.comment.toLowerCase().includes(needle))
-      .map((payment) => ({ payment, next: nextOccurrence(payment) }));
+      .map((payment) => ({ payment, next: nextOccurrence(payment, atMinute(now)) }));
     const direction = sort.direction === "asc" ? 1 : -1;
     const inBase = (payment: Recurring) => convert(payment.amount, payment.currency, baseCurrency, rates) ?? payment.amount;
     return list.sort((a, b) => {
@@ -116,7 +119,7 @@ export default function RecurringScreen() {
       if (!a.next || !b.next) return a.next ? -1 : b.next ? 1 : 0;
       return direction * `${a.next.date} ${a.next.time}`.localeCompare(`${b.next.date} ${b.next.time}`);
     });
-  }, [payments, query, sort, baseCurrency, rates]);
+  }, [payments, query, sort, baseCurrency, rates, now]);
 
   const toggleNotify = async (payment: Recurring, on: boolean) => {
     setRecurringNotify(payment, on).catch(reportWriteError);

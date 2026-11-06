@@ -12,8 +12,9 @@ import { useTheme } from "@/theme/ThemeProvider";
 import { radius, spacing } from "@/theme/tokens";
 import { formatLongDate } from "@/utils/dates";
 import { describeRule } from "@/utils/repeat";
-import { nextOccurrence } from "@/utils/schedule";
+import { atMinute, nextOccurrence } from "@/utils/schedule";
 import { useBottomSpace } from "@/utils/useBottomSpace";
+import { useClock } from "@/utils/useClock";
 import { AppText } from "@/components/AppText";
 import { Fab } from "@/components/Fab";
 import { HeaderSearchInput } from "@/components/HeaderSearchInput";
@@ -32,16 +33,17 @@ export default function RemindersScreen() {
   const [searching, setSearching] = useState(false);
   const [query, setQuery] = useState("");
 
+  const now = useClock();
   const rows = useMemo(() => {
     const needle = query.trim().toLowerCase();
     return reminders
       .filter((reminder) => !needle || reminder.title.toLowerCase().includes(needle) || reminder.comment.toLowerCase().includes(needle))
-      .map((reminder) => ({ reminder, next: nextOccurrence(reminder) }))
+      .map((reminder) => ({ reminder, next: nextOccurrence(reminder, atMinute(now)) }))
       .sort((a, b) => {
         if (!a.next || !b.next) return a.next ? -1 : b.next ? 1 : a.reminder.title.localeCompare(b.reminder.title);
         return `${a.next.date} ${a.next.time}`.localeCompare(`${b.next.date} ${b.next.time}`);
       });
-  }, [reminders, query]);
+  }, [reminders, query, now]);
 
   const toggle = async (reminder: Reminder, on: boolean) => {
     setReminderActive(reminder, on).catch(reportWriteError);

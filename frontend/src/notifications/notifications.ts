@@ -57,6 +57,26 @@ export const requestNotificationPermission = async () => {
   return (await Notifications.requestPermissionsAsync()).granted;
 };
 
+// Calls `open` with the screen of a notification the user tapped: now, and the one that launched the app if it was
+// closed. Returns the unsubscribe function.
+export const onNotificationOpened = (open: (url: string) => void) => {
+  if (!supported) return () => {};
+  const urlOf = (response: Notifications.NotificationResponse | null) => {
+    const url = response?.notification.request.content.data?.url;
+    return typeof url === "string" ? url : null;
+  };
+  const launched = urlOf(Notifications.getLastNotificationResponse());
+  if (launched) {
+    open(launched);
+    Notifications.clearLastNotificationResponse();
+  }
+  const subscription = Notifications.addNotificationResponseReceivedListener((response) => {
+    const url = urlOf(response);
+    if (url) open(url);
+  });
+  return () => subscription.remove();
+};
+
 export type NotificationTexts = {
   payment: (payment: Recurring) => { title: string; body: string };
   reminder: (reminder: Reminder) => { title: string; body: string };
@@ -86,11 +106,17 @@ const rebuild = async (payments: Recurring[], reminders: Reminder[], texts: Noti
   };
 
   // Each notification has a stable id (what + when), so a rebuild replaces it instead of adding a second one.
-  const planned: { id: string; when: number; content: { title: string; body: string } }[] = [];
+  // url: the screen a tap on the notification opens (payments waiting for confirmation -> the payments list).
+  const planned: { id: string; when: number; url?: string; content: { title: string; body: string } }[] = [];
   for (const payment of payments) {
     if (!payment.notify) continue;
     for (const occurrence of occurrencesBetween(payment, from, to, 40)) {
-      planned.push({ id: `p:${payment.id}:${occurrence.date}T${occurrence.time}`, when: at(occurrence.date, occurrence.time), content: texts.payment(payment) });
+      planned.push({
+        id: `p:${payment.id}:${occurrence.date}T${occurrence.time}`,
+        when: at(occurrence.date, occurrence.time),
+        url: payment.autoAdd ? undefined : "/recurring",
+        content: texts.payment(payment),
+      });
     }
   }
   for (const reminder of reminders) {
@@ -114,7 +140,7 @@ const rebuild = async (payments: Recurring[], reminders: Reminder[], texts: Noti
   for (const item of upcoming) {
     await Notifications.scheduleNotificationAsync({
       identifier: item.id,
-      content: { ...item.content, data: { when: item.when } },
+      content: { ...item.content, data: { when: item.when, ...(item.url && { url: item.url }) } },
       trigger: { type: Notifications.SchedulableTriggerInputTypes.DATE, date: item.when, channelId: CHANNEL },
     });
   }
