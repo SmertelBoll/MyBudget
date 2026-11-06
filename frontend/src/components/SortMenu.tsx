@@ -7,19 +7,28 @@ import { useTheme } from "@/theme/ThemeProvider";
 import { radius, spacing } from "@/theme/tokens";
 import { AppText } from "./AppText";
 
-export type SortKey = "date" | "amount";
+export type SortKey = "date" | "amount" | "name";
 export type SortDirection = "desc" | "asc";
 export type SortValue = { key: SortKey; direction: SortDirection };
 
 // The button is drawn from the same parts as the menu (what + arrow), so its arrow always matches the menu's.
-const KEY_ICONS: Record<SortKey, IconName> = { date: "calendar-month-outline", amount: "cash" };
+const KEY_ICONS: Record<SortKey, IconName> = { date: "calendar-month-outline", amount: "cash", name: "sort-alphabetical-variant" };
 const ARROWS: Record<SortDirection, IconName> = { desc: "arrow-down", asc: "arrow-up" };
 
-const LABELS: Record<SortKey, string> = { date: "logs.sortDate", amount: "logs.sortAmount" };
+const LABELS: Record<SortKey, string> = { date: "logs.sortDate", amount: "logs.sortAmount", name: "recurring.sortName" };
 
 // Screen 11: a small menu under the sort button. Two ways to sort; the arrow shows the direction, and choosing the
 // current one again turns it around. A new one starts from the largest / newest.
-export function SortMenu({ value, onChange }: { value: SortValue; onChange: (value: SortValue) => void }) {
+export function SortMenu({
+  value,
+  onChange,
+  keys = ["date", "amount"],
+}: {
+  value: SortValue;
+  onChange: (value: SortValue) => void;
+  // Which ways to sort are offered (logs: date and amount; payments add the name).
+  keys?: SortKey[];
+}) {
   const { colors } = useTheme();
   const { t } = useI18n();
   const { width } = useWindowDimensions();
@@ -30,7 +39,8 @@ export function SortMenu({ value, onChange }: { value: SortValue; onChange: (val
     anchor.current?.measureInWindow((x, y, w, h) => setPosition({ top: y + h + 4, right: Math.max(spacing.sm, width - (x + w)) }));
 
   const pick = (key: SortKey) => {
-    const direction: SortDirection = key === value.key ? (value.direction === "desc" ? "asc" : "desc") : "desc";
+    // A new way starts from the newest / largest, or A to Z for names.
+    const direction: SortDirection = key === value.key ? (value.direction === "desc" ? "asc" : "desc") : key === "name" ? "asc" : "desc";
     onChange({ key, direction });
     setPosition(null);
   };
@@ -77,7 +87,7 @@ export function SortMenu({ value, onChange }: { value: SortValue; onChange: (val
                 elevation: 8,
               }}
             >
-              {(["date", "amount"] as SortKey[]).map((key) => {
+              {keys.map((key) => {
                 const active = key === value.key;
                 return (
                   <Pressable

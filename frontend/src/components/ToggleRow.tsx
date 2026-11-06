@@ -22,7 +22,18 @@ const slide = (progress: Animated.Value, on: boolean) =>
 // A label with our own switch; the whole row toggles. The platform switch jumps between colors; this one slides the
 // thumb and fades the track. The animation starts on touch, before the screen re-renders with the new value, so a
 // heavy form can't make it stutter.
-export function ToggleRow({ label, value, onChange }: { label: string; value: boolean; onChange: (value: boolean) => void }) {
+// hideLabel: only the switch (inside list rows); the label is still read out by screen readers.
+export function ToggleRow({
+  label,
+  value,
+  onChange,
+  hideLabel,
+}: {
+  label: string;
+  value: boolean;
+  onChange: (value: boolean) => void;
+  hideLabel?: boolean;
+}) {
   const { colors } = useTheme();
   // Created once and kept for the component's life.
   const [progress] = useState(() => new Animated.Value(value ? 1 : 0));
@@ -43,9 +54,10 @@ export function ToggleRow({ label, value, onChange }: { label: string; value: bo
       accessibilityRole="switch"
       accessibilityState={{ checked: value }}
       accessibilityLabel={label}
-      style={{ flexDirection: "row", alignItems: "center", gap: spacing.md, minHeight: 48 }}
+      hitSlop={hideLabel ? 8 : undefined}
+      style={{ flexDirection: "row", alignItems: "center", gap: spacing.md, minHeight: hideLabel ? 32 : 48 }}
     >
-      <AppText style={{ flex: 1 }}>{label}</AppText>
+      {!hideLabel && <AppText style={{ flex: 1 }}>{label}</AppText>}
       <Animated.View
         style={{
           width: TRACK_WIDTH,

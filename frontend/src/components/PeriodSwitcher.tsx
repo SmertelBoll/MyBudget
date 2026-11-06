@@ -29,12 +29,15 @@ export function PeriodSwitcher({
   value,
   onChange,
   onSwipeVertical,
+  allowFuture,
   children,
 }: {
   value: PeriodRange;
   onChange: (range: PeriodRange) => void;
   // Home: an up / down swipe over the block folds / opens the chart.
   onSwipeVertical?: (direction: "up" | "down") => void;
+  // Upcoming payments look ahead, so later periods are allowed there.
+  allowFuture?: boolean;
   children?: ReactNode;
 }) {
   const { colors } = useTheme();
@@ -44,7 +47,7 @@ export function PeriodSwitcher({
   // Custom range: one calendar, first tap = start, second = end.
   const [picking, setPicking] = useState(false);
 
-  const latest = isLatestPeriod(value);
+  const latest = !allowFuture && isLatestPeriod(value);
   const step = (delta: -1 | 1) => {
     if (delta > 0 && latest) return;
     onChange(shiftPeriod(value, delta, firstDay));
@@ -68,11 +71,11 @@ export function PeriodSwitcher({
         }
         const flick = Math.abs(dx) >= FLICK_DISTANCE && Math.abs(vx) >= FLICK_VELOCITY;
         if (!flick && Math.abs(dx) < SWIPE_DISTANCE) return;
-        if (dx < 0 && !isLatestPeriod(value)) onChange(shiftPeriod(value, 1, firstDay));
+        if (dx < 0 && (allowFuture || !isLatestPeriod(value))) onChange(shiftPeriod(value, 1, firstDay));
         else if (dx > 0) onChange(shiftPeriod(value, -1, firstDay));
       },
     });
-  }, [value, onChange, firstDay, onSwipeVertical]);
+  }, [value, onChange, firstDay, onSwipeVertical, allowFuture]);
 
   const pickKind = (kind: PeriodKind) => {
     if (kind === "custom") setPicking(true);

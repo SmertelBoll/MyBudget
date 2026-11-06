@@ -44,6 +44,12 @@
           "photosPermission": "MyBudget uses your photos to attach receipts to entries.",
           "cameraPermission": "MyBudget uses the camera to photograph receipts for entries."
         }
+      ],
+      [
+        "expo-notifications",
+        {
+          "color": "#F9F919"
+        }
       ]
     ],
     "experiments": {
