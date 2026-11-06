@@ -65,25 +65,36 @@ const rebuild = async (payments: Recurring[], reminders: Reminder[], texts: Noti
     return new Date(day.getFullYear(), day.getMonth(), day.getDate(), hours, minutes).getTime();
   };
 
-  const planned: { when: number; content: { title: string; body: string } }[] = [];
+  // Each notification has a stable id (what + when), so a rebuild replaces it instead of adding a second one.
+  const planned: { id: string; when: number; content: { title: string; body: string } }[] = [];
   for (const payment of payments) {
     if (!payment.notify) continue;
     for (const occurrence of occurrencesBetween(payment, from, to, 40)) {
-      planned.push({ when: at(occurrence.date, occurrence.time), content: texts.payment(payment) });
+      planned.push({ id: `p:${payment.id}:${occurrence.date}T${occurrence.time}`, when: at(occurrence.date, occurrence.time), content: texts.payment(payment) });
     }
   }
   for (const reminder of reminders) {
     if (!reminder.active) continue;
     for (const occurrence of occurrencesBetween(reminder, from, to, 40)) {
-      planned.push({ when: at(occurrence.date, occurrence.time), content: texts.reminder(reminder) });
+      planned.push({ id: `r:${reminder.id}:${occurrence.date}T${occurrence.time}`, when: at(occurrence.date, occurrence.time), content: texts.reminder(reminder) });
     }
   }
-
-  await Notifications.cancelAllScheduledNotificationsAsync();
   const upcoming = planned.filter((item) => item.when > now).sort((a, b) => a.when - b.when).slice(0, MAX_SCHEDULED);
+  const keep = new Set(upcoming.map((item) => item.id));
+
+  // Only future notifications that are no longer wanted are removed. One whose time has come stays: Android may
+  // deliver it a little late, and removing it then (e.g. because the payment it announces was just added and the
+  // plan rebuilt) would lose it.
+  for (const request of await Notifications.getAllScheduledNotificationsAsync()) {
+    // Ones from before stable ids carry no time: they are replaced by the plan.
+    const when = request.content.data?.when;
+    const stale = when === undefined || Number(when) > now;
+    if (!keep.has(request.identifier) && stale) await Notifications.cancelScheduledNotificationAsync(request.identifier);
+  }
   for (const item of upcoming) {
     await Notifications.scheduleNotificationAsync({
-      content: item.content,
+      identifier: item.id,
+      content: { ...item.content, data: { when: item.when } },
       trigger: { type: Notifications.SchedulableTriggerInputTypes.DATE, date: item.when, channelId: CHANNEL },
     });
   }

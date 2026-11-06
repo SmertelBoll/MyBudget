@@ -1,5 +1,7 @@
 import { useMemo, useState } from "react";
-import { KeyboardAvoidingView, Platform, Pressable, ScrollView, View } from "react-native";
+import { Pressable, View } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
+import { KEYBOARD_GAP } from "@/utils/keyboard";
 import { useLocalSearchParams } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRecord } from "@/data/hooks";
@@ -134,8 +136,7 @@ function TransferForm({ initial, existingId }: { initial: FormValues; existingId
           ) : undefined
         }
       />
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
-        <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ padding: spacing.md, gap: spacing.lg, paddingBottom: bottomSpace }}>
+      <KeyboardAwareScrollView bottomOffset={KEYBOARD_GAP} keyboardShouldPersistTaps="handled" contentContainerStyle={{ padding: spacing.md, gap: spacing.lg, paddingBottom: bottomSpace }}>
           <AccountPicker
             label={t("transfers.from")}
             value={values.from}
@@ -185,8 +186,7 @@ function TransferForm({ initial, existingId }: { initial: FormValues; existingId
             placeholder={t("transfers.comment")}
             maxLength={500}
           />
-        </ScrollView>
-      </KeyboardAvoidingView>
+        </KeyboardAwareScrollView>
 
       <BottomActionButton title={t(existing ? "common.save" : "common.add")} onPress={save} loading={saving} muted={invalid} />
     </View>

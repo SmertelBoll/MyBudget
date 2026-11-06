@@ -1,5 +1,7 @@
 import { useMemo, useState } from "react";
-import { KeyboardAvoidingView, Platform, Pressable, ScrollView, View } from "react-native";
+import { Pressable, View } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
+import { KEYBOARD_GAP } from "@/utils/keyboard";
 import { useLocalSearchParams } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useAuth } from "@/auth/AuthProvider";
@@ -196,8 +198,7 @@ function AccountForm({ initial, existingId }: { initial: FormValues; existingId:
           ) : undefined
         }
       />
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
-        <ScrollView
+      <KeyboardAwareScrollView bottomOffset={KEYBOARD_GAP}
           keyboardShouldPersistTaps="handled"
           contentContainerStyle={{ padding: spacing.md, gap: spacing.lg, paddingBottom: bottomSpace }}
         >
@@ -259,8 +260,7 @@ function AccountForm({ initial, existingId }: { initial: FormValues; existingId:
             placeholder={t("accounts.notePlaceholder")}
             maxLength={200}
           />
-        </ScrollView>
-      </KeyboardAvoidingView>
+        </KeyboardAwareScrollView>
 
       <BottomActionButton title={t("common.save")} onPress={save} loading={saving} muted={Boolean(nameError || balanceError)} />
     </View>

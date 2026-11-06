@@ -1,5 +1,7 @@
 import { useMemo, useState } from "react";
-import { KeyboardAvoidingView, Platform, Pressable, ScrollView, View } from "react-native";
+import { Platform, Pressable, View } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
+import { KEYBOARD_GAP } from "@/utils/keyboard";
 import { useLocalSearchParams } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import type { EntryType } from "@/api/types";
@@ -31,9 +33,11 @@ import { RepeatPicker } from "@/components/RepeatPicker";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import { SegmentedSwitch } from "@/components/SegmentedSwitch";
 import { TextField } from "@/components/TextField";
-import { TimeField, isValidTime } from "@/components/TimeField";
+import { TimeField, isValidTime, timeOrDefault } from "@/components/TimeField";
 import { useToast } from "@/components/Toast";
 import { ToggleRow } from "@/components/ToggleRow";
+
+const DEFAULT_TIME = "09:00";
 
 type FormValues = {
   type: EntryType;
@@ -107,7 +111,7 @@ export default function RecurringFormScreen() {
       rule: existing?.rule ?? { kind: "monthly" },
       autoAdd: existing?.autoAdd ?? true,
       startDate: existing?.startDate ?? todayLocal(),
-      time: existing?.time ?? "09:00",
+      time: existing?.time ?? "",
       endDate: existing?.endDate ?? null,
       accountId: existing?.accountId ?? fallbackAccount,
       categoryId: existing?.categoryId ?? null,
@@ -148,7 +152,7 @@ function RecurringForm({ initial, existingId }: { initial: FormValues; existingI
     account: !values.accountId ? t("entry.accountRequired") : null,
     category: !values.categoryId ? t("entry.categoryRequired") : null,
     amount: !amountMinor || amountMinor <= 0 ? t("amount.mustBePositive") : null,
-    time: !isValidTime(values.time) ? t("common.required") : null,
+    time: values.time && !isValidTime(values.time) ? t("common.required") : null,
   };
   const invalid = Object.values(errors).some(Boolean);
   const show = (error: string | null) => (submitted && error ? error : undefined);
@@ -174,7 +178,7 @@ function RecurringForm({ initial, existingId }: { initial: FormValues; existingI
         rule: values.rule,
         autoAdd: values.autoAdd,
         startDate: values.startDate,
-        time: values.time,
+        time: timeOrDefault(values.time, DEFAULT_TIME),
         // A one-time payment has no end; an end before the start would mean "never".
         endDate: once || !values.endDate || values.endDate < values.startDate ? null : values.endDate,
         accountId: values.accountId,
@@ -233,8 +237,7 @@ function RecurringForm({ initial, existingId }: { initial: FormValues; existingI
         </View>
       </ScreenHeader>
 
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
-        <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ padding: spacing.md, gap: spacing.lg, paddingBottom: bottomSpace }}>
+      <KeyboardAwareScrollView bottomOffset={KEYBOARD_GAP} keyboardShouldPersistTaps="handled" contentContainerStyle={{ padding: spacing.md, gap: spacing.lg, paddingBottom: bottomSpace }}>
           <TextField
             label={t("recurring.name")}
             value={values.name}
@@ -244,12 +247,12 @@ function RecurringForm({ initial, existingId }: { initial: FormValues; existingI
             error={show(errors.name)}
           />
 
-          <RepeatPicker value={values.rule} onChange={(rule) => set("rule", rule)} startDate={values.startDate} time={values.time} />
+          <RepeatPicker value={values.rule} onChange={(rule) => set("rule", rule)} startDate={values.startDate} time={timeOrDefault(values.time, DEFAULT_TIME)} />
           <ToggleRow label={t("recurring.autoAdd")} value={values.autoAdd} onChange={(next) => set("autoAdd", next)} />
           <ToggleRow label={t("recurring.notify")} value={values.notify} onChange={toggleNotify} />
 
           <DateField label={t(once ? "recurring.date" : "recurring.startDate")} value={values.startDate} onChange={(date) => set("startDate", date)} />
-          <TimeField label={t("recurring.time")} value={values.time} onChange={(time) => set("time", time)} error={show(errors.time)} />
+          <TimeField label={t("recurring.time")} value={values.time} onChange={(time) => set("time", time)} error={show(errors.time)} placeholder={DEFAULT_TIME} />
           {!once && <EndDateField value={values.endDate} onChange={(date) => set("endDate", date)} min={values.startDate} />}
 
           {belowFold && (
@@ -278,8 +281,7 @@ function RecurringForm({ initial, existingId }: { initial: FormValues; existingI
           />
             </>
           )}
-        </ScrollView>
-      </KeyboardAvoidingView>
+        </KeyboardAwareScrollView>
 
       <BottomActionButton title={t(existing ? "common.save" : "common.add")} onPress={save} loading={saving} muted={invalid} />
     </View>

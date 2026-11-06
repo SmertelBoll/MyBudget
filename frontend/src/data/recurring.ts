@@ -1,7 +1,7 @@
 import { addDays, todayLocal } from "@/utils/dates";
 import { dueOccurrences, nextOccurrence, type Occurrence } from "@/utils/schedule";
 import { newId } from "./accounts";
-import { getSnapshot, removeEntity, saveEntities, saveEntity } from "./store";
+import { getSnapshot, removeEntities, removeEntity, saveEntities, saveEntity } from "./store";
 import type { Recurring, Reminder, Transaction } from "./types";
 
 // Spec 8.4. Automatic payments become ordinary entries on their day; missed days (the app wasn't opened) are filled
@@ -47,6 +47,8 @@ export const processDuePayments = async () => {
     const existing = new Set(getSnapshot("transactions").map((tx) => tx.id));
     const entries: Transaction[] = [];
     const updated: Recurring[] = [];
+    // A one-time payment has nothing left to do once its entry exists: it goes away.
+    const finished: string[] = [];
     for (const payment of getSnapshot("recurring")) {
       if (!payment.autoAdd) continue;
       const due = dueOccurrences(payment, payment.lastGeneratedAt);
@@ -55,11 +57,16 @@ export const processDuePayments = async () => {
         const entry = entryFor(payment, occurrence);
         if (!existing.has(entry.id)) entries.push(entry);
       }
+      if (payment.rule.kind === "once") {
+        finished.push(payment.id);
+        continue;
+      }
       const through = doneThrough(payment, due);
       if (through !== payment.lastGeneratedAt) updated.push({ ...payment, lastGeneratedAt: through });
     }
     if (entries.length) await saveEntities("transactions", entries);
     if (updated.length) await saveEntities("recurring", updated);
+    if (finished.length) await removeEntities("recurring", finished);
   } finally {
     running = false;
   }
@@ -76,6 +83,10 @@ export const pendingPayments = (payments: Recurring[]): PendingPayment[] =>
 // Confirm adds the entry; skip only moves past it. Either way everything up to that occurrence is settled.
 export const settlePending = async ({ payment, occurrence }: PendingPayment, confirm: boolean) => {
   if (confirm) await saveEntity("transactions", entryFor(payment, occurrence));
+  if (payment.rule.kind === "once") {
+    await removeEntity("recurring", payment.id);
+    return;
+  }
   const handled = dueOccurrences(payment, payment.lastGeneratedAt).filter(
     (o) => `${o.date} ${o.time}` <= `${occurrence.date} ${occurrence.time}`
   );

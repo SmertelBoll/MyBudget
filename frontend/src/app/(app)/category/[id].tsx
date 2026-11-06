@@ -1,5 +1,7 @@
 import { useMemo, useState } from "react";
-import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
+import { View } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
+import { KEYBOARD_GAP } from "@/utils/keyboard";
 import { useLocalSearchParams } from "expo-router";
 import type { EntryType } from "@/api/types";
 import { categoryName, countCategoryEntries, deleteCategory, saveCategory } from "@/data/categories";
@@ -128,8 +130,7 @@ function CategoryForm({ initial, existingId }: { initial: FormValues; existingId
           ) : undefined
         }
       />
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
-        <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ padding: spacing.md, gap: spacing.lg, paddingBottom: bottomSpace }}>
+      <KeyboardAwareScrollView bottomOffset={KEYBOARD_GAP} keyboardShouldPersistTaps="handled" contentContainerStyle={{ padding: spacing.md, gap: spacing.lg, paddingBottom: bottomSpace }}>
           {locked ? (
             // "Other" is the fallback for deleted categories: only its color can change.
             <View style={{ flexDirection: "row", alignItems: "center", gap: spacing.md }}>
@@ -208,8 +209,7 @@ function CategoryForm({ initial, existingId }: { initial: FormValues; existingId
           )}
 
           <ColorPicker label={t("accounts.color")} value={values.color} onChange={(color) => set("color", color)} />
-        </ScrollView>
-      </KeyboardAvoidingView>
+        </KeyboardAwareScrollView>
 
       <BottomActionButton
         title={t(existing ? "common.save" : "common.add")}

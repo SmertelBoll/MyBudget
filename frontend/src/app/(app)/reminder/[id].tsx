@@ -1,5 +1,7 @@
 import { useMemo, useState } from "react";
-import { KeyboardAvoidingView, Platform, Pressable, ScrollView, View } from "react-native";
+import { Platform, Pressable, View } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
+import { KEYBOARD_GAP } from "@/utils/keyboard";
 import { useLocalSearchParams } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRecord } from "@/data/hooks";
@@ -19,7 +21,7 @@ import { DateField } from "@/components/DateField";
 import { RepeatPicker } from "@/components/RepeatPicker";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import { TextField } from "@/components/TextField";
-import { TimeField, isValidTime } from "@/components/TimeField";
+import { TimeField, isValidTime, timeOrDefault } from "@/components/TimeField";
 import { useToast } from "@/components/Toast";
 import { ToggleRow } from "@/components/ToggleRow";
 
@@ -29,7 +31,8 @@ const nextHour = () => {
   return { date: toLocalDate(at), time: `${String(at.getHours()).padStart(2, "0")}:00` };
 };
 
-type FormValues = { title: string; rule: RepeatRule; startDate: string; time: string; comment: string; active: boolean };
+// defaultTime: what an empty time field means (shown faintly).
+type FormValues = { title: string; rule: RepeatRule; startDate: string; time: string; defaultTime: string; comment: string; active: boolean };
 
 // Screen 9: create ("new") and edit share one form: title, repeat, date and time, comment, "Active".
 export default function ReminderFormScreen() {
@@ -39,7 +42,8 @@ export default function ReminderFormScreen() {
     title: existing?.title ?? "",
     rule: existing?.rule ?? { kind: "once" },
     startDate: existing?.startDate ?? nextHour().date,
-    time: existing?.time ?? nextHour().time,
+    time: existing?.time ?? "",
+    defaultTime: nextHour().time,
     comment: existing?.comment ?? "",
     active: existing?.active ?? true,
   }));
@@ -64,7 +68,7 @@ function ReminderForm({ initial, existingId }: { initial: FormValues; existingId
 
   const errors = {
     title: !values.title.trim() ? t("recurring.nameRequired") : null,
-    time: !isValidTime(values.time) ? t("common.required") : null,
+    time: values.time && !isValidTime(values.time) ? t("common.required") : null,
   };
   const invalid = Object.values(errors).some(Boolean);
   const show = (error: string | null) => (submitted && error ? error : undefined);
@@ -73,7 +77,11 @@ function ReminderForm({ initial, existingId }: { initial: FormValues; existingId
     setSubmitted(true);
     if (invalid) return;
     setSaving(true);
-    saveReminder({ ...values, title: values.title.trim(), comment: values.comment.trim() }, existing).catch(reportWriteError);
+    const { defaultTime, ...fields } = values;
+    saveReminder(
+      { ...fields, time: timeOrDefault(values.time, defaultTime), title: values.title.trim(), comment: values.comment.trim() },
+      existing
+    ).catch(reportWriteError);
     if (values.active && !(await requestNotificationPermission()) && Platform.OS !== "web") {
       toast.show(t("recurring.notificationsOff"), { kind: "error" });
     }
@@ -102,8 +110,7 @@ function ReminderForm({ initial, existingId }: { initial: FormValues; existingId
           ) : undefined
         }
       />
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
-        <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ padding: spacing.md, gap: spacing.lg, paddingBottom: bottomSpace }}>
+      <KeyboardAwareScrollView bottomOffset={KEYBOARD_GAP} keyboardShouldPersistTaps="handled" contentContainerStyle={{ padding: spacing.md, gap: spacing.lg, paddingBottom: bottomSpace }}>
           <TextField
             label={t("reminders.name")}
             value={values.title}
@@ -113,13 +120,19 @@ function ReminderForm({ initial, existingId }: { initial: FormValues; existingId
             error={show(errors.title)}
           />
           <ToggleRow label={t("reminders.active")} value={values.active} onChange={(on) => set("active", on)} />
-          <RepeatPicker value={values.rule} onChange={(rule) => set("rule", rule)} startDate={values.startDate} time={values.time} />
+          <RepeatPicker value={values.rule} onChange={(rule) => set("rule", rule)} startDate={values.startDate} time={timeOrDefault(values.time, values.defaultTime)} />
           <DateField
             label={t(values.rule.kind === "once" ? "recurring.date" : "recurring.startDate")}
             value={values.startDate}
             onChange={(date) => set("startDate", date)}
           />
-          <TimeField label={t("recurring.time")} value={values.time} onChange={(time) => set("time", time)} error={show(errors.time)} />
+          <TimeField
+            label={t("recurring.time")}
+            value={values.time}
+            onChange={(time) => set("time", time)}
+            error={show(errors.time)}
+            placeholder={values.defaultTime}
+          />
           <TextField
             label={t("transfers.comment")}
             value={values.comment}
@@ -128,8 +141,7 @@ function ReminderForm({ initial, existingId }: { initial: FormValues; existingId
             maxLength={500}
             multiline
           />
-        </ScrollView>
-      </KeyboardAvoidingView>
+        </KeyboardAwareScrollView>
       <BottomActionButton title={t(existing ? "common.save" : "common.add")} onPress={save} loading={saving} muted={invalid} />
     </View>
   );

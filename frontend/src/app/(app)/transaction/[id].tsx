@@ -1,5 +1,7 @@
-import { useMemo, useRef, useState, type ComponentRef } from "react";
-import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
+import { useMemo, useRef, useState } from "react";
+import { View } from "react-native";
+import { KeyboardAwareScrollView, type KeyboardAwareScrollViewRef } from "react-native-keyboard-controller";
+import { KEYBOARD_GAP } from "@/utils/keyboard";
 import { useLocalSearchParams } from "expo-router";
 import type { EntryType } from "@/api/types";
 import { useAuth } from "@/auth/AuthProvider";
@@ -116,7 +118,7 @@ function TransactionForm({ initial, existingId }: { initial: FormValues; existin
   const [submitted, setSubmitted] = useState(false);
   const [saving, setSaving] = useState(false);
   const [currencyOpen, setCurrencyOpen] = useState(false);
-  const scrollRef = useRef<ComponentRef<typeof ScrollView>>(null);
+  const scrollRef = useRef<KeyboardAwareScrollViewRef>(null);
   const positions = useRef<Record<string, number>>({});
 
   const set = <K extends keyof FormValues>(key: K, value: FormValues[K]) =>
@@ -272,8 +274,7 @@ function TransactionForm({ initial, existingId }: { initial: FormValues; existin
         </View>
       </ScreenHeader>
 
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
-        <ScrollView
+      <KeyboardAwareScrollView bottomOffset={KEYBOARD_GAP}
           ref={scrollRef}
           keyboardShouldPersistTaps="handled"
           contentContainerStyle={{ padding: spacing.md, gap: spacing.lg, paddingBottom: bottomSpace }}
@@ -350,8 +351,7 @@ function TransactionForm({ initial, existingId }: { initial: FormValues; existin
           {user?.settings.showPhotos !== false && <PhotoStrip value={values.photos} onChange={(photos) => set("photos", photos)} />}
             </>
           )}
-        </ScrollView>
-      </KeyboardAvoidingView>
+        </KeyboardAwareScrollView>
 
       <BottomActionButton title={t(existing ? "common.save" : "common.add")} onPress={save} loading={saving} muted={invalid} />
 

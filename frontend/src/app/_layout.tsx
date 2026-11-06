@@ -1,5 +1,6 @@
 import { useEffect, type ReactNode } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { KeyboardProvider } from "react-native-keyboard-controller";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import * as SplashScreen from "expo-splash-screen";
@@ -19,11 +20,14 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
+      {/* Lets forms scroll the focused field above the keyboard (screens draw edge-to-edge on Android). */}
+      <KeyboardProvider>
       <AuthProvider>
         <UserScopedProviders ready={fontsLoaded || Boolean(fontError)}>
           <RootNavigator />
         </UserScopedProviders>
       </AuthProvider>
+      </KeyboardProvider>
     </GestureHandlerRootView>
   );
 }
