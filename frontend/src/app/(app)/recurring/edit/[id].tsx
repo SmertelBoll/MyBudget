@@ -16,6 +16,7 @@ import { formatLongDate, todayLocal } from "@/utils/dates";
 import { parseAmount } from "@/utils/money";
 import { useBottomSpace } from "@/utils/useBottomSpace";
 import { useMoney } from "@/utils/useMoney";
+import { useAfterFirstFrame } from "@/utils/useAfterFirstFrame";
 import { useUnsavedGuard } from "@/utils/useUnsavedGuard";
 import { AccountPicker } from "@/components/AccountPicker";
 import { useDialog } from "@/components/AppDialog";
@@ -137,6 +138,8 @@ function RecurringForm({ initial, existingId }: { initial: FormValues; existingI
   const account = useRecord("accounts", values.accountId);
   const dirty = useMemo(() => JSON.stringify(values) !== JSON.stringify(initial), [values, initial]);
   const leave = useUnsavedGuard(dirty && !saving);
+  // Fields below the fold are drawn a frame later, so the screen opens without waiting for them.
+  const belowFold = useAfterFirstFrame();
 
   const amountMinor = parseAmount(values.amount);
   const once = values.rule.kind === "once";
@@ -184,6 +187,10 @@ function RecurringForm({ initial, existingId }: { initial: FormValues; existingI
       },
       existing
     ).catch(reportWriteError);
+    // Notifications are on by default: the system is asked on saving, not only when the switch is touched.
+    if (values.notify && !(await requestNotificationPermission()) && Platform.OS !== "web") {
+      toast.show(t("recurring.notificationsOff"), { kind: "error" });
+    }
     leave();
   };
 
@@ -245,6 +252,8 @@ function RecurringForm({ initial, existingId }: { initial: FormValues; existingI
           <TimeField label={t("recurring.time")} value={values.time} onChange={(time) => set("time", time)} error={show(errors.time)} />
           {!once && <EndDateField value={values.endDate} onChange={(date) => set("endDate", date)} min={values.startDate} />}
 
+          {belowFold && (
+            <>
           <AccountPicker label={t("entry.account")} value={values.accountId} onChange={(accountId) => set("accountId", accountId)} error={show(errors.account)} />
           <CategoryChooser type={values.type} value={values.categoryId} onChange={(categoryId) => set("categoryId", categoryId)} error={show(errors.category)} />
 
@@ -259,7 +268,7 @@ function RecurringForm({ initial, existingId }: { initial: FormValues; existingI
             />
           </View>
 
-          <TagChips value={values.tagIds} onChange={(tagIds) => set("tagIds", tagIds)} />
+          <TagChips value={values.tagIds} onChange={(tagIds) => set("tagIds", tagIds)} categoryId={values.categoryId} />
           <TextField
             label={t("transfers.comment")}
             value={values.comment}
@@ -267,6 +276,8 @@ function RecurringForm({ initial, existingId }: { initial: FormValues; existingI
             placeholder={t("transfers.comment")}
             maxLength={500}
           />
+            </>
+          )}
         </ScrollView>
       </KeyboardAvoidingView>
 

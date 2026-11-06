@@ -16,6 +16,7 @@ import { todayLocal } from "@/utils/dates";
 import { parseAmount } from "@/utils/money";
 import { useBottomSpace } from "@/utils/useBottomSpace";
 import { useMoney } from "@/utils/useMoney";
+import { useAfterFirstFrame } from "@/utils/useAfterFirstFrame";
 import { useUnsavedGuard } from "@/utils/useUnsavedGuard";
 import { AccountPicker } from "@/components/AccountPicker";
 import { useDialog } from "@/components/AppDialog";
@@ -127,6 +128,8 @@ function TransactionForm({ initial, existingId }: { initial: FormValues; existin
 
   const dirty = useMemo(() => !sameValues(values, initial), [values, initial]);
   const leave = useUnsavedGuard(dirty && !saving);
+  // Fields below the fold are drawn a frame later, so the screen opens without waiting for them.
+  const belowFold = useAfterFirstFrame();
 
   const { topMinor, bottomMinor } = twoCurrencies
     ? resolvePair(values.amount, values.accountAmount, rate)
@@ -323,8 +326,11 @@ function TransactionForm({ initial, existingId }: { initial: FormValues; existin
 
           <DateChips value={values.date} onChange={(date) => set("date", date)} />
 
+          {belowFold && (
+            <>
           {/* Tags sit near the end of the form: scrolling to the end brings the search field up before the keyboard. */}
           <TagChips
+            categoryId={values.categoryId}
             value={values.tagIds}
             onChange={(tagIds) => set("tagIds", tagIds)}
             onSearchOpen={() => scrollRef.current?.scrollToEnd({ animated: true })}
@@ -342,6 +348,8 @@ function TransactionForm({ initial, existingId }: { initial: FormValues; existin
             />
           )}
           {user?.settings.showPhotos !== false && <PhotoStrip value={values.photos} onChange={(photos) => set("photos", photos)} />}
+            </>
+          )}
         </ScrollView>
       </KeyboardAvoidingView>
 

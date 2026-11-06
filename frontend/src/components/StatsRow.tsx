@@ -101,6 +101,8 @@ export function StatsRow({
             accessibilityState={{ expanded }}
             accessibilityLabel={t(expanded ? "home.hideDetails" : "home.showDetails")}
             style={({ pressed }) => ({
+              // A clear gap after the amount, so the arrow doesn't read as part of it.
+              marginLeft: spacing.sm,
               marginRight: spacing.sm,
               width: 28,
               height: 28,
@@ -113,7 +115,7 @@ export function StatsRow({
             <MaterialCommunityIcons name={expanded ? "chevron-up" : "chevron-down"} size={20} color={colors.text} />
           </Pressable>
         ) : (
-          <View style={{ width: 28 + spacing.sm }} />
+          <View style={{ width: 28 + spacing.sm * 2 }} />
         )}
       </View>
       {expanded &&

@@ -6,7 +6,20 @@ import type { Account, Transaction, Transfer } from "./types";
 
 // Spec 5.4: balance = anchor amount + every income/expense/transfer of the account created on the device after
 // the anchor was set (by creation time, not by operation date, so entries added for past days still count).
+// The collections are new arrays whenever they change, so the last result can be reused while they stay the same:
+// every screen that shows balances (forms, pickers, Home) mounts without going through all entries again.
+let cached: { accounts: Account[]; transactions: Transaction[]; transfers: Transfer[]; result: Map<string, number> } | null = null;
+
 export const computeBalances = (accounts: Account[], transactions: Transaction[], transfers: Transfer[]) => {
+  if (cached && cached.accounts === accounts && cached.transactions === transactions && cached.transfers === transfers) {
+    return cached.result;
+  }
+  const result = computeFresh(accounts, transactions, transfers);
+  cached = { accounts, transactions, transfers, result };
+  return result;
+};
+
+const computeFresh = (accounts: Account[], transactions: Transaction[], transfers: Transfer[]) => {
   const anchors = new Map(accounts.map((account) => [account.id, Date.parse(account.balanceAnchorAt)]));
   const balances = new Map(accounts.map((account) => [account.id, account.balanceAnchor]));
 

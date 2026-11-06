@@ -3,7 +3,8 @@ import { Pressable, ScrollView, TextInput, View } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useCollection } from "@/data/hooks";
 import { reportWriteError } from "@/data/store";
-import { TAG_MAX_LENGTH, createTag, findTagByName, sortTags } from "@/data/tags";
+import { useRankedTags } from "@/data/tagRanking";
+import { TAG_MAX_LENGTH, createTag, findTagByName } from "@/data/tags";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTheme } from "@/theme/ThemeProvider";
 import { fontSize, fonts, radius, spacing } from "@/theme/tokens";
@@ -56,7 +57,10 @@ export function TagChips({
   value,
   onChange,
   onSearchOpen,
+  categoryId = null,
 }: {
+  // The chosen category: its most used recent tags come first (with none, the whole app's).
+  categoryId?: string | null;
   value: string[];
   onChange: (tagIds: string[]) => void;
   // Lets the form bring this block into view first.
@@ -76,12 +80,13 @@ export function TagChips({
     return () => clearTimeout(timer);
   }, [searching]);
 
+  const ranked = useRankedTags(tags, categoryId, lang);
   const visible = useMemo(() => {
     const needle = query.trim().toLowerCase();
     // Chosen tags first, so they're visible without scrolling.
-    const sorted = sortTags(tags, lang).sort((a, b) => Number(value.includes(b.id)) - Number(value.includes(a.id)));
+    const sorted = [...ranked].sort((a, b) => Number(value.includes(b.id)) - Number(value.includes(a.id)));
     return sorted.filter((tag) => !needle || tag.name.toLowerCase().includes(needle));
-  }, [tags, query, lang, value]);
+  }, [ranked, query, value]);
 
   const toggle = (id: string) => onChange(value.includes(id) ? value.filter((tagId) => tagId !== id) : [...value, id]);
 
