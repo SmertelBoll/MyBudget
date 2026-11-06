@@ -10,6 +10,9 @@ const SHARED = {
   accent: "#F9F919",
   accentPressed: "#F2DB0B",
   onAccent: CONTRAST_DARK,
+  // Inactive primary button: a dim solid yellow, not a transparent one.
+  accentMuted: "#d8d87a",
+  onAccentMuted: "#5c5c33",
   danger: "#dd3333",
   dangerPressed: "#b32020",
   onDanger: CONTRAST_LIGHT,

@@ -28,11 +28,12 @@ export function Button({ title, onPress, variant = "primary", icon, loading, dis
     danger: { bg: colors.danger, pressed: colors.dangerPressed, fg: colors.onDanger, border: null },
     text: { bg: "transparent", pressed: colors.selected, fg: colors.text, border: null },
   }[variant];
-  // Inactive look: the whole button fades evenly. Android applies opacity to each drawn piece separately, so
-  // overlapping parts (a border over the fill) would come out brighter; offscreen compositing fades it as one image.
+  // Inactive look: the primary button turns a dim solid yellow (no border, so no bright edge); other variants fade.
+  // Android applies opacity to each drawn piece separately, so offscreen compositing fades them as one image.
   const dimmed = muted || disabled;
-  const bg = palette.bg;
-  const fg = palette.fg;
+  const dimPrimary = dimmed && variant === "primary";
+  const bg = dimPrimary ? colors.accentMuted : palette.bg;
+  const fg = dimPrimary ? colors.onAccentMuted : palette.fg;
 
   return (
     <Pressable
@@ -40,7 +41,7 @@ export function Button({ title, onPress, variant = "primary", icon, loading, dis
       disabled={disabled || loading}
       accessibilityRole="button"
       accessibilityState={{ disabled: Boolean(disabled), busy: Boolean(loading) }}
-      needsOffscreenAlphaCompositing={dimmed}
+      needsOffscreenAlphaCompositing={dimmed && !dimPrimary}
       style={({ pressed }) => [
         {
           minHeight: 48,
@@ -51,7 +52,7 @@ export function Button({ title, onPress, variant = "primary", icon, loading, dis
           paddingHorizontal: spacing.lg,
           alignItems: "center",
           justifyContent: "center",
-          opacity: dimmed ? 0.45 : 1,
+          opacity: dimmed && !dimPrimary ? 0.45 : 1,
         },
         style,
       ]}
