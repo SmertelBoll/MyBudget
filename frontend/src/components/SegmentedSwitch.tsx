@@ -10,7 +10,10 @@ export function SegmentedSwitch<T extends string>({
   options,
   value,
   onChange,
+  compact,
 }: {
+  // Lower, for headers that need the room.
+  compact?: boolean;
   options: Option<T>[];
   value: T;
   onChange: (value: T) => void;
@@ -32,7 +35,7 @@ export function SegmentedSwitch<T extends string>({
             style={{
               flex: 1,
               alignItems: "center",
-              paddingVertical: spacing.sm,
+              paddingVertical: compact ? 6 : spacing.sm,
               borderRadius: radius.md,
               backgroundColor: active ? colors.accent : "transparent",
             }}

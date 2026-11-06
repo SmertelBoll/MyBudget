@@ -28,10 +28,13 @@ const LABELS: Record<PeriodKind, string> = {
 export function PeriodSwitcher({
   value,
   onChange,
+  onSwipeVertical,
   children,
 }: {
   value: PeriodRange;
   onChange: (range: PeriodRange) => void;
+  // Home: an up / down swipe over the block folds / opens the chart.
+  onSwipeVertical?: (direction: "up" | "down") => void;
   children?: ReactNode;
 }) {
   const { colors } = useTheme();
@@ -51,18 +54,25 @@ export function PeriodSwitcher({
   // capture phase lets the gesture win over the chart's own touch handling.
   const swipe = useMemo(() => {
     const sideways = (dx: number, dy: number) => Math.abs(dx) > 8 && Math.abs(dx) > Math.abs(dy) * 1.5;
+    const upDown = (dx: number, dy: number) => Boolean(onSwipeVertical) && Math.abs(dy) > 8 && Math.abs(dy) > Math.abs(dx) * 1.5;
+    const claim = (dx: number, dy: number) => sideways(dx, dy) || upDown(dx, dy);
     return PanResponder.create({
-      onMoveShouldSetPanResponder: (_, gesture) => sideways(gesture.dx, gesture.dy),
-      onMoveShouldSetPanResponderCapture: (_, gesture) => sideways(gesture.dx, gesture.dy),
+      onMoveShouldSetPanResponder: (_, gesture) => claim(gesture.dx, gesture.dy),
+      onMoveShouldSetPanResponderCapture: (_, gesture) => claim(gesture.dx, gesture.dy),
       onPanResponderTerminationRequest: () => false,
-      onPanResponderRelease: (_, { dx, vx }) => {
+      onPanResponderRelease: (_, { dx, dy, vx, vy }) => {
+        if (Math.abs(dy) > Math.abs(dx)) {
+          const flickY = Math.abs(dy) >= FLICK_DISTANCE && Math.abs(vy) >= FLICK_VELOCITY;
+          if (flickY || Math.abs(dy) >= SWIPE_DISTANCE) onSwipeVertical?.(dy < 0 ? "up" : "down");
+          return;
+        }
         const flick = Math.abs(dx) >= FLICK_DISTANCE && Math.abs(vx) >= FLICK_VELOCITY;
         if (!flick && Math.abs(dx) < SWIPE_DISTANCE) return;
         if (dx < 0 && !isLatestPeriod(value)) onChange(shiftPeriod(value, 1, firstDay));
         else if (dx > 0) onChange(shiftPeriod(value, -1, firstDay));
       },
     });
-  }, [value, onChange, firstDay]);
+  }, [value, onChange, firstDay, onSwipeVertical]);
 
   const pickKind = (kind: PeriodKind) => {
     if (kind === "custom") setPicking(true);
@@ -72,7 +82,8 @@ export function PeriodSwitcher({
   };
 
   return (
-    <View style={{ gap: spacing.xs }} {...swipe.panHandlers}>
+    // No text selection while dragging (web).
+    <View style={{ gap: spacing.xs, userSelect: "none" }} {...swipe.panHandlers}>
       <View accessibilityRole="tablist" style={{ flexDirection: "row", justifyContent: "space-around" }}>
         {PERIOD_KINDS.map((kind) => {
           const active = kind === value.kind;

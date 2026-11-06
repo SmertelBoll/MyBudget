@@ -79,11 +79,14 @@ export function AccountFilterSelect({
   value,
   onChange,
   showBalance,
+  compact,
 }: {
   value: AccountFilter;
   onChange: (filter: AccountFilter) => void;
   // Home shows the chosen accounts' balance under the name.
   showBalance?: boolean;
+  // Smaller balance, for a lower header.
+  compact?: boolean;
 }) {
   const { colors } = useTheme();
   const { t } = useI18n();
@@ -127,7 +130,7 @@ export function AccountFilterSelect({
           </AppText>
           <MaterialCommunityIcons name="menu-down" size={22} color={colors.text} />
         </View>
-        {showBalance && <AppText variant="display">{money(balance, totals.currency)}</AppText>}
+        {showBalance && <AppText variant={compact ? "title" : "display"}>{money(balance, totals.currency)}</AppText>}
       </Pressable>
 
       <AppSheet visible={open} title={t("home.selectAccounts")} onClose={() => setOpen(false)}>

@@ -12,7 +12,8 @@ const SIZE = 220;
 const STROKE = 46;
 const GAP = 2;
 const EXPANDED_HEIGHT = SIZE + spacing.md;
-const COLLAPSED_HEIGHT = 56;
+// Room for the bar above the "+" button that sits in the corner below it.
+const COLLAPSED_HEIGHT = 74;
 const DURATION = 260;
 
 function Ring({ segments, sum }: { segments: ChartSegment[]; sum: number }) {

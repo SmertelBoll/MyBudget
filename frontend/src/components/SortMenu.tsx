@@ -6,16 +6,14 @@ import { useI18n } from "@/i18n/I18nProvider";
 import { useTheme } from "@/theme/ThemeProvider";
 import { radius, spacing } from "@/theme/tokens";
 import { AppText } from "./AppText";
-import { IconButton } from "./IconButton";
 
 export type SortKey = "date" | "amount";
 export type SortDirection = "desc" | "asc";
 export type SortValue = { key: SortKey; direction: SortDirection };
 
-const ICONS: Record<SortKey, Record<SortDirection, IconName>> = {
-  date: { desc: "sort-calendar-descending", asc: "sort-calendar-ascending" },
-  amount: { desc: "sort-numeric-descending", asc: "sort-numeric-ascending" },
-};
+// The button is drawn from the same parts as the menu (what + arrow), so its arrow always matches the menu's.
+const KEY_ICONS: Record<SortKey, IconName> = { date: "calendar-month-outline", amount: "cash" };
+const ARROWS: Record<SortDirection, IconName> = { desc: "arrow-down", asc: "arrow-up" };
 
 const LABELS: Record<SortKey, string> = { date: "logs.sortDate", amount: "logs.sortAmount" };
 
@@ -40,7 +38,23 @@ export function SortMenu({ value, onChange }: { value: SortValue; onChange: (val
   return (
     <>
       <View ref={anchor} collapsable={false}>
-        <IconButton icon={ICONS[value.key][value.direction]} label={t("logs.sort")} onPress={open} />
+        <Pressable
+          onPress={open}
+          hitSlop={6}
+          accessibilityRole="button"
+          accessibilityLabel={`${t("logs.sort")}: ${t(LABELS[value.key])}`}
+          style={({ pressed }) => ({
+            flexDirection: "row",
+            alignItems: "center",
+            height: 40,
+            paddingHorizontal: spacing.sm,
+            borderRadius: radius.md,
+            backgroundColor: pressed ? colors.selected : colors.tonal,
+          })}
+        >
+          <MaterialCommunityIcons name={KEY_ICONS[value.key]} size={20} color={colors.text} />
+          <MaterialCommunityIcons name={ARROWS[value.direction]} size={16} color={colors.text} />
+        </Pressable>
       </View>
       <Modal visible={position !== null} transparent animationType="fade" onRequestClose={() => setPosition(null)} statusBarTranslucent>
         <Pressable style={{ flex: 1 }} onPress={() => setPosition(null)} accessibilityLabel={t("common.close")}>
@@ -85,7 +99,7 @@ export function SortMenu({ value, onChange }: { value: SortValue; onChange: (val
                       {t(LABELS[key])}
                     </AppText>
                     <MaterialCommunityIcons
-                      name={active && value.direction === "asc" ? "arrow-up" : "arrow-down"}
+                      name={active ? ARROWS[value.direction] : ARROWS.desc}
                       size={20}
                       color={active ? colors.text : colors.textSecondary}
                     />

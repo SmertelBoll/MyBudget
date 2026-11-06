@@ -1,5 +1,6 @@
 import { useMemo, useRef, useState } from "react";
-import { FlatList, Platform, View, useWindowDimensions } from "react-native";
+import { FlatList, Platform, Pressable, View } from "react-native";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import type { EntryType } from "@/api/types";
 import { useAuth } from "@/auth/AuthProvider";
@@ -29,6 +30,10 @@ const COLLAPSE_AT = 24;
 const NO_TAG_COLOR = "#6D7FA3";
 const TAG_ICON = "pound";
 const NO_TAG_ICON = "tag-off-outline";
+const BY_OPTIONS = [
+  { value: "category", icon: "shape-outline", label: "home.byCategories" },
+  { value: "tag", icon: "pound", label: "home.byTags" },
+] as const;
 
 // Opens the log with what Home shows now (spec 11), optionally narrowed to one category and / or tag.
 export const logsParams = (
@@ -68,15 +73,14 @@ export default function HomeScreen() {
   const [by, setBy] = useState<"category" | "tag">("category");
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [collapsed, setCollapsed] = useState(false);
-  // One fold or unfold per gesture: while the finger stays down the chart never flips back and forth.
-  const gesture = useRef({ active: false, changed: false });
-  const { height: windowHeight } = useWindowDimensions();
+  // One fold or unfold per gesture: while the finger stays down the chart never flips back and forth. "pulled" =
+  // the list was moved back towards its top by the user (not just shifted by the chart changing size).
+  const gesture = useRef({ active: false, changed: false, pulled: false, lastY: 0 });
 
   const entries = usePeriodEntries(type, filter, range);
   const categoryById = useMemo(() => new Map(categories.map((category) => [category.id, category])), [categories]);
   const tagById = useMemo(() => new Map(tags.map((tag) => [tag.id, tag])), [tags]);
   const { total, groups } = useMemo(() => groupEntries(entries, by, new Set(tagById.keys())), [entries, by, tagById]);
-
 
   const look = (group: Group, index: number) => {
     if (by === "tag") {
@@ -127,15 +131,20 @@ export default function HomeScreen() {
     setCollapsed(next);
   };
 
-  // Spec 2.2, 2.8: scrolling the list up folds the chart into a bar; back at the very top it opens again.
+  // Spec 2.2, 2.8: scrolling the list up folds the chart into a bar; scrolling back to the very top opens it. With
+  // few rows the list does not scroll at all: then a vertical swipe on the chart block (or a tap on the bar) does it.
   const onScrollY = (y: number) => {
+    const current = gesture.current;
+    if (y < current.lastY) current.pulled = true;
+    current.lastY = y;
     if (y > COLLAPSE_AT) setChartCollapsed(true);
-    else if (y <= 0 && (gesture.current.active || Platform.OS === "web")) setChartCollapsed(false);
+    else if (y <= 0 && current.pulled && (current.active || Platform.OS === "web")) setChartCollapsed(false);
   };
-  // Let go at the top (or a fling that stopped there): open the chart.
+  // Let go at the top after pulling the list down (or a fling that stopped there): open the chart.
   const onScrollSettled = (y: number) => {
-    gesture.current = { active: false, changed: false };
-    if (y <= 0 && collapsed) setCollapsed(false);
+    const { changed, pulled } = gesture.current;
+    gesture.current = { active: false, changed: false, pulled: false, lastY: y };
+    if (!changed && pulled && y <= 0 && collapsed) setCollapsed(false);
   };
 
   const openLog = (only?: { category?: string; tag?: string }) =>
@@ -152,7 +161,7 @@ export default function HomeScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
       <ScreenHeader
-        center={<AccountFilterSelect value={filter} onChange={setFilter} showBalance />}
+        center={<AccountFilterSelect value={filter} onChange={setFilter} showBalance compact />}
         right={
           <IconButton
             icon="receipt-text-outline"
@@ -161,8 +170,9 @@ export default function HomeScreen() {
           />
         }
       >
-        <View style={{ paddingHorizontal: spacing.md, paddingTop: spacing.xs }}>
+        <View style={{ paddingHorizontal: spacing.md }}>
           <SegmentedSwitch
+            compact
             options={[
               { value: "expense", label: t("entries.expenses") },
               { value: "income", label: t("entries.income") },
@@ -178,41 +188,66 @@ export default function HomeScreen() {
 
       <View style={{ padding: spacing.md, paddingBottom: spacing.sm }}>
         <View style={{ backgroundColor: colors.surface, borderRadius: radius.md, padding: spacing.sm, paddingBottom: spacing.md }}>
-          <PeriodSwitcher value={range} onChange={setRange}>
-            <PeriodChart segments={segments} label={money(total, baseCurrency)} collapsed={collapsed} />
+          <PeriodSwitcher value={range} onChange={setRange} onSwipeVertical={(direction) => setCollapsed(direction === "up")}>
+            <Pressable onPress={() => setCollapsed(false)} disabled={!collapsed} accessibilityRole={collapsed ? "button" : undefined}>
+              <PeriodChart segments={segments} label={money(total, baseCurrency)} collapsed={collapsed} />
+            </Pressable>
           </PeriodSwitcher>
-          <Fab placement="corner" label={t("entry.addTitle")} onPress={() => openNewTransaction(type)} size={52} />
-        </View>
-        {/* Stays in place: only the rows below scroll. */}
-        <View style={{ marginTop: spacing.sm }}>
-          <SegmentedSwitch
-            options={[
-              { value: "category", label: t("home.byCategories") },
-              { value: "tag", label: t("home.byTags") },
-            ]}
-            value={by}
-            onChange={(next) => {
-              setBy(next);
-              setExpanded(new Set());
+          {/* Categories / tags: a small switch in the free corner, so the rows keep the room below. */}
+          <View
+            accessibilityRole="tablist"
+            style={{
+              position: "absolute",
+              left: spacing.md,
+              bottom: spacing.md,
+              flexDirection: "row",
+              padding: 3,
+              borderRadius: radius.md,
+              backgroundColor: colors.background,
             }}
-          />
+          >
+            {BY_OPTIONS.map((option) => {
+              const active = option.value === by;
+              return (
+                <Pressable
+                  key={option.value}
+                  onPress={() => {
+                    setBy(option.value);
+                    setExpanded(new Set());
+                  }}
+                  accessibilityRole="tab"
+                  accessibilityLabel={t(option.label)}
+                  accessibilityState={{ selected: active }}
+                  style={{
+                    width: 38,
+                    height: 32,
+                    alignItems: "center",
+                    justifyContent: "center",
+                    borderRadius: radius.md - 3,
+                    backgroundColor: active ? colors.accent : "transparent",
+                  }}
+                >
+                  <MaterialCommunityIcons name={option.icon} size={18} color={active ? colors.onAccent : colors.text} />
+                </Pressable>
+              );
+            })}
+          </View>
+          <Fab placement="corner" label={t("entry.addTitle")} onPress={() => openNewTransaction(type)} size={52} />
         </View>
       </View>
 
       <FlatList
         data={groups}
         keyExtractor={(group) => group.id}
-        // Taller than the list can ever be (even with the chart folded), so the chart can be folded and opened with
-        // only a few rows. Fixed, so the chart's animation never re-renders the screen.
-        contentContainerStyle={{ paddingHorizontal: spacing.md, gap: spacing.sm, paddingBottom: bottomSpace, minHeight: windowHeight * 0.8 }}
+        contentContainerStyle={{ paddingHorizontal: spacing.md, gap: spacing.sm, paddingBottom: bottomSpace }}
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={
           <AppText secondary style={{ textAlign: "center", paddingVertical: spacing.xl }}>
             {t("home.empty")}
           </AppText>
         }
-        onScrollBeginDrag={() => {
-          gesture.current = { active: true, changed: false };
+        onScrollBeginDrag={(event) => {
+          gesture.current = { active: true, changed: false, pulled: false, lastY: event.nativeEvent.contentOffset.y };
         }}
         onScrollEndDrag={(event) => {
           // A fling continues and ends in onMomentumScrollEnd; a plain release ends here.
