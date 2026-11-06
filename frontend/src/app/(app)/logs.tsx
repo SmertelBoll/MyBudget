@@ -18,7 +18,6 @@ import { PERIOD_KINDS, currentPeriod, formatPeriod, type PeriodKind, type Period
 import { useBottomSpace } from "@/utils/useBottomSpace";
 import { useMoney } from "@/utils/useMoney";
 import { AccountFilterSelect } from "@/components/AccountFilterSelect";
-import { useDialog } from "@/components/AppDialog";
 import { AppText } from "@/components/AppText";
 import { Fab } from "@/components/Fab";
 import { HeaderSearchInput } from "@/components/HeaderSearchInput";
@@ -27,16 +26,11 @@ import { LogRow } from "@/components/LogRow";
 import { PeriodSwitcher } from "@/components/PeriodSwitcher";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import { SegmentedSwitch } from "@/components/SegmentedSwitch";
+import { SortMenu, type SortValue } from "@/components/SortMenu";
 
 type Params = { type?: string; accounts?: string; kind?: string; start?: string; end?: string; category?: string; tag?: string };
 
-type Sort = "date-desc" | "date-asc" | "amount-desc" | "amount-asc";
-const SORTS: { value: Sort; label: string; icon: string }[] = [
-  { value: "date-desc", label: "logs.sortDateDesc", icon: "sort-calendar-descending" },
-  { value: "date-asc", label: "logs.sortDateAsc", icon: "sort-calendar-ascending" },
-  { value: "amount-desc", label: "logs.sortAmountDesc", icon: "sort-numeric-descending" },
-  { value: "amount-asc", label: "logs.sortAmountAsc", icon: "sort-numeric-ascending" },
-];
+
 
 const DATE = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -73,8 +67,7 @@ export default function LogsScreen() {
   );
   const [searching, setSearching] = useState(false);
   const [query, setQuery] = useState("");
-  const [sort, setSort] = useState<Sort>("date-desc");
-  const dialog = useDialog();
+  const [sort, setSort] = useState<SortValue>({ key: "date", direction: "desc" });
   const onlyCategory = params.category || null;
   const onlyTag = params.tag || null;
   const narrowed = Boolean(onlyCategory || onlyTag);
@@ -110,13 +103,13 @@ export default function LogsScreen() {
   }, [transactions, type, filter, range, needle, onlyCategory, onlyTag, accountById, categoryById, tagById, baseCurrency, rates, t, toInput]);
 
   const total = rows.reduce((sum, row) => sum + row.value, 0);
-  const byAmount = sort === "amount-desc" || sort === "amount-asc";
+  const byAmount = sort.key === "amount";
   const sections = useMemo(() => {
-    const direction = sort.endsWith("asc") ? -1 : 1;
+    const direction = sort.direction === "asc" ? -1 : 1;
     const newestFirst = (a: (typeof rows)[number], b: (typeof rows)[number]) =>
       b.tx.date.localeCompare(a.tx.date) || b.tx.clientCreatedAt.localeCompare(a.tx.clientCreatedAt);
     // By amount: one list without day headers (each row shows its date instead).
-    if (sort === "amount-desc" || sort === "amount-asc") {
+    if (sort.key === "amount") {
       return [{ date: "", data: [...rows].sort((a, b) => direction * (b.value - a.value) || newestFirst(a, b)) }];
     }
     const sorted = [...rows].sort((a, b) => direction * newestFirst(a, b));
@@ -124,15 +117,6 @@ export default function LogsScreen() {
     for (const row of sorted) groups.set(row.tx.date, [...(groups.get(row.tx.date) ?? []), row]);
     return [...groups].map(([date, data]) => ({ date, data }));
   }, [rows, sort]);
-
-  const currentSort = SORTS.find((option) => option.value === sort)!;
-  const chooseSort = async () => {
-    const picked = await dialog.choose({
-      title: t("logs.sort"),
-      options: SORTS.map((option) => ({ value: option.value, label: t(option.label) })),
-    });
-    if (picked) setSort(picked as Sort);
-  };
 
   const onlyCategoryRecord = onlyCategory ? categoryById.get(onlyCategory) : undefined;
   const tagTitle = onlyTag ? (onlyTag === NO_TAG ? t("home.noTag") : (tagById.get(onlyTag)?.name ?? "?")) : null;
@@ -245,7 +229,7 @@ export default function LogsScreen() {
                   {t("logs.total", { amount: money(total, baseCurrency, true) })}
                 </AppText>
               )}
-              <IconButton icon={currentSort.icon as "sort"} label={t("logs.sort")} onPress={chooseSort} />
+              <SortMenu value={sort} onChange={setSort} />
             </View>
           </View>
         }

@@ -333,10 +333,8 @@
   "logs.empty": "No entries for this period",
   "logs.noResults": "Nothing found",
   "logs.sort": "Sort",
-  "logs.sortDateDesc": "Newest first",
-  "logs.sortDateAsc": "Oldest first",
-  "logs.sortAmountDesc": "Largest amount first",
-  "logs.sortAmountAsc": "Smallest amount first",
+  "logs.sortDate": "Date",
+  "logs.sortAmount": "Amount",
 
   "currency.AED": "United Arab Emirates Dirham",
   "currency.AFN": "Afghan Afghani",

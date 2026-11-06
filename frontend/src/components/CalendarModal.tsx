@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { PanResponder, Pressable, View } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useAuth } from "@/auth/AuthProvider";
@@ -7,6 +7,7 @@ import { useTheme } from "@/theme/ThemeProvider";
 import { radius, spacing } from "@/theme/tokens";
 import { formatMonthTitle, monthGrid, parseLocalDate, todayLocal, weekdayNames } from "@/utils/dates";
 import { AppText } from "./AppText";
+import { Button } from "./Button";
 import { FullScreenModal } from "./FullScreenModal";
 
 const SWIPE_DISTANCE = 50;
@@ -19,15 +20,18 @@ export function CalendarModal({
   onClose,
   onChange,
   onRangeChange,
+  initialRange,
 }: {
   visible: boolean;
-  // Range mode: the first tap is the start, the second the end; both and the days between are highlighted.
-  // Defaults to "Choose a date"; e.g. "Start of the period" when picking a range.
+  // Defaults to "Choose a date".
   title?: string;
   value: string;
   onClose: () => void;
   onChange?: (date: string) => void;
+  // Range mode: the first tap is the start, the second the end; both and the days between are highlighted, and
+  // "Select" confirms. A tap after that starts a new range.
   onRangeChange?: (start: string, end: string) => void;
+  initialRange?: { start: string; end: string };
 }) {
   const { colors } = useTheme();
   const { t, lang } = useI18n();
@@ -36,18 +40,8 @@ export function CalendarModal({
   const today = todayLocal();
 
   const rangeMode = Boolean(onRangeChange);
-  const [range, setRange] = useState<{ start: string; end: string | null } | null>(null);
+  const [range, setRange] = useState<{ start: string; end: string | null } | null>(initialRange ?? null);
   const done = Boolean(range?.end);
-
-  // A short pause on the finished range so it's visible, then back to the screen.
-  useEffect(() => {
-    if (!range?.end) return;
-    const timer = setTimeout(() => {
-      onRangeChange?.(range.start, range.end!);
-      onClose();
-    }, 350);
-    return () => clearTimeout(timer);
-  }, [range, onRangeChange, onClose]);
 
   const pick = (date: string) => {
     if (!rangeMode) {
@@ -55,8 +49,7 @@ export function CalendarModal({
       onClose();
       return;
     }
-    if (done) return;
-    if (!range) setRange({ start: date, end: null });
+    if (!range || done) setRange({ start: date, end: null });
     else setRange(date < range.start ? { start: date, end: range.start } : { start: range.start, end: date });
   };
 
@@ -89,7 +82,7 @@ export function CalendarModal({
   const weekdays = weekdayNames(lang, firstDay);
 
   return (
-    <FullScreenModal visible={visible} title={rangeMode ? t(range ? "periods.pickEnd" : "periods.pickStart") : (title ?? t("dates.pick"))} onClose={onClose}>
+    <FullScreenModal visible={visible} title={rangeMode ? t(!range ? "periods.pickStart" : !done ? "periods.pickEnd" : "periods.custom") : (title ?? t("dates.pick"))} onClose={onClose}>
       <View style={{ padding: spacing.md, gap: spacing.md }} {...swipe.panHandlers}>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           <Pressable onPress={() => shift(-1)} hitSlop={8} accessibilityLabel={t("dates.previousMonth")} style={{ padding: spacing.sm }}>
@@ -143,6 +136,17 @@ export function CalendarModal({
             );
           })}
         </View>
+        {rangeMode && (
+          <Button
+            title={t("home.select")}
+            disabled={!done}
+            onPress={() => {
+              if (!range?.end) return;
+              onRangeChange?.(range.start, range.end);
+              onClose();
+            }}
+          />
+        )}
       </View>
     </FullScreenModal>
   );

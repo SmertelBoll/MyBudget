@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Pressable, View } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useI18n } from "@/i18n/I18nProvider";
@@ -47,15 +48,19 @@ export function StatsRow({
   const { t } = useI18n();
   const openable = breakdown.length > 0;
   const over = limit ? limit.used > 1 : false;
+  // One highlight for the whole line, arrow included, while the row is held.
+  const [pressed, setPressed] = useState(false);
 
   return (
     <View style={{ borderRadius: radius.md, overflow: "hidden", backgroundColor: colors.surface }}>
       {/* The row and its arrow are side by side, not one inside the other: two separate buttons. */}
-      <View style={{ flexDirection: "row", alignItems: "center" }}>
+      <View style={{ flexDirection: "row", alignItems: "center", backgroundColor: pressed ? colors.selected : "transparent" }}>
       <Pressable
         onPress={onPress}
+        onPressIn={() => setPressed(true)}
+        onPressOut={() => setPressed(false)}
         accessibilityRole="button"
-        style={({ pressed }) => ({
+        style={{
           flex: 1,
           flexDirection: "row",
           alignItems: "center",
@@ -63,8 +68,7 @@ export function StatsRow({
           paddingVertical: spacing.md,
           paddingLeft: spacing.md,
           paddingRight: spacing.xs,
-          backgroundColor: pressed ? colors.selected : "transparent",
-        })}
+        }}
       >
         <IconCircle icon={icon} color={color} size={40} />
         <View style={{ flex: 1, minWidth: 0, gap: 4 }}>

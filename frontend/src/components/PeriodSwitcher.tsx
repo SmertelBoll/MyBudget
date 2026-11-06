@@ -9,7 +9,10 @@ import { PERIOD_KINDS, currentPeriod, formatPeriod, isLatestPeriod, shiftPeriod,
 import { AppText } from "./AppText";
 import { CalendarModal } from "./CalendarModal";
 
-const SWIPE_DISTANCE = 50;
+// A swipe counts when it travels far enough or is a quick flick (short but fast), as in system pagers.
+const SWIPE_DISTANCE = 40;
+const FLICK_DISTANCE = 12;
+const FLICK_VELOCITY = 0.3;
 
 const LABELS: Record<PeriodKind, string> = {
   day: "periods.day",
@@ -47,16 +50,18 @@ export function PeriodSwitcher({
   // A clearly sideways move anywhere over the block (tabs, title, chart); vertical drags stay with the list. The
   // capture phase lets the gesture win over the chart's own touch handling.
   const swipe = useMemo(() => {
-    const sideways = (dx: number, dy: number) => Math.abs(dx) > 20 && Math.abs(dx) > Math.abs(dy) * 1.5;
+    const sideways = (dx: number, dy: number) => Math.abs(dx) > 8 && Math.abs(dx) > Math.abs(dy) * 1.5;
     return PanResponder.create({
-        onMoveShouldSetPanResponder: (_, gesture) => sideways(gesture.dx, gesture.dy),
-        onMoveShouldSetPanResponderCapture: (_, gesture) => sideways(gesture.dx, gesture.dy),
-        onPanResponderTerminationRequest: () => false,
-        onPanResponderRelease: (_, gesture) => {
-          if (gesture.dx <= -SWIPE_DISTANCE && !isLatestPeriod(value)) onChange(shiftPeriod(value, 1, firstDay));
-          else if (gesture.dx >= SWIPE_DISTANCE) onChange(shiftPeriod(value, -1, firstDay));
-        },
-      });
+      onMoveShouldSetPanResponder: (_, gesture) => sideways(gesture.dx, gesture.dy),
+      onMoveShouldSetPanResponderCapture: (_, gesture) => sideways(gesture.dx, gesture.dy),
+      onPanResponderTerminationRequest: () => false,
+      onPanResponderRelease: (_, { dx, vx }) => {
+        const flick = Math.abs(dx) >= FLICK_DISTANCE && Math.abs(vx) >= FLICK_VELOCITY;
+        if (!flick && Math.abs(dx) < SWIPE_DISTANCE) return;
+        if (dx < 0 && !isLatestPeriod(value)) onChange(shiftPeriod(value, 1, firstDay));
+        else if (dx > 0) onChange(shiftPeriod(value, -1, firstDay));
+      },
+    });
   }, [value, onChange, firstDay]);
 
   const pickKind = (kind: PeriodKind) => {
@@ -120,6 +125,7 @@ export function PeriodSwitcher({
         <CalendarModal
           visible
           value={value.start}
+          initialRange={value.kind === "custom" ? { start: value.start, end: value.end } : undefined}
           onRangeChange={(start, end) => onChange({ kind: "custom", start, end })}
           onClose={() => setPicking(false)}
         />

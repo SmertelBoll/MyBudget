@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState } from "react";
-import { FlatList, Platform, View } from "react-native";
+import { FlatList, Platform, View, useWindowDimensions } from "react-native";
 import { router } from "expo-router";
 import type { EntryType } from "@/api/types";
 import { useAuth } from "@/auth/AuthProvider";
@@ -24,8 +24,9 @@ import { SegmentedSwitch } from "@/components/SegmentedSwitch";
 import { StatsRow, type StatsChild } from "@/components/StatsRow";
 
 const COLLAPSE_AT = 24;
-// Tags are grey for now (no colors of their own); the chart alternates shades so its parts stay apart.
-const TAG_SHADES = ["#9E9E9E", "#757575", "#BDBDBD", "#616161", "#E0E0E0"];
+// Tags are grey for now (no colors of their own); "no tag" has its own color. The icon and its part of the chart
+// always use the same color.
+const NO_TAG_COLOR = "#6D7FA3";
 const TAG_ICON = "pound";
 const NO_TAG_ICON = "tag-off-outline";
 
@@ -67,27 +68,25 @@ export default function HomeScreen() {
   const [by, setBy] = useState<"category" | "tag">("category");
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [collapsed, setCollapsed] = useState(false);
-  // The user's finger or the fling after it: only those may open the chart again at the top.
-  const userScroll = useRef(false);
-  const [listHeight, setListHeight] = useState(0);
+  // One fold or unfold per gesture: while the finger stays down the chart never flips back and forth.
+  const gesture = useRef({ active: false, changed: false });
+  const { height: windowHeight } = useWindowDimensions();
 
   const entries = usePeriodEntries(type, filter, range);
   const categoryById = useMemo(() => new Map(categories.map((category) => [category.id, category])), [categories]);
   const tagById = useMemo(() => new Map(tags.map((tag) => [tag.id, tag])), [tags]);
   const { total, groups } = useMemo(() => groupEntries(entries, by, new Set(tagById.keys())), [entries, by, tagById]);
 
-  const tagColor = (index: number) => TAG_SHADES[index % TAG_SHADES.length];
 
   const look = (group: Group, index: number) => {
     if (by === "tag") {
       const tag = tagById.get(group.id);
-      return { icon: tag ? TAG_ICON : NO_TAG_ICON, color: colors.iconIdle, chartColor: tagColor(index), title: tag?.name ?? t("home.noTag") };
+      return { icon: tag ? TAG_ICON : NO_TAG_ICON, color: tag ? colors.iconIdle : NO_TAG_COLOR, title: tag?.name ?? t("home.noTag") };
     }
     const category = categoryById.get(group.id);
     return {
       icon: category?.icon ?? "help",
       color: category?.color ?? colors.iconIdle,
-      chartColor: undefined as string | undefined,
       title: category ? categoryName(category, t) : "?",
     };
   };
@@ -118,12 +117,25 @@ export default function HomeScreen() {
   };
 
   const segments = groups.map((group, index) => {
-    const { color, chartColor } = look(group, index);
-    return { id: group.id, value: group.amount, color: chartColor ?? color };
+    return { id: group.id, value: group.amount, color: look(group, index).color };
   });
 
   const setChartCollapsed = (next: boolean) => {
-    if (next !== collapsed) setCollapsed(next);
+    if (next === collapsed || gesture.current.changed) return;
+    // Wheel / mouse scrolling on the web has no gestures to lock.
+    if (Platform.OS !== "web") gesture.current.changed = true;
+    setCollapsed(next);
+  };
+
+  // Spec 2.2, 2.8: scrolling the list up folds the chart into a bar; back at the very top it opens again.
+  const onScrollY = (y: number) => {
+    if (y > COLLAPSE_AT) setChartCollapsed(true);
+    else if (y <= 0 && (gesture.current.active || Platform.OS === "web")) setChartCollapsed(false);
+  };
+  // Let go at the top (or a fling that stopped there): open the chart.
+  const onScrollSettled = (y: number) => {
+    gesture.current = { active: false, changed: false };
+    if (y <= 0 && collapsed) setCollapsed(false);
   };
 
   const openLog = (only?: { category?: string; tag?: string }) =>
@@ -169,17 +181,10 @@ export default function HomeScreen() {
           <PeriodSwitcher value={range} onChange={setRange}>
             <PeriodChart segments={segments} label={money(total, baseCurrency)} collapsed={collapsed} />
           </PeriodSwitcher>
-          <Fab placement="corner" label={t("entry.addTitle")} onPress={() => openNewTransaction(type)} size={collapsed ? 48 : 64} />
+          <Fab placement="corner" label={t("entry.addTitle")} onPress={() => openNewTransaction(type)} size={52} />
         </View>
-      </View>
-
-      <FlatList
-        data={groups}
-        keyExtractor={(group) => group.id}
-        onLayout={(event) => setListHeight(event.nativeEvent.layout.height)}
-        // Always a little taller than the list itself, so the chart can be folded and opened even with few rows.
-        contentContainerStyle={{ paddingHorizontal: spacing.md, gap: spacing.sm, paddingBottom: bottomSpace, minHeight: listHeight + COLLAPSE_AT * 3 }}
-        ListHeaderComponent={
+        {/* Stays in place: only the rows below scroll. */}
+        <View style={{ marginTop: spacing.sm }}>
           <SegmentedSwitch
             options={[
               { value: "category", label: t("home.byCategories") },
@@ -191,25 +196,31 @@ export default function HomeScreen() {
               setExpanded(new Set());
             }}
           />
-        }
+        </View>
+      </View>
+
+      <FlatList
+        data={groups}
+        keyExtractor={(group) => group.id}
+        // Taller than the list can ever be (even with the chart folded), so the chart can be folded and opened with
+        // only a few rows. Fixed, so the chart's animation never re-renders the screen.
+        contentContainerStyle={{ paddingHorizontal: spacing.md, gap: spacing.sm, paddingBottom: bottomSpace, minHeight: windowHeight * 0.8 }}
+        showsVerticalScrollIndicator={false}
         ListEmptyComponent={
           <AppText secondary style={{ textAlign: "center", paddingVertical: spacing.xl }}>
             {t("home.empty")}
           </AppText>
         }
         onScrollBeginDrag={() => {
-          userScroll.current = true;
+          gesture.current = { active: true, changed: false };
         }}
-        onMomentumScrollEnd={() => {
-          userScroll.current = false;
+        onScrollEndDrag={(event) => {
+          // A fling continues and ends in onMomentumScrollEnd; a plain release ends here.
+          const velocity = event.nativeEvent.velocity?.y ?? 0;
+          if (Math.abs(velocity) < 0.05) onScrollSettled(event.nativeEvent.contentOffset.y);
         }}
-        // Spec 2.2, 2.8: scrolling the list up shrinks the chart; it opens again once the list is back at the very
-        // top by the user's own move (not when the list merely gets taller as the chart shrinks).
-        onScroll={(event) => {
-          const y = event.nativeEvent.contentOffset.y;
-          if (y > COLLAPSE_AT) setChartCollapsed(true);
-          else if (y <= 2 && (userScroll.current || Platform.OS === "web")) setChartCollapsed(false);
-        }}
+        onMomentumScrollEnd={(event) => onScrollSettled(event.nativeEvent.contentOffset.y)}
+        onScroll={(event) => onScrollY(event.nativeEvent.contentOffset.y)}
         scrollEventThrottle={32}
         renderItem={({ item, index }) => {
           const { icon, color, title } = look(item, index);
