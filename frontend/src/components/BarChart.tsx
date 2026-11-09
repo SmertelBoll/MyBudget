@@ -24,7 +24,6 @@ const STACKED_BAR = 30;
 // they grow or shrink to the new scale.
 const SETTLE_MS = 160;
 const GROW_MS = 320;
-const DAYS_UP_FRONT = 370;
 
 // Bars are plain views sized in percent of their period's bar box. The box's height follows the chart's scale (one
 // shared value for all periods) and animates on the UI thread: one animated view per period instead of one per bar,
@@ -215,8 +214,7 @@ function Bars({ buckets, todayIndex, granularity, mode, colorOf, selection, onSe
   const { lang } = useI18n();
   const { money, baseCurrency } = useMoney();
   const itemWidth = ITEM_WIDTH[mode === "general" ? "general" : "stacked"];
-  // Days fly by fastest when flung: about a year of them is drawn at once and kept drawn on both sides. Opening the
-  // day view takes a moment longer; scrolling through that year then never waits for bars.
+  // Days fly by fastest when flung: many more of them are kept drawn on both sides.
   const byDay = granularity === "day";
 
   // Today's bar is the last one fully on screen.
@@ -318,10 +316,10 @@ function Bars({ buckets, todayIndex, granularity, mode, colorOf, selection, onSe
         getItemLayout={(_, index) => ({ length: itemWidth, offset: itemWidth * index, index })}
         initialScrollIndex={startIndex}
         // Bars are cheap: keep plenty ready on both sides so a fast fling never shows empty space.
-        initialNumToRender={byDay ? DAYS_UP_FRONT : Math.ceil(viewport / itemWidth) * 3}
-        maxToRenderPerBatch={byDay ? 120 : 30}
+        initialNumToRender={Math.ceil(viewport / itemWidth) * (byDay ? 8 : 3)}
+        maxToRenderPerBatch={byDay ? 60 : 30}
         updateCellsBatchingPeriod={16}
-        windowSize={byDay ? 151 : 31}
+        windowSize={byDay ? 61 : 31}
         // Off-screen periods aren't drawn by the system while scrolling (Android).
         removeClippedSubviews
         extraData={selection}
