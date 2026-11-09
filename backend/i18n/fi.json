@@ -673,5 +673,9 @@
   "settings.resetTitle": "Palautetaanko kaikki asetukset?",
   "settings.resetMessage": "Kaikki tämän näkymän asetukset palautuvat alkutilaan. Tietosi, kieli ja päävaluutta säilyvät",
   "settings.resetDone": "Asetukset palautettu",
-  "transfers.export": "Vie Exceliin"
+  "transfers.export": "Vie Exceliin",
+  "logs.filter": "Suodata",
+  "logs.filterCategories": "Luokat",
+  "logs.filterTags": "Tunnisteet",
+  "logs.filterReset": "Tyhjennä"
 }

@@ -673,5 +673,9 @@
   "settings.resetTitle": "Nulstil alle indstillinger?",
   "settings.resetMessage": "Alle indstillinger på denne skærm går tilbage til start. Dine data, sprog og hovedvaluta bevares",
   "settings.resetDone": "Indstillinger nulstillet",
-  "transfers.export": "Eksportér til Excel"
+  "transfers.export": "Eksportér til Excel",
+  "logs.filter": "Filter",
+  "logs.filterCategories": "Kategorier",
+  "logs.filterTags": "Tags",
+  "logs.filterReset": "Ryd"
 }

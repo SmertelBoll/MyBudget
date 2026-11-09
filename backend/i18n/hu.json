@@ -673,5 +673,9 @@
   "settings.resetTitle": "Visszaállítod az összes beállítást?",
   "settings.resetMessage": "A képernyő összes beállítása visszaáll a kezdeti állapotra. Az adataid, a nyelv és a fő pénznem megmarad",
   "settings.resetDone": "Beállítások visszaállítva",
-  "transfers.export": "Exportálás Excelbe"
+  "transfers.export": "Exportálás Excelbe",
+  "logs.filter": "Szűrő",
+  "logs.filterCategories": "Kategóriák",
+  "logs.filterTags": "Címkék",
+  "logs.filterReset": "Törlés"
 }

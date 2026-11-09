@@ -663,5 +663,9 @@
   "settings.resetTitle": "すべての設定をリセットしますか？",
   "settings.resetMessage": "この画面の設定はすべて初期状態に戻ります。データ、言語、基本通貨はそのまま残ります",
   "settings.resetDone": "設定をリセットしました",
-  "transfers.export": "Excelに書き出す"
+  "transfers.export": "Excelに書き出す",
+  "logs.filter": "絞り込み",
+  "logs.filterCategories": "カテゴリ",
+  "logs.filterTags": "タグ",
+  "logs.filterReset": "クリア"
 }

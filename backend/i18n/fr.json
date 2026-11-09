@@ -683,5 +683,9 @@
   "settings.resetTitle": "Réinitialiser tous les réglages ?",
   "settings.resetMessage": "Tous les réglages de cet écran reviennent à leur état initial. Vos données, la langue et la devise principale sont conservées",
   "settings.resetDone": "Réglages réinitialisés",
-  "transfers.export": "Exporter vers Excel"
+  "transfers.export": "Exporter vers Excel",
+  "logs.filter": "Filtrer",
+  "logs.filterCategories": "Catégories",
+  "logs.filterTags": "Étiquettes",
+  "logs.filterReset": "Effacer"
 }

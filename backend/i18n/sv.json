@@ -673,5 +673,9 @@
   "settings.resetTitle": "Återställa alla inställningar?",
   "settings.resetMessage": "Alla inställningar på den här skärmen går tillbaka till början. Dina data, språk och huvudvaluta behålls",
   "settings.resetDone": "Inställningarna har återställts",
-  "transfers.export": "Exportera till Excel"
+  "transfers.export": "Exportera till Excel",
+  "logs.filter": "Filter",
+  "logs.filterCategories": "Kategorier",
+  "logs.filterTags": "Taggar",
+  "logs.filterReset": "Rensa"
 }

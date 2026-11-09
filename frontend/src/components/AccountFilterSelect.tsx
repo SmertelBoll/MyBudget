@@ -38,7 +38,7 @@ export function Choice({ icon, color, title, subtitle, selected, highlight, onPr
   icon: string;
   color: string;
   title: string;
-  subtitle: string;
+  subtitle?: string;
   selected: boolean;
   highlight?: boolean;
   onPress: () => void;
@@ -68,9 +68,11 @@ export function Choice({ icon, color, title, subtitle, selected, highlight, onPr
         <AppText variant="heading" numberOfLines={1}>
           {title}
         </AppText>
-        <AppText variant="caption" secondary>
-          {subtitle}
-        </AppText>
+        {subtitle ? (
+          <AppText variant="caption" secondary>
+            {subtitle}
+          </AppText>
+        ) : null}
       </View>
     </Pressable>
   );

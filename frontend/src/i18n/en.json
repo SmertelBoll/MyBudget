@@ -708,5 +708,9 @@
   "settings.resetTitle": "Reset all settings?",
   "settings.resetMessage": "Every setting on this screen goes back to how it was at the start. Your data, language and main currency stay",
   "settings.resetDone": "Settings reset",
-  "transfers.export": "Export to Excel"
+  "transfers.export": "Export to Excel",
+  "logs.filter": "Filter",
+  "logs.filterCategories": "Categories",
+  "logs.filterTags": "Tags",
+  "logs.filterReset": "Clear"
 }

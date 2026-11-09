@@ -196,18 +196,19 @@ function Item({
   const animated = useAnimatedStyle(() =>
     dragging
       ? {
-          zIndex: 10,
           transform: [{ translateX: tx.get() }, { translateY: ty.get() }, { scale: 1 + lift.get() * 0.05 }],
           opacity: 1 - lift.get() * 0.1,
         }
-      : { zIndex: 0, transform: [{ translateX: sx.get() }, { translateY: sy.get() }, { scale: 1 }], opacity: 1 }
+      : { transform: [{ translateX: sx.get() }, { translateY: sy.get() }, { scale: 1 }], opacity: 1 }
   );
 
   return (
-    <GestureDetector gesture={pan}>
-      <Animated.View style={[style, animated]} onLayout={(event) => onLayout(event.nativeEvent.layout)}>
-        {children}
-      </Animated.View>
-    </GestureDetector>
+    // Measured on this outer view: on the phone the gesture detector wraps its child in a view of its own, so the
+    // child's position would come out as 0, 0 for every item. The lifted item is drawn above its neighbours.
+    <View style={[style, { zIndex: dragging ? 10 : 0, elevation: dragging ? 10 : 0 }]} onLayout={(event) => onLayout(event.nativeEvent.layout)}>
+      <GestureDetector gesture={pan}>
+        <Animated.View style={animated}>{children}</Animated.View>
+      </GestureDetector>
+    </View>
   );
 }

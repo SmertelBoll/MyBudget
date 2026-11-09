@@ -673,5 +673,9 @@
   "settings.resetTitle": "Tüm ayarlar sıfırlansın mı?",
   "settings.resetMessage": "Bu ekrandaki tüm ayarlar başlangıç durumuna döner. Verileriniz, diliniz ve ana para biriminiz korunur",
   "settings.resetDone": "Ayarlar sıfırlandı",
-  "transfers.export": "Excel’e aktar"
+  "transfers.export": "Excel’e aktar",
+  "logs.filter": "Filtrele",
+  "logs.filterCategories": "Kategoriler",
+  "logs.filterTags": "Etiketler",
+  "logs.filterReset": "Temizle"
 }

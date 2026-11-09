@@ -693,5 +693,9 @@
   "settings.resetTitle": "Obnovit všechna nastavení?",
   "settings.resetMessage": "Všechna nastavení na této obrazovce se vrátí do původního stavu. Vaše data, jazyk a hlavní měna zůstanou",
   "settings.resetDone": "Nastavení obnoveno",
-  "transfers.export": "Exportovat do Excelu"
+  "transfers.export": "Exportovat do Excelu",
+  "logs.filter": "Filtr",
+  "logs.filterCategories": "Kategorie",
+  "logs.filterTags": "Štítky",
+  "logs.filterReset": "Vymazat"
 }

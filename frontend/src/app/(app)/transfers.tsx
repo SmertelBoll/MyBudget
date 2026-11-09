@@ -134,11 +134,12 @@ export default function TransfersScreen() {
         right={
           <View style={{ flexDirection: "row" }}>
             {!searching && (
-              <IconButton icon="download" label={t("transfers.export")} onPress={exportShown} />
+              <IconButton icon="download" label={t("transfers.export")} onPress={exportShown} plain />
             )}
             <IconButton
               icon={searching ? "close" : "magnify"}
               label={t(searching ? "common.close" : "logs.search")}
+              plain
               onPress={() => {
                 setSearching(!searching);
                 setQuery("");

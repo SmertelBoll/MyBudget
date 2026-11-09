@@ -11,6 +11,7 @@ export function IconButton({
   onPress,
   size = 40,
   active,
+  plain,
 }: {
   icon: IconName;
   label: string;
@@ -18,6 +19,8 @@ export function IconButton({
   size?: number;
   // Highlighted state, e.g. "−" switched on.
   active?: boolean;
+  // No background of its own (header icons that sit side by side); shaded only while pressed.
+  plain?: boolean;
 }) {
   const { colors } = useTheme();
   return (
@@ -33,7 +36,7 @@ export function IconButton({
         borderRadius: size / 2,
         alignItems: "center",
         justifyContent: "center",
-        backgroundColor: active ? colors.accent : pressed ? colors.selected : colors.tonal,
+        backgroundColor: active ? colors.accent : pressed ? colors.selected : plain ? "transparent" : colors.tonal,
       })}
     >
       <MaterialCommunityIcons name={icon} size={size * 0.55} color={active ? colors.onAccent : colors.text} />

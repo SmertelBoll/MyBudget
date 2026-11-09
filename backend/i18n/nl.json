@@ -673,5 +673,9 @@
   "settings.resetTitle": "Alle instellingen herstellen?",
   "settings.resetMessage": "Alle instellingen op dit scherm gaan terug naar de beginstand. Je gegevens, taal en hoofdvaluta blijven behouden",
   "settings.resetDone": "Instellingen hersteld",
-  "transfers.export": "Exporteren naar Excel"
+  "transfers.export": "Exporteren naar Excel",
+  "logs.filter": "Filter",
+  "logs.filterCategories": "Categorieën",
+  "logs.filterTags": "Tags",
+  "logs.filterReset": "Wissen"
 }

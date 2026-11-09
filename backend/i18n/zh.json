@@ -663,5 +663,9 @@
   "settings.resetTitle": "重置所有设置？",
   "settings.resetMessage": "此页面上的所有设置将恢复为初始状态。你的数据、语言和主货币保持不变",
   "settings.resetDone": "设置已重置",
-  "transfers.export": "导出到 Excel"
+  "transfers.export": "导出到 Excel",
+  "logs.filter": "筛选",
+  "logs.filterCategories": "类别",
+  "logs.filterTags": "标签",
+  "logs.filterReset": "清除"
 }

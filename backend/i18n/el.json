@@ -673,5 +673,9 @@
   "settings.resetTitle": "Επαναφορά όλων των ρυθμίσεων;",
   "settings.resetMessage": "Όλες οι ρυθμίσεις αυτής της οθόνης επιστρέφουν στην αρχική τους κατάσταση. Τα δεδομένα, η γλώσσα και το κύριο νόμισμα παραμένουν",
   "settings.resetDone": "Οι ρυθμίσεις επαναφέρθηκαν",
-  "transfers.export": "Εξαγωγή σε Excel"
+  "transfers.export": "Εξαγωγή σε Excel",
+  "logs.filter": "Φίλτρο",
+  "logs.filterCategories": "Κατηγορίες",
+  "logs.filterTags": "Ετικέτες",
+  "logs.filterReset": "Καθαρισμός"
 }

@@ -683,5 +683,9 @@
   "settings.resetTitle": "Ripristinare tutte le impostazioni?",
   "settings.resetMessage": "Tutte le impostazioni di questa schermata tornano allo stato iniziale. I tuoi dati, la lingua e la valuta principale restano",
   "settings.resetDone": "Impostazioni ripristinate",
-  "transfers.export": "Esporta in Excel"
+  "transfers.export": "Esporta in Excel",
+  "logs.filter": "Filtra",
+  "logs.filterCategories": "Categorie",
+  "logs.filterTags": "Tag",
+  "logs.filterReset": "Azzera"
 }

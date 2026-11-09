@@ -663,5 +663,9 @@
   "settings.resetTitle": "모든 설정을 초기화할까요?",
   "settings.resetMessage": "이 화면의 모든 설정이 처음 상태로 돌아갑니다. 데이터, 언어, 기본 통화는 그대로 유지됩니다",
   "settings.resetDone": "설정이 초기화되었습니다",
-  "transfers.export": "Excel로 내보내기"
+  "transfers.export": "Excel로 내보내기",
+  "logs.filter": "필터",
+  "logs.filterCategories": "카테고리",
+  "logs.filterTags": "태그",
+  "logs.filterReset": "지우기"
 }

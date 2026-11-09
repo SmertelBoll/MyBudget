@@ -713,5 +713,9 @@
   "settings.resetTitle": "إعادة ضبط كل الإعدادات؟",
   "settings.resetMessage": "ستعود كل الإعدادات في هذه الشاشة إلى وضعها الأولي. تبقى بياناتك واللغة والعملة الرئيسية كما هي",
   "settings.resetDone": "تمت إعادة ضبط الإعدادات",
-  "transfers.export": "تصدير إلى Excel"
+  "transfers.export": "تصدير إلى Excel",
+  "logs.filter": "تصفية",
+  "logs.filterCategories": "الفئات",
+  "logs.filterTags": "الوسوم",
+  "logs.filterReset": "مسح"
 }

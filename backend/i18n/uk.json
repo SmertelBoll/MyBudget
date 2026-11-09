@@ -699,5 +699,9 @@
   "settings.resetTitle": "Скинути всі налаштування?",
   "settings.resetMessage": "Усі налаштування на цьому екрані повернуться до початкових. Дані, мова й основна валюта залишаться",
   "settings.resetDone": "Налаштування скинуто",
-  "transfers.export": "Вивантажити в Excel"
+  "transfers.export": "Вивантажити в Excel",
+  "logs.filter": "Фільтр",
+  "logs.filterCategories": "Категорії",
+  "logs.filterTags": "Теги",
+  "logs.filterReset": "Очистити"
 }

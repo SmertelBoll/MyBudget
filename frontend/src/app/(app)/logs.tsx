@@ -30,6 +30,7 @@ import { PeriodSwitcher } from "@/components/PeriodSwitcher";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import { SegmentedSwitch } from "@/components/SegmentedSwitch";
 import { SortMenu, type SortValue } from "@/components/SortMenu";
+import { LogFilter, NO_NARROW, passesNarrow, type LogNarrow } from "@/components/LogFilter";
 
 type Params = { type?: string; accounts?: string; kind?: string; start?: string; end?: string; category?: string; tag?: string };
 
@@ -71,6 +72,8 @@ export default function LogsScreen() {
   const [searching, setSearching] = useState(false);
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<SortValue>({ key: "date", direction: "desc" });
+  // Categories and tags chosen in the filter sheet (next to sorting).
+  const [narrow, setNarrow] = useState<LogNarrow>(NO_NARROW);
   const onlyCategory = params.category || null;
   const onlyTag = params.tag || null;
   const narrowed = Boolean(onlyCategory || onlyTag);
@@ -84,6 +87,7 @@ export default function LogsScreen() {
     const allTime: PeriodRange = { kind: "custom", start: "0000-01-01", end: "9999-12-31" };
     const list = filterTransactions(transactions, { type, accountIds: filter, range: needle ? allTime : range }).filter((tx) => {
       if (onlyCategory && tx.categoryId !== onlyCategory) return false;
+      if (!passesNarrow(narrow, tx.categoryId, tx.tagIds, (id) => tagById.has(id))) return false;
       if (!onlyTag) return true;
       const known = tx.tagIds.filter((id) => tagById.has(id));
       return onlyTag === NO_TAG ? known.length === 0 : known.includes(onlyTag);
@@ -103,7 +107,7 @@ export default function LogsScreen() {
       ];
       return texts.some((text) => normalize(text).includes(needle));
     });
-  }, [transactions, type, filter, range, needle, onlyCategory, onlyTag, accountById, categoryById, tagById, baseCurrency, rates, t, toInput]);
+  }, [transactions, type, filter, range, needle, onlyCategory, onlyTag, narrow, accountById, categoryById, tagById, baseCurrency, rates, t, toInput]);
 
   const total = rows.reduce((sum, row) => sum + row.value, 0);
   const byAmount = sort.key === "amount";
@@ -186,10 +190,11 @@ export default function LogsScreen() {
         }
         right={
           <View style={{ flexDirection: "row" }}>
-            {!searching && <IconButton icon="download" label={t("transfers.export")} onPress={exportShown} />}
+            {!searching && <IconButton icon="download" label={t("transfers.export")} onPress={exportShown} plain />}
             <IconButton
               icon={searching ? "close" : "magnify"}
               label={t(searching ? "common.close" : "logs.search")}
+              plain
               onPress={() => {
                 setSearching(!searching);
                 setQuery("");
@@ -206,7 +211,11 @@ export default function LogsScreen() {
               { value: "income", label: t("entries.income") },
             ]}
             value={type}
-            onChange={setType}
+            onChange={(next) => {
+              setType(next);
+              // Categories belong to one type: the chosen ones would hide everything on the other side.
+              setNarrow((current) => ({ ...current, categories: [] }));
+            }}
           />
           </View>
         )}
@@ -243,6 +252,7 @@ export default function LogsScreen() {
                   {t("logs.total", { amount: money(total, baseCurrency, true) })}
                 </AppText>
               )}
+              <LogFilter type={type} value={narrow} onChange={setNarrow} />
               <SortMenu value={sort} onChange={setSort} />
             </View>
           </View>

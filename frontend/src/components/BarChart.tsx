@@ -214,6 +214,8 @@ function Bars({ buckets, todayIndex, granularity, mode, colorOf, selection, onSe
   const { lang } = useI18n();
   const { money, baseCurrency } = useMoney();
   const itemWidth = ITEM_WIDTH[mode === "general" ? "general" : "stacked"];
+  // Days fly by fastest when flung: many more of them are kept drawn on both sides.
+  const byDay = granularity === "day";
 
   // Today's bar is the last one fully on screen.
   const startIndex = Math.max(0, todayIndex + 1 - Math.floor(viewport / itemWidth));
@@ -314,10 +316,10 @@ function Bars({ buckets, todayIndex, granularity, mode, colorOf, selection, onSe
         getItemLayout={(_, index) => ({ length: itemWidth, offset: itemWidth * index, index })}
         initialScrollIndex={startIndex}
         // Bars are cheap: keep plenty ready on both sides so a fast fling never shows empty space.
-        initialNumToRender={Math.ceil(viewport / itemWidth) * 3}
-        maxToRenderPerBatch={30}
+        initialNumToRender={Math.ceil(viewport / itemWidth) * (byDay ? 8 : 3)}
+        maxToRenderPerBatch={byDay ? 60 : 30}
         updateCellsBatchingPeriod={16}
-        windowSize={31}
+        windowSize={byDay ? 61 : 31}
         // Off-screen periods aren't drawn by the system while scrolling (Android).
         removeClippedSubviews
         extraData={selection}
