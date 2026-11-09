@@ -44,3 +44,6 @@ example
 
 # secrets
 .env
+
+# Skia for the browser preview (npm run skia:web copies it)
+public/canvaskit.wasm

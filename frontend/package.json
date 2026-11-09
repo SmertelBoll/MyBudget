@@ -1,12 +1,13 @@
 {
   "name": "mybudget-frontend",
   "version": "1.0.0",
-  "main": "expo-router/entry",
+  "main": "index",
   "dependencies": {
     "@expo-google-fonts/bungee": "^0.4.1",
     "@expo-google-fonts/rubik": "^0.4.2",
     "@expo/ui": "~58.0.27",
     "@expo/vector-icons": "^15.0.2",
+    "@shopify/react-native-skia": "2.14.0",
     "cronstrue": "^3.38.0",
     "expo": "~58.0.23",
     "expo-application": "~58.1.2",
@@ -59,7 +60,8 @@
     "web": "expo start --web",
     "lint": "expo lint",
     "i18n:copy": "node scripts/copy-i18n.js",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "skia:web": "setup-skia-web public"
   },
   "private": true
 }
