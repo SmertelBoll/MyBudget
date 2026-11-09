@@ -32,7 +32,7 @@ git push -u origin main
    - `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`;
    - решту (`GOOGLE_CLIENT_IDS`, `IPINFO_TOKEN`, `SMTP_*`, `SUPPORT_EMAIL`) можна лишити порожніми.
    `JWT_*` Render згенерує сам.
-3. **Apply**. Перша збірка триває кілька хвилин. Перевірка: відкрити `https://mybudget-api.onrender.com/health`
+3. **Apply**. Перша збірка триває кілька хвилин. Перевірка: відкрити `https://mybudget-api-uqdt.onrender.com/health`
    — має бути `{"ok":true}`.
 4. Якщо Render дав іншу адресу (назва зайнята), замінити її в `frontend/eas.json` (обидва `EXPO_PUBLIC_API_URL`).
 

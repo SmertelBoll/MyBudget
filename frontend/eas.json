@@ -10,13 +10,13 @@
         "buildType": "apk"
       },
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://mybudget-api.onrender.com"
+        "EXPO_PUBLIC_API_URL": "https://mybudget-api-uqdt.onrender.com"
       }
     },
     "production": {
       "autoIncrement": true,
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://mybudget-api.onrender.com"
+        "EXPO_PUBLIC_API_URL": "https://mybudget-api-uqdt.onrender.com"
       }
     }
   },
