@@ -1,4 +1,6 @@
 import UserModel from "../models/user.js";
+import SessionModel from "../models/session.js";
+import { checkPassword, hashPassword, verifyPassword } from "../utils/passwords.js";
 import { AppError } from "../utils/AppError.js";
 import { deleteUserData } from "../utils/userData.js";
 import { logSecurityEvent } from "../utils/securityLog.js";
@@ -56,4 +58,28 @@ export const restoreData = async (req, res) => {
   const result = await restoreBackup(req.userId, req.body);
   logSecurityEvent("data_restored", { userId: req.userId, sessionId: req.sessionId, req });
   res.json(result);
+};
+
+// The current password must be right (unless there is none yet). Every other device is signed out: a changed password
+// usually means someone else might know the old one. This device stays signed in.
+export const changePassword = async (req, res) => {
+  const { currentPassword, newPassword } = req.valid;
+  const user = await findUser(req.userId);
+  if (user.passwordHash && !(await verifyPassword(currentPassword ?? "", user.passwordHash))) {
+    logSecurityEvent("password_change_failed", { userId: user._id, sessionId: req.sessionId, req });
+    throw new AppError(400, "auth.wrongPassword");
+  }
+  const problem = checkPassword(newPassword);
+  if (problem) throw new AppError(400, problem);
+
+  user.passwordHash = await hashPassword(newPassword);
+  user.failedLogins = 0;
+  user.lockedUntil = null;
+  await user.save();
+  const ended = await SessionModel.updateMany(
+    { userId: user._id, revokedAt: null, _id: { $ne: req.sessionId } },
+    { $set: { revokedAt: new Date(), revokeReason: "password" } }
+  );
+  logSecurityEvent("password_changed", { userId: user._id, sessionId: req.sessionId, req, meta: { endedSessions: ended.modifiedCount } });
+  res.json({ user: user.toPublic(), endedSessions: ended.modifiedCount });
 };

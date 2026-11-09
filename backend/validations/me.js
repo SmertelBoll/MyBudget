@@ -14,6 +14,7 @@ export const settingsSchema = z
     showCents: z.boolean(),
     focus: z.enum(["expense", "income"]),
     hideBalance: z.boolean(),
+    receiptComments: z.boolean(),
   })
   .partial();
 

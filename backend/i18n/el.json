@@ -705,5 +705,19 @@
   "receipt.save": "Προσθήκη εγγραφών ({{count}})",
   "receipt.added": "Εγγραφές που προστέθηκαν: {{count}}",
   "receipt.needCategory": "Επιλέξτε κατηγορία",
-  "receipt.removeItem": "Αφαίρεση είδους"
+  "receipt.removeItem": "Αφαίρεση είδους",
+  "password.title": "Αλλαγή κωδικού",
+  "password.setTitle": "Ορισμός κωδικού",
+  "password.linkHint": "Μετά την αλλαγή οι άλλες συσκευές αποσυνδέονται",
+  "password.hint": "Εισαγάγετε τον τρέχοντα κωδικό και έναν νέο. Οι άλλες συσκευές θα αποσυνδεθούν.",
+  "password.setHint": "Ο λογαριασμός σας δεν έχει ακόμη κωδικό (συνδέεστε με Google). Ορίστε έναν για να συνδέεστε και με email.",
+  "password.current": "Τρέχων κωδικός",
+  "password.new": "Νέος κωδικός",
+  "password.repeat": "Επαναλάβετε τον νέο κωδικό",
+  "password.changed": "Ο κωδικός άλλαξε",
+  "password.changedOthersOut": "Ο κωδικός άλλαξε. Οι άλλες συσκευές αποσυνδέθηκαν",
+  "password.offline": "Για την αλλαγή κωδικού χρειάζεται σύνδεση στο διαδίκτυο",
+  "auth.wrongPassword": "Λάθος τρέχων κωδικός",
+  "settings.receiptComments": "Συμπλήρωση σχολίων κατά τη σάρωση αποδείξεων",
+  "receipt.fillComments": "Συμπλήρωση σχολίων (είδος · κατάστημα)"
 }

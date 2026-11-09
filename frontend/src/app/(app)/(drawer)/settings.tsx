@@ -37,6 +37,7 @@ const DEFAULT_SETTINGS: UserSettings = {
   showCents: false,
   focus: "expense",
   hideBalance: false,
+  receiptComments: false,
 };
 
 // Monday first, as in the calendar.
@@ -128,6 +129,11 @@ export default function SettingsScreen() {
           <View>
             <ToggleRow label={t("settings.showComment")} value={settings.showComment} onChange={(value) => setSetting("showComment", value)} />
             <ToggleRow label={t("settings.showPhotos")} value={settings.showPhotos} onChange={(value) => setSetting("showPhotos", value)} />
+            <ToggleRow
+              label={t("settings.receiptComments")}
+              value={settings.receiptComments === true}
+              onChange={(value) => setSetting("receiptComments", value)}
+            />
             <AppText variant="caption" secondary>
               {t("settings.fieldsHint")}
             </AppText>
@@ -178,6 +184,12 @@ export default function SettingsScreen() {
         <DataSection />
 
         <SettingsCard title={t("settings.security")} flush>
+          <SettingsLink
+            icon="lock-reset"
+            label={t(user.hasPassword === false ? "password.setTitle" : "password.title")}
+            hint={t("password.linkHint")}
+            onPress={() => router.push("/password")}
+          />
           <SettingsLink icon="cellphone-link" label={t("sessions.title")} hint={t("sessions.hint")} onPress={() => router.push("/sessions")} />
         </SettingsCard>
 

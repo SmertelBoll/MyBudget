@@ -695,5 +695,19 @@
   "receipt.save": "添加记录（{{count}}）",
   "receipt.added": "已添加记录：{{count}}",
   "receipt.needCategory": "请选择类别",
-  "receipt.removeItem": "移除条目"
+  "receipt.removeItem": "移除条目",
+  "password.title": "修改密码",
+  "password.setTitle": "设置密码",
+  "password.linkHint": "修改后其他设备将退出登录",
+  "password.hint": "输入当前密码和新密码。其他设备将退出登录。",
+  "password.setHint": "你的账户还没有密码（你通过 Google 登录）。设置密码后也可以用邮箱登录。",
+  "password.current": "当前密码",
+  "password.new": "新密码",
+  "password.repeat": "再次输入新密码",
+  "password.changed": "密码已修改",
+  "password.changedOthersOut": "密码已修改。其他设备已退出登录",
+  "password.offline": "修改密码需要联网",
+  "auth.wrongPassword": "当前密码不正确",
+  "settings.receiptComments": "扫描小票时填写备注",
+  "receipt.fillComments": "填写备注（条目 · 商店）"
 }

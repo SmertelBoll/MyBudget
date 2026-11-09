@@ -705,5 +705,19 @@
   "receipt.save": "Einträge hinzufügen ({{count}})",
   "receipt.added": "Einträge hinzugefügt: {{count}}",
   "receipt.needCategory": "Kategorie wählen",
-  "receipt.removeItem": "Position entfernen"
+  "receipt.removeItem": "Position entfernen",
+  "password.title": "Passwort ändern",
+  "password.setTitle": "Passwort festlegen",
+  "password.linkHint": "Nach einer Änderung werden andere Geräte abgemeldet",
+  "password.hint": "Gib dein aktuelles und ein neues Passwort ein. Andere Geräte werden abgemeldet.",
+  "password.setHint": "Dein Konto hat noch kein Passwort (du meldest dich mit Google an). Lege eins fest, um dich auch per E-Mail anzumelden.",
+  "password.current": "Aktuelles Passwort",
+  "password.new": "Neues Passwort",
+  "password.repeat": "Neues Passwort wiederholen",
+  "password.changed": "Passwort geändert",
+  "password.changedOthersOut": "Passwort geändert. Andere Geräte wurden abgemeldet",
+  "password.offline": "Zum Ändern des Passworts ist eine Internetverbindung nötig",
+  "auth.wrongPassword": "Aktuelles Passwort ist falsch",
+  "settings.receiptComments": "Kommentare beim Scannen von Belegen ausfüllen",
+  "receipt.fillComments": "Kommentare ausfüllen (Position · Geschäft)"
 }

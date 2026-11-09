@@ -705,5 +705,19 @@
   "receipt.save": "Kayıt ekle ({{count}})",
   "receipt.added": "Eklenen kayıt: {{count}}",
   "receipt.needCategory": "Kategori seçin",
-  "receipt.removeItem": "Kalemi kaldır"
+  "receipt.removeItem": "Kalemi kaldır",
+  "password.title": "Şifreyi değiştir",
+  "password.setTitle": "Şifre belirle",
+  "password.linkHint": "Değişiklikten sonra diğer cihazlarda oturum kapanır",
+  "password.hint": "Mevcut şifrenizi ve yeni şifreyi girin. Diğer cihazlarda oturum kapanacak.",
+  "password.setHint": "Hesabınızın henüz şifresi yok (Google ile giriş yapıyorsunuz). E-postayla da giriş yapmak için bir şifre belirleyin.",
+  "password.current": "Mevcut şifre",
+  "password.new": "Yeni şifre",
+  "password.repeat": "Yeni şifreyi tekrarlayın",
+  "password.changed": "Şifre değiştirildi",
+  "password.changedOthersOut": "Şifre değiştirildi. Diğer cihazlarda oturum kapandı",
+  "password.offline": "Şifreyi değiştirmek için internet gerekir",
+  "auth.wrongPassword": "Mevcut şifre yanlış",
+  "settings.receiptComments": "Fiş tararken açıklamaları doldur",
+  "receipt.fillComments": "Açıklamaları doldur (kalem · mağaza)"
 }

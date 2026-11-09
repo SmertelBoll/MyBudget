@@ -705,5 +705,19 @@
   "receipt.save": "Lägg till poster ({{count}})",
   "receipt.added": "Poster tillagda: {{count}}",
   "receipt.needCategory": "Välj en kategori",
-  "receipt.removeItem": "Ta bort vara"
+  "receipt.removeItem": "Ta bort vara",
+  "password.title": "Byt lösenord",
+  "password.setTitle": "Ange lösenord",
+  "password.linkHint": "Efter en ändring loggas andra enheter ut",
+  "password.hint": "Ange ditt nuvarande lösenord och ett nytt. Andra enheter loggas ut.",
+  "password.setHint": "Ditt konto har inget lösenord ännu (du loggar in med Google). Ange ett för att även kunna logga in med e-post.",
+  "password.current": "Nuvarande lösenord",
+  "password.new": "Nytt lösenord",
+  "password.repeat": "Upprepa det nya lösenordet",
+  "password.changed": "Lösenordet har ändrats",
+  "password.changedOthersOut": "Lösenordet har ändrats. Andra enheter har loggats ut",
+  "password.offline": "Det krävs internet för att byta lösenord",
+  "auth.wrongPassword": "Fel nuvarande lösenord",
+  "settings.receiptComments": "Fyll i kommentarer när kvitton skannas",
+  "receipt.fillComments": "Fyll i kommentarer (vara · butik)"
 }

@@ -179,7 +179,7 @@ function HomeContent() {
         center={<AccountFilterSelect value={filter} onChange={setFilter} showBalance compact />}
         right={
           <IconButton
-            icon="receipt-text-outline"
+            icon="format-list-bulleted"
             label={t("logs.open")}
             onPress={() => openLog(type, filter, range)}
           />

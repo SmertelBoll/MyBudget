@@ -695,5 +695,19 @@
   "receipt.save": "記録を追加 ({{count}})",
   "receipt.added": "追加した記録: {{count}}",
   "receipt.needCategory": "カテゴリを選択",
-  "receipt.removeItem": "品目を削除"
+  "receipt.removeItem": "品目を削除",
+  "password.title": "パスワードを変更",
+  "password.setTitle": "パスワードを設定",
+  "password.linkHint": "変更後、他の端末はログアウトされます",
+  "password.hint": "現在のパスワードと新しいパスワードを入力してください。他の端末はログアウトされます。",
+  "password.setHint": "このアカウントにはまだパスワードがありません（Google でログインしています）。メールでもログインできるよう設定してください。",
+  "password.current": "現在のパスワード",
+  "password.new": "新しいパスワード",
+  "password.repeat": "新しいパスワード（確認）",
+  "password.changed": "パスワードを変更しました",
+  "password.changedOthersOut": "パスワードを変更しました。他の端末はログアウトされました",
+  "password.offline": "パスワードの変更にはインターネット接続が必要です",
+  "auth.wrongPassword": "現在のパスワードが正しくありません",
+  "settings.receiptComments": "レシート読み取り時にコメントを入力",
+  "receipt.fillComments": "コメントを入力（品目 · 店舗）"
 }

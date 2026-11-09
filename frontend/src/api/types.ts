@@ -16,6 +16,7 @@ export type UserSettings = {
   focus: EntryType;
   // Missing on users saved before it existed: shown.
   hideBalance?: boolean;
+  receiptComments?: boolean;
 };
 
 export type User = {

@@ -725,5 +725,19 @@
   "receipt.save": "Přidat záznamy ({{count}})",
   "receipt.added": "Přidáno záznamů: {{count}}",
   "receipt.needCategory": "Vyberte kategorii",
-  "receipt.removeItem": "Odebrat položku"
+  "receipt.removeItem": "Odebrat položku",
+  "password.title": "Změnit heslo",
+  "password.setTitle": "Nastavit heslo",
+  "password.linkHint": "Po změně se ostatní zařízení odhlásí",
+  "password.hint": "Zadejte současné heslo a nové. Ostatní zařízení se odhlásí.",
+  "password.setHint": "Váš účet zatím nemá heslo (přihlašujete se přes Google). Nastavte ho, abyste se mohli přihlásit i e-mailem.",
+  "password.current": "Současné heslo",
+  "password.new": "Nové heslo",
+  "password.repeat": "Zopakujte nové heslo",
+  "password.changed": "Heslo změněno",
+  "password.changedOthersOut": "Heslo změněno. Ostatní zařízení byla odhlášena",
+  "password.offline": "Ke změně hesla je potřeba internet",
+  "auth.wrongPassword": "Nesprávné současné heslo",
+  "settings.receiptComments": "Vyplňovat komentáře při skenování účtenek",
+  "receipt.fillComments": "Vyplnit komentáře (položka · obchod)"
 }

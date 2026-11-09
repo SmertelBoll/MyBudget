@@ -715,5 +715,19 @@
   "receipt.save": "Adicionar registos ({{count}})",
   "receipt.added": "Registos adicionados: {{count}}",
   "receipt.needCategory": "Escolha uma categoria",
-  "receipt.removeItem": "Remover artigo"
+  "receipt.removeItem": "Remover artigo",
+  "password.title": "Alterar palavra-passe",
+  "password.setTitle": "Definir palavra-passe",
+  "password.linkHint": "Após a alteração, os outros dispositivos terminam a sessão",
+  "password.hint": "Introduza a palavra-passe atual e uma nova. Os outros dispositivos terminarão a sessão.",
+  "password.setHint": "A sua conta ainda não tem palavra-passe (entra com o Google). Defina uma para entrar também com o email.",
+  "password.current": "Palavra-passe atual",
+  "password.new": "Nova palavra-passe",
+  "password.repeat": "Repita a nova palavra-passe",
+  "password.changed": "Palavra-passe alterada",
+  "password.changedOthersOut": "Palavra-passe alterada. Os outros dispositivos terminaram a sessão",
+  "password.offline": "Para alterar a palavra-passe é preciso internet",
+  "auth.wrongPassword": "Palavra-passe atual incorreta",
+  "settings.receiptComments": "Preencher comentários ao digitalizar recibos",
+  "receipt.fillComments": "Preencher comentários (artigo · loja)"
 }

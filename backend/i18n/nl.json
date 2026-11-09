@@ -705,5 +705,19 @@
   "receipt.save": "Boekingen toevoegen ({{count}})",
   "receipt.added": "Boekingen toegevoegd: {{count}}",
   "receipt.needCategory": "Kies een categorie",
-  "receipt.removeItem": "Artikel verwijderen"
+  "receipt.removeItem": "Artikel verwijderen",
+  "password.title": "Wachtwoord wijzigen",
+  "password.setTitle": "Wachtwoord instellen",
+  "password.linkHint": "Na een wijziging worden andere apparaten afgemeld",
+  "password.hint": "Voer je huidige en een nieuw wachtwoord in. Andere apparaten worden afgemeld.",
+  "password.setHint": "Je account heeft nog geen wachtwoord (je logt in met Google). Stel er een in om ook met e-mail in te loggen.",
+  "password.current": "Huidig wachtwoord",
+  "password.new": "Nieuw wachtwoord",
+  "password.repeat": "Herhaal het nieuwe wachtwoord",
+  "password.changed": "Wachtwoord gewijzigd",
+  "password.changedOthersOut": "Wachtwoord gewijzigd. Andere apparaten zijn afgemeld",
+  "password.offline": "Voor het wijzigen van het wachtwoord is internet nodig",
+  "auth.wrongPassword": "Huidig wachtwoord is onjuist",
+  "settings.receiptComments": "Opmerkingen invullen bij het scannen van bonnen",
+  "receipt.fillComments": "Opmerkingen invullen (artikel · winkel)"
 }

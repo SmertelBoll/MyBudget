@@ -715,5 +715,19 @@
   "receipt.save": "Añadir registros ({{count}})",
   "receipt.added": "Registros añadidos: {{count}}",
   "receipt.needCategory": "Elige una categoría",
-  "receipt.removeItem": "Quitar artículo"
+  "receipt.removeItem": "Quitar artículo",
+  "password.title": "Cambiar contraseña",
+  "password.setTitle": "Establecer contraseña",
+  "password.linkHint": "Tras el cambio se cerrará la sesión en otros dispositivos",
+  "password.hint": "Introduce tu contraseña actual y una nueva. Se cerrará la sesión en otros dispositivos.",
+  "password.setHint": "Tu cuenta aún no tiene contraseña (entras con Google). Crea una para entrar también con tu correo.",
+  "password.current": "Contraseña actual",
+  "password.new": "Nueva contraseña",
+  "password.repeat": "Repite la nueva contraseña",
+  "password.changed": "Contraseña cambiada",
+  "password.changedOthersOut": "Contraseña cambiada. Se cerró la sesión en otros dispositivos",
+  "password.offline": "Para cambiar la contraseña hace falta internet",
+  "auth.wrongPassword": "La contraseña actual no es correcta",
+  "settings.receiptComments": "Rellenar comentarios al escanear recibos",
+  "receipt.fillComments": "Rellenar comentarios (artículo · tienda)"
 }

@@ -705,5 +705,19 @@
   "receipt.save": "Bejegyzések hozzáadása ({{count}})",
   "receipt.added": "Hozzáadott bejegyzések: {{count}}",
   "receipt.needCategory": "Válassz kategóriát",
-  "receipt.removeItem": "Tétel eltávolítása"
+  "receipt.removeItem": "Tétel eltávolítása",
+  "password.title": "Jelszó módosítása",
+  "password.setTitle": "Jelszó beállítása",
+  "password.linkHint": "Módosítás után a többi eszköz kijelentkezik",
+  "password.hint": "Add meg a jelenlegi és az új jelszót. A többi eszköz kijelentkezik.",
+  "password.setHint": "A fiókodnak még nincs jelszava (Google-lel lépsz be). Állíts be egyet, hogy e-maillel is be tudj lépni.",
+  "password.current": "Jelenlegi jelszó",
+  "password.new": "Új jelszó",
+  "password.repeat": "Új jelszó ismét",
+  "password.changed": "Jelszó módosítva",
+  "password.changedOthersOut": "Jelszó módosítva. A többi eszköz kijelentkezett",
+  "password.offline": "A jelszó módosításához internet kell",
+  "auth.wrongPassword": "Hibás jelenlegi jelszó",
+  "settings.receiptComments": "Megjegyzések kitöltése blokk beolvasásakor",
+  "receipt.fillComments": "Megjegyzések kitöltése (tétel · üzlet)"
 }

@@ -32,6 +32,7 @@ import { FullScreenModal } from "@/components/FullScreenModal";
 import { IconCircle } from "@/components/IconCircle";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import { TextField } from "@/components/TextField";
+import { ToggleRow } from "@/components/ToggleRow";
 import { useToast } from "@/components/Toast";
 import { CategoryChooser } from "@/components/entry/CategoryChooser";
 import { TagChips } from "@/components/entry/TagChips";
@@ -74,6 +75,8 @@ export default function ReceiptScreen() {
   const [stage, setStage] = useState<"pick" | "reading" | "review">("pick");
   const [notice, setNotice] = useState<string | null>(null);
   const [merchant, setMerchant] = useState("");
+  // Comments stay empty unless switched on here; Settings decides how the switch starts.
+  const [fillComments, setFillComments] = useState(user?.settings.receiptComments === true);
   const [date, setDate] = useState(todayLocal());
   const [receiptTotal, setReceiptTotal] = useState<number | null>(null);
   const [items, setItems] = useState<Item[]>([]);
@@ -165,7 +168,7 @@ export default function ReceiptScreen() {
           accountAmount: item.amount,
           rate: 1,
           date,
-          comment: shop ? `${item.name} · ${shop}` : item.name,
+          comment: !fillComments ? "" : shop ? `${item.name} · ${shop}` : item.name,
           photos: photoId ? [photoId] : [],
         });
       }
@@ -210,6 +213,7 @@ export default function ReceiptScreen() {
             <DateField label={t("entry.date")} value={date} onChange={setDate} />
           </View>
         </View>
+        <ToggleRow label={t("receipt.fillComments")} value={fillComments} onChange={setFillComments} />
 
         {notice && (
           <View style={{ flexDirection: "row", gap: spacing.sm, padding: spacing.md, borderRadius: radius.md, backgroundColor: colors.tonal }}>

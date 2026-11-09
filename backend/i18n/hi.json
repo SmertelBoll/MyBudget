@@ -705,5 +705,19 @@
   "receipt.save": "प्रविष्टियाँ जोड़ें ({{count}})",
   "receipt.added": "जोड़ी गई प्रविष्टियाँ: {{count}}",
   "receipt.needCategory": "श्रेणी चुनें",
-  "receipt.removeItem": "आइटम हटाएँ"
+  "receipt.removeItem": "आइटम हटाएँ",
+  "password.title": "पासवर्ड बदलें",
+  "password.setTitle": "पासवर्ड सेट करें",
+  "password.linkHint": "बदलने के बाद दूसरे डिवाइस से साइन आउट हो जाएगा",
+  "password.hint": "मौजूदा पासवर्ड और नया पासवर्ड दर्ज करें। दूसरे डिवाइस से साइन आउट हो जाएगा।",
+  "password.setHint": "आपके खाते में अभी पासवर्ड नहीं है (आप Google से साइन इन करते हैं)। ईमेल से भी साइन इन करने के लिए पासवर्ड सेट करें।",
+  "password.current": "मौजूदा पासवर्ड",
+  "password.new": "नया पासवर्ड",
+  "password.repeat": "नया पासवर्ड दोबारा लिखें",
+  "password.changed": "पासवर्ड बदल गया",
+  "password.changedOthersOut": "पासवर्ड बदल गया। दूसरे डिवाइस से साइन आउट हो गया",
+  "password.offline": "पासवर्ड बदलने के लिए इंटरनेट चाहिए",
+  "auth.wrongPassword": "मौजूदा पासवर्ड गलत है",
+  "settings.receiptComments": "रसीद स्कैन करते समय टिप्पणियाँ भरें",
+  "receipt.fillComments": "टिप्पणियाँ भरें (आइटम · दुकान)"
 }

@@ -715,5 +715,19 @@
   "receipt.save": "Aggiungi movimenti ({{count}})",
   "receipt.added": "Movimenti aggiunti: {{count}}",
   "receipt.needCategory": "Scegli una categoria",
-  "receipt.removeItem": "Rimuovi voce"
+  "receipt.removeItem": "Rimuovi voce",
+  "password.title": "Cambia password",
+  "password.setTitle": "Imposta una password",
+  "password.linkHint": "Dopo la modifica gli altri dispositivi vengono disconnessi",
+  "password.hint": "Inserisci la password attuale e una nuova. Gli altri dispositivi verranno disconnessi.",
+  "password.setHint": "Il tuo account non ha ancora una password (accedi con Google). Impostane una per accedere anche con l'email.",
+  "password.current": "Password attuale",
+  "password.new": "Nuova password",
+  "password.repeat": "Ripeti la nuova password",
+  "password.changed": "Password cambiata",
+  "password.changedOthersOut": "Password cambiata. Gli altri dispositivi sono stati disconnessi",
+  "password.offline": "Per cambiare la password serve una connessione a internet",
+  "auth.wrongPassword": "Password attuale errata",
+  "settings.receiptComments": "Compila i commenti durante la scansione degli scontrini",
+  "receipt.fillComments": "Compila i commenti (voce · negozio)"
 }

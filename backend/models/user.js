@@ -31,6 +31,8 @@ const UserSchema = new mongoose.Schema(
       focus: { type: String, enum: ["expense", "income"], default: "expense" },
       // Home shows dots instead of the balance until the eye next to it is tapped.
       hideBalance: { type: Boolean, default: false },
+      // Receipt scanning: fill each entry's comment with the item and the store (the switch on that screen starts here).
+      receiptComments: { type: Boolean, default: false },
     },
     // Change counter: every synced write takes the next value, /sync/pull returns everything above the client's
     // cursor.

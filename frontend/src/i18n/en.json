@@ -740,5 +740,19 @@
   "receipt.save": "Add entries ({{count}})",
   "receipt.added": "Entries added: {{count}}",
   "receipt.needCategory": "Choose a category",
-  "receipt.removeItem": "Remove item"
+  "receipt.removeItem": "Remove item",
+  "password.title": "Change password",
+  "password.setTitle": "Set a password",
+  "password.linkHint": "Other devices are signed out after a change",
+  "password.hint": "Enter your current password and a new one. Other devices will be signed out.",
+  "password.setHint": "Your account has no password yet (you sign in with Google). Set one to sign in with email too.",
+  "password.current": "Current password",
+  "password.new": "New password",
+  "password.repeat": "Repeat the new password",
+  "password.changed": "Password changed",
+  "password.changedOthersOut": "Password changed. Other devices are signed out",
+  "password.offline": "Changing the password needs an internet connection",
+  "auth.wrongPassword": "Wrong current password",
+  "settings.receiptComments": "Fill comments when scanning receipts",
+  "receipt.fillComments": "Fill comments (item · store)"
 }

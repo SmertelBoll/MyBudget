@@ -172,6 +172,27 @@ describe("profile", () => {
     assert.equal(bad.status, 400);
   });
 
+  it("changes the password: the old one is checked, other devices are signed out", async () => {
+    const phone = await register(app, "pass@gmail.com", "Phone");
+    const laptop = await login(app, "pass@gmail.com", "Laptop");
+
+    const wrong = await http.post("/me/password", { currentPassword: "nope-nope-nope", newPassword: "another-long-secret" }, phone.accessToken);
+    assert.equal(wrong.body.code, "auth.wrongPassword");
+    const weak = await http.post("/me/password", { currentPassword: PASSWORD, newPassword: "short" }, phone.accessToken);
+    assert.equal(weak.body.code, "auth.passwordTooShort");
+
+    const ok = await http.post("/me/password", { currentPassword: PASSWORD, newPassword: "another-long-secret" }, phone.accessToken);
+    assert.equal(ok.status, 200, JSON.stringify(ok.body));
+    assert.equal(ok.body.endedSessions, 1);
+    assert.equal((await http.post("/auth/refresh", { refreshToken: laptop.refreshToken })).body.code, "session.revoked");
+    assert.equal((await http.get("/me", phone.accessToken)).status, 200);
+
+    const old = await http.post("/auth/login", { email: "pass@gmail.com", password: PASSWORD, device: device() });
+    assert.equal(old.body.code, "auth.invalidCredentials");
+    const fresh = await http.post("/auth/login", { email: "pass@gmail.com", password: "another-long-secret", device: device() });
+    assert.equal(fresh.status, 200);
+  });
+
   it("deleting the account removes the user and their sessions", async () => {
     const { accessToken, refreshToken } = await register(app, "gone@gmail.com");
     const res = await http.del("/me", accessToken);

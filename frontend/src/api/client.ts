@@ -52,9 +52,9 @@ export const clearTokens = async () => {
 
 type Method = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
-const send = async <T,>(method: Method, path: string, body?: unknown, token?: string | null): Promise<T> => {
+const send = async <T,>(method: Method, path: string, body?: unknown, token?: string | null, timeoutMs = TIMEOUT_MS): Promise<T> => {
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
   // Photos go up as multipart: fetch sets that Content-Type (with the boundary) itself.
   const isForm = typeof FormData !== "undefined" && body instanceof FormData;
   let res: Response;
@@ -106,19 +106,21 @@ export const refreshSession = (): Promise<AuthPayload> => {
   return refreshInFlight;
 };
 
-type RequestOptions = { body?: unknown; auth?: boolean };
+// timeoutMs: longer for a request the server works on for a while (restoring a backup), so the app doesn't give up
+// on it and report "no connection" while the server is still finishing.
+type RequestOptions = { body?: unknown; auth?: boolean; timeoutMs?: number };
 
-export const request = async <T,>(method: Method, path: string, { body, auth = true }: RequestOptions = {}) => {
-  if (!auth) return send<T>(method, path, body);
+export const request = async <T,>(method: Method, path: string, { body, auth = true, timeoutMs }: RequestOptions = {}) => {
+  if (!auth) return send<T>(method, path, body, null, timeoutMs);
 
   if (!accessToken) await refreshSession();
   try {
-    return await send<T>(method, path, body, accessToken);
+    return await send<T>(method, path, body, accessToken, timeoutMs);
   } catch (error) {
     const expired = error instanceof ApiError && (error.code === "auth.tokenExpired" || error.code === "auth.invalidToken");
     if (!expired) throw error;
     await refreshSession();
-    return send<T>(method, path, body, accessToken);
+    return send<T>(method, path, body, accessToken, timeoutMs);
   }
 };
 

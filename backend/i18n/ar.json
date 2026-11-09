@@ -745,5 +745,19 @@
   "receipt.save": "إضافة القيود ({{count}})",
   "receipt.added": "القيود المضافة: {{count}}",
   "receipt.needCategory": "اختر فئة",
-  "receipt.removeItem": "إزالة البند"
+  "receipt.removeItem": "إزالة البند",
+  "password.title": "تغيير كلمة المرور",
+  "password.setTitle": "تعيين كلمة مرور",
+  "password.linkHint": "بعد التغيير يُسجَّل الخروج من الأجهزة الأخرى",
+  "password.hint": "أدخل كلمة المرور الحالية وكلمة مرور جديدة. سيُسجَّل الخروج من الأجهزة الأخرى.",
+  "password.setHint": "لا توجد كلمة مرور لحسابك بعد (تسجّل الدخول عبر Google). عيّن واحدة لتسجّل الدخول بالبريد أيضًا.",
+  "password.current": "كلمة المرور الحالية",
+  "password.new": "كلمة المرور الجديدة",
+  "password.repeat": "أعد كتابة كلمة المرور الجديدة",
+  "password.changed": "تم تغيير كلمة المرور",
+  "password.changedOthersOut": "تم تغيير كلمة المرور. سُجّل الخروج من الأجهزة الأخرى",
+  "password.offline": "يتطلب تغيير كلمة المرور اتصالًا بالإنترنت",
+  "auth.wrongPassword": "كلمة المرور الحالية غير صحيحة",
+  "settings.receiptComments": "ملء الملاحظات عند مسح الإيصالات",
+  "receipt.fillComments": "ملء الملاحظات (البند · المتجر)"
 }

@@ -705,5 +705,19 @@
   "receipt.save": "Lisää kirjaukset ({{count}})",
   "receipt.added": "Kirjauksia lisätty: {{count}}",
   "receipt.needCategory": "Valitse luokka",
-  "receipt.removeItem": "Poista tuote"
+  "receipt.removeItem": "Poista tuote",
+  "password.title": "Vaihda salasana",
+  "password.setTitle": "Aseta salasana",
+  "password.linkHint": "Muutoksen jälkeen muut laitteet kirjautuvat ulos",
+  "password.hint": "Anna nykyinen ja uusi salasana. Muut laitteet kirjautuvat ulos.",
+  "password.setHint": "Tililläsi ei vielä ole salasanaa (kirjaudut Googlella). Aseta salasana, niin voit kirjautua myös sähköpostilla.",
+  "password.current": "Nykyinen salasana",
+  "password.new": "Uusi salasana",
+  "password.repeat": "Toista uusi salasana",
+  "password.changed": "Salasana vaihdettu",
+  "password.changedOthersOut": "Salasana vaihdettu. Muut laitteet kirjattiin ulos",
+  "password.offline": "Salasanan vaihtaminen vaatii internetyhteyden",
+  "auth.wrongPassword": "Nykyinen salasana on väärä",
+  "settings.receiptComments": "Täytä kommentit kuitteja skannatessa",
+  "receipt.fillComments": "Täytä kommentit (tuote · kauppa)"
 }

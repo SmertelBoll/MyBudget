@@ -705,5 +705,19 @@
   "receipt.save": "Legg til poster ({{count}})",
   "receipt.added": "Poster lagt til: {{count}}",
   "receipt.needCategory": "Velg en kategori",
-  "receipt.removeItem": "Fjern vare"
+  "receipt.removeItem": "Fjern vare",
+  "password.title": "Endre passord",
+  "password.setTitle": "Angi passord",
+  "password.linkHint": "Etter en endring logges andre enheter ut",
+  "password.hint": "Skriv inn nåværende passord og et nytt. Andre enheter logges ut.",
+  "password.setHint": "Kontoen din har ikke passord ennå (du logger inn med Google). Angi et for å logge inn med e-post også.",
+  "password.current": "Nåværende passord",
+  "password.new": "Nytt passord",
+  "password.repeat": "Gjenta det nye passordet",
+  "password.changed": "Passordet er endret",
+  "password.changedOthersOut": "Passordet er endret. Andre enheter er logget ut",
+  "password.offline": "Du trenger internett for å endre passordet",
+  "auth.wrongPassword": "Feil nåværende passord",
+  "settings.receiptComments": "Fyll ut kommentarer ved skanning av kvitteringer",
+  "receipt.fillComments": "Fyll ut kommentarer (vare · butikk)"
 }

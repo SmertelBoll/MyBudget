@@ -266,7 +266,7 @@ export default function LogsScreen() {
         }
         ListEmptyComponent={
           <View style={{ alignItems: "center", gap: spacing.sm, paddingVertical: spacing.xl }}>
-            <MaterialCommunityIcons name={needle ? "text-search" : "receipt-text-outline"} size={48} color={colors.textSecondary} />
+            <MaterialCommunityIcons name={needle ? "text-search" : "format-list-bulleted"} size={48} color={colors.textSecondary} />
             <AppText secondary>{t(needle ? "logs.noResults" : "logs.empty")}</AppText>
           </View>
         }

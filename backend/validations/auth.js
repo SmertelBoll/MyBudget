@@ -33,3 +33,10 @@ export const googleSchema = z.object({
 export const refreshSchema = z.object({
   refreshToken: z.string().min(10).max(300),
 });
+
+// Settings -> Security -> "Change password". An account made through Google alone has no password yet: it sets one
+// without the current password.
+export const changePasswordSchema = z.object({
+  currentPassword: z.string().max(128).optional(),
+  newPassword: z.string().max(128),
+});

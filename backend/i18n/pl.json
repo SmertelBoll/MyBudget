@@ -725,5 +725,19 @@
   "receipt.save": "Dodaj wpisy ({{count}})",
   "receipt.added": "Dodano wpisów: {{count}}",
   "receipt.needCategory": "Wybierz kategorię",
-  "receipt.removeItem": "Usuń pozycję"
+  "receipt.removeItem": "Usuń pozycję",
+  "password.title": "Zmień hasło",
+  "password.setTitle": "Ustaw hasło",
+  "password.linkHint": "Po zmianie inne urządzenia zostaną wylogowane",
+  "password.hint": "Podaj obecne hasło i nowe. Inne urządzenia zostaną wylogowane.",
+  "password.setHint": "Twoje konto nie ma jeszcze hasła (logujesz się przez Google). Ustaw je, aby logować się też e-mailem.",
+  "password.current": "Obecne hasło",
+  "password.new": "Nowe hasło",
+  "password.repeat": "Powtórz nowe hasło",
+  "password.changed": "Hasło zmienione",
+  "password.changedOthersOut": "Hasło zmienione. Inne urządzenia zostały wylogowane",
+  "password.offline": "Do zmiany hasła potrzebny jest internet",
+  "auth.wrongPassword": "Nieprawidłowe obecne hasło",
+  "settings.receiptComments": "Wypełniaj komentarze przy skanowaniu paragonów",
+  "receipt.fillComments": "Wypełnij komentarze (pozycja · sklep)"
 }

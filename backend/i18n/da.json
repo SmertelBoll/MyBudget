@@ -705,5 +705,19 @@
   "receipt.save": "Tilføj poster ({{count}})",
   "receipt.added": "Tilføjede poster: {{count}}",
   "receipt.needCategory": "Vælg en kategori",
-  "receipt.removeItem": "Fjern vare"
+  "receipt.removeItem": "Fjern vare",
+  "password.title": "Skift adgangskode",
+  "password.setTitle": "Angiv adgangskode",
+  "password.linkHint": "Efter en ændring logges andre enheder ud",
+  "password.hint": "Indtast din nuværende adgangskode og en ny. Andre enheder logges ud.",
+  "password.setHint": "Din konto har endnu ingen adgangskode (du logger ind med Google). Angiv en for også at logge ind med e-mail.",
+  "password.current": "Nuværende adgangskode",
+  "password.new": "Ny adgangskode",
+  "password.repeat": "Gentag den nye adgangskode",
+  "password.changed": "Adgangskoden er ændret",
+  "password.changedOthersOut": "Adgangskoden er ændret. Andre enheder er logget ud",
+  "password.offline": "Det kræver internet at skifte adgangskode",
+  "auth.wrongPassword": "Forkert nuværende adgangskode",
+  "settings.receiptComments": "Udfyld kommentarer ved scanning af kvitteringer",
+  "receipt.fillComments": "Udfyld kommentarer (vare · butik)"
 }

@@ -715,5 +715,19 @@
   "receipt.save": "Ajouter les opérations ({{count}})",
   "receipt.added": "Opérations ajoutées : {{count}}",
   "receipt.needCategory": "Choisissez une catégorie",
-  "receipt.removeItem": "Retirer l'article"
+  "receipt.removeItem": "Retirer l'article",
+  "password.title": "Changer le mot de passe",
+  "password.setTitle": "Définir un mot de passe",
+  "password.linkHint": "Les autres appareils sont déconnectés après un changement",
+  "password.hint": "Saisissez votre mot de passe actuel et un nouveau. Les autres appareils seront déconnectés.",
+  "password.setHint": "Votre compte n'a pas encore de mot de passe (vous vous connectez avec Google). Définissez-en un pour vous connecter aussi par e-mail.",
+  "password.current": "Mot de passe actuel",
+  "password.new": "Nouveau mot de passe",
+  "password.repeat": "Répétez le nouveau mot de passe",
+  "password.changed": "Mot de passe modifié",
+  "password.changedOthersOut": "Mot de passe modifié. Les autres appareils sont déconnectés",
+  "password.offline": "Il faut une connexion Internet pour changer le mot de passe",
+  "auth.wrongPassword": "Mot de passe actuel incorrect",
+  "settings.receiptComments": "Remplir les commentaires lors du scan des tickets",
+  "receipt.fillComments": "Remplir les commentaires (article · magasin)"
 }

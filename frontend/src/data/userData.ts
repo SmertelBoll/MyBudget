@@ -201,6 +201,10 @@ export const readBackup = (bytes: Uint8Array) => {
 };
 
 // Online only: the server replaces the account's records in one go, then this device starts over from it.
+// A large backup on a sleeping free server: waking up plus writing thousands of records can take well over the usual
+// 20 s. Giving up early showed "no connection" while the server went on and finished the restore.
+const RESTORE_TIMEOUT_MS = 180_000;
+
 export const restoreBackup = async (backup: ReturnType<typeof readBackup>, step: (label: string) => void = () => {}) => {
   const { data, photos } = backup;
   step("send");
@@ -209,7 +213,7 @@ export const restoreBackup = async (backup: ReturnType<typeof readBackup>, step:
     collections: data.collections,
     settings: data.settings,
     baseCurrency: data.baseCurrency,
-  });
+  }, { timeoutMs: RESTORE_TIMEOUT_MS });
   step("local");
   await startOver(user);
   step("photos");

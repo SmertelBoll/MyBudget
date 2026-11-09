@@ -731,5 +731,19 @@
   "receipt.save": "Додати записи ({{count}})",
   "receipt.added": "Додано записів: {{count}}",
   "receipt.needCategory": "Виберіть категорію",
-  "receipt.removeItem": "Прибрати позицію"
+  "receipt.removeItem": "Прибрати позицію",
+  "password.title": "Змінити пароль",
+  "password.setTitle": "Встановити пароль",
+  "password.linkHint": "Після зміни інші пристрої вийдуть з акаунта",
+  "password.hint": "Введіть поточний пароль і новий. Інші пристрої вийдуть з акаунта.",
+  "password.setHint": "У вашого акаунта ще немає пароля (ви входите через Google). Встановіть його, щоб входити й поштою.",
+  "password.current": "Поточний пароль",
+  "password.new": "Новий пароль",
+  "password.repeat": "Повторіть новий пароль",
+  "password.changed": "Пароль змінено",
+  "password.changedOthersOut": "Пароль змінено. Інші пристрої вийшли з акаунта",
+  "password.offline": "Для зміни пароля потрібен інтернет",
+  "auth.wrongPassword": "Неправильний поточний пароль",
+  "settings.receiptComments": "Заповнювати коментарі під час сканування чеків",
+  "receipt.fillComments": "Заповнити коментарі (позиція · магазин)"
 }

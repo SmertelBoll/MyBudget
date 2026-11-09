@@ -265,7 +265,7 @@ function TransactionForm({ initial, existingId }: { initial: FormValues; existin
             <IconButton icon="trash-can-outline" label={t("common.delete")} onPress={remove} />
           ) : (
             // A receipt photo instead: each of its lines becomes an expense.
-            <IconButton icon="receipt-text-outline" label={t("receipt.scan")} onPress={() => router.replace("/receipt")} />
+            <IconButton icon="line-scan" label={t("receipt.scan")} onPress={() => router.replace("/receipt")} />
           )
         }
       >

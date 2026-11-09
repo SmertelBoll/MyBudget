@@ -5,7 +5,8 @@ import { useAuth } from "@/auth/AuthProvider";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTheme } from "@/theme/ThemeProvider";
 import { spacing } from "@/theme/tokens";
-import { PERIOD_KINDS, currentPeriod, formatPeriod, isLatestPeriod, shiftPeriod, type PeriodKind, type PeriodRange } from "@/utils/periods";
+import { todayLocal } from "@/utils/dates";
+import { PERIOD_KINDS, formatPeriod, inPeriod, isLatestPeriod, periodContaining, shiftPeriod, type PeriodKind, type PeriodRange } from "@/utils/periods";
 import { AppText } from "./AppText";
 import { CalendarModal } from "./CalendarModal";
 
@@ -80,7 +81,10 @@ export function PeriodSwitcher({
   const pickKind = (kind: PeriodKind) => {
     if (kind === "custom") setPicking(true);
     else if (kind !== value.kind) {
-      onChange(currentPeriod(kind, firstDay));
+      // The new size keeps the place being looked at: from August to days is 1 August. When today is in the
+      // period on screen, today (and its week, month...) is kept instead.
+      const today = todayLocal();
+      onChange(periodContaining(kind, inPeriod(today, value) ? today : value.start, firstDay));
     }
   };
 
