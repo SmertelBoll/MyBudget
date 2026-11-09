@@ -687,5 +687,6 @@
   "logs.filter": "Filtra",
   "logs.filterCategories": "Categorie",
   "logs.filterTags": "Tag",
-  "logs.filterReset": "Azzera"
+  "logs.filterReset": "Azzera",
+  "logs.filterAll": "Seleziona tutto"
 }

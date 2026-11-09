@@ -717,5 +717,6 @@
   "logs.filter": "تصفية",
   "logs.filterCategories": "الفئات",
   "logs.filterTags": "الوسوم",
-  "logs.filterReset": "مسح"
+  "logs.filterReset": "مسح",
+  "logs.filterAll": "تحديد الكل"
 }

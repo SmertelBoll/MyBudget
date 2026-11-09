@@ -677,5 +677,6 @@
   "logs.filter": "Filter",
   "logs.filterCategories": "Categorieën",
   "logs.filterTags": "Tags",
-  "logs.filterReset": "Wissen"
+  "logs.filterReset": "Wissen",
+  "logs.filterAll": "Alles selecteren"
 }

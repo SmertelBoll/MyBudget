@@ -677,5 +677,6 @@
   "logs.filter": "Filter",
   "logs.filterCategories": "Kategorier",
   "logs.filterTags": "Tags",
-  "logs.filterReset": "Ryd"
+  "logs.filterReset": "Ryd",
+  "logs.filterAll": "Vælg alle"
 }

@@ -703,5 +703,6 @@
   "logs.filter": "Фільтр",
   "logs.filterCategories": "Категорії",
   "logs.filterTags": "Теги",
-  "logs.filterReset": "Очистити"
+  "logs.filterReset": "Очистити",
+  "logs.filterAll": "Вибрати всі"
 }

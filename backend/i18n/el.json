@@ -677,5 +677,6 @@
   "logs.filter": "Φίλτρο",
   "logs.filterCategories": "Κατηγορίες",
   "logs.filterTags": "Ετικέτες",
-  "logs.filterReset": "Καθαρισμός"
+  "logs.filterReset": "Καθαρισμός",
+  "logs.filterAll": "Επιλογή όλων"
 }

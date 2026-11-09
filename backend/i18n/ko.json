@@ -667,5 +667,6 @@
   "logs.filter": "필터",
   "logs.filterCategories": "카테고리",
   "logs.filterTags": "태그",
-  "logs.filterReset": "지우기"
+  "logs.filterReset": "지우기",
+  "logs.filterAll": "모두 선택"
 }

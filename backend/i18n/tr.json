@@ -677,5 +677,6 @@
   "logs.filter": "Filtrele",
   "logs.filterCategories": "Kategoriler",
   "logs.filterTags": "Etiketler",
-  "logs.filterReset": "Temizle"
+  "logs.filterReset": "Temizle",
+  "logs.filterAll": "Tümünü seç"
 }

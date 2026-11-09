@@ -697,5 +697,6 @@
   "logs.filter": "Filtr",
   "logs.filterCategories": "Kategorie",
   "logs.filterTags": "Štítky",
-  "logs.filterReset": "Vymazat"
+  "logs.filterReset": "Vymazat",
+  "logs.filterAll": "Vybrat vše"
 }

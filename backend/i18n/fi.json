@@ -677,5 +677,6 @@
   "logs.filter": "Suodata",
   "logs.filterCategories": "Luokat",
   "logs.filterTags": "Tunnisteet",
-  "logs.filterReset": "Tyhjennä"
+  "logs.filterReset": "Tyhjennä",
+  "logs.filterAll": "Valitse kaikki"
 }

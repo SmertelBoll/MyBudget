@@ -712,5 +712,6 @@
   "logs.filter": "Filter",
   "logs.filterCategories": "Categories",
   "logs.filterTags": "Tags",
-  "logs.filterReset": "Clear"
+  "logs.filterReset": "Clear",
+  "logs.filterAll": "Select all"
 }

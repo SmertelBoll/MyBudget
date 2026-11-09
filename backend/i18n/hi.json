@@ -677,5 +677,6 @@
   "logs.filter": "फ़िल्टर",
   "logs.filterCategories": "श्रेणियाँ",
   "logs.filterTags": "टैग",
-  "logs.filterReset": "साफ़ करें"
+  "logs.filterReset": "साफ़ करें",
+  "logs.filterAll": "सभी चुनें"
 }

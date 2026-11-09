@@ -667,5 +667,6 @@
   "logs.filter": "筛选",
   "logs.filterCategories": "类别",
   "logs.filterTags": "标签",
-  "logs.filterReset": "清除"
+  "logs.filterReset": "清除",
+  "logs.filterAll": "全选"
 }

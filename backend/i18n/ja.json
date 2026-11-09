@@ -667,5 +667,6 @@
   "logs.filter": "絞り込み",
   "logs.filterCategories": "カテゴリ",
   "logs.filterTags": "タグ",
-  "logs.filterReset": "クリア"
+  "logs.filterReset": "クリア",
+  "logs.filterAll": "すべて選択"
 }

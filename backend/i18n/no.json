@@ -677,5 +677,6 @@
   "logs.filter": "Filter",
   "logs.filterCategories": "Kategorier",
   "logs.filterTags": "Tagger",
-  "logs.filterReset": "Tøm"
+  "logs.filterReset": "Tøm",
+  "logs.filterAll": "Velg alle"
 }

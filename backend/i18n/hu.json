@@ -677,5 +677,6 @@
   "logs.filter": "Szűrő",
   "logs.filterCategories": "Kategóriák",
   "logs.filterTags": "Címkék",
-  "logs.filterReset": "Törlés"
+  "logs.filterReset": "Törlés",
+  "logs.filterAll": "Összes kijelölése"
 }

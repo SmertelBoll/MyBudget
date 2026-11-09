@@ -677,5 +677,6 @@
   "logs.filter": "Filter",
   "logs.filterCategories": "Kategorier",
   "logs.filterTags": "Taggar",
-  "logs.filterReset": "Rensa"
+  "logs.filterReset": "Rensa",
+  "logs.filterAll": "Välj alla"
 }

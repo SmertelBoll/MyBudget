@@ -69,6 +69,10 @@ export function LogFilter({
     [kind, categories, tags, type, t, colors.iconIdle]
   );
   const title = t(kind === "categories" ? "logs.filterCategories" : "logs.filterTags");
+  // No narrowing is shown as everything ticked; everything ticked is saved as no narrowing (so a category or tag
+  // added later is in too).
+  const allIds = options.map((option) => option.id);
+  const allChosen = allIds.every((id) => draft.includes(id));
 
   return (
     <>
@@ -77,7 +81,7 @@ export function LogFilter({
           icon={kind === "categories" ? "shape-outline" : "pound"}
           label={title}
           onPress={() => {
-            setDraft(value[kind]);
+            setDraft(value[kind].length ? value[kind] : allIds);
             setOpen(true);
           }}
           size={36}
@@ -90,6 +94,7 @@ export function LogFilter({
 
       <AppSheet visible={open} title={title} onClose={() => setOpen(false)}>
         <ScrollView style={{ maxHeight: 440 }} contentContainerStyle={{ gap: spacing.xs }}>
+          <Choice icon="check-all" color={colors.accent} title={t("logs.filterAll")} selected={allChosen} highlight onPress={() => setDraft(allChosen ? [] : allIds)} />
           {options.map((option) => (
             <Choice
               key={option.id}
@@ -102,11 +107,12 @@ export function LogFilter({
           ))}
         </ScrollView>
         <View style={{ flexDirection: "row", gap: spacing.sm }}>
-          <Button title={t("logs.filterReset")} variant="secondary" onPress={() => setDraft([])} style={{ flex: 1 }} />
+          <Button title={t("common.cancel")} variant="secondary" onPress={() => setOpen(false)} style={{ flex: 1 }} />
           <Button
             title={t("home.select")}
+            disabled={!draft.length}
             onPress={() => {
-              onChange({ ...value, [kind]: draft });
+              onChange({ ...value, [kind]: allChosen ? [] : draft });
               setOpen(false);
             }}
             style={{ flex: 1 }}
