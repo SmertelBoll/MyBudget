@@ -729,5 +729,8 @@
   "password.offline": "Il faut une connexion Internet pour changer le mot de passe",
   "auth.wrongPassword": "Mot de passe actuel incorrect",
   "settings.receiptComments": "Remplir les commentaires lors du scan des tickets",
-  "receipt.fillComments": "Remplir les commentaires (article · magasin)"
+  "receipt.fillComments": "Remplir les commentaires (article · magasin)",
+  "common.timeout": "Le serveur a mis trop de temps à répondre. Réessayez",
+  "sync.slow": "Le serveur répond lentement. Touchez pour réessayer",
+  "sessions.loading": "Chargement des sessions…"
 }

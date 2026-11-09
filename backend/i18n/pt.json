@@ -729,5 +729,8 @@
   "password.offline": "Para alterar a palavra-passe é preciso internet",
   "auth.wrongPassword": "Palavra-passe atual incorreta",
   "settings.receiptComments": "Preencher comentários ao digitalizar recibos",
-  "receipt.fillComments": "Preencher comentários (artigo · loja)"
+  "receipt.fillComments": "Preencher comentários (artigo · loja)",
+  "common.timeout": "O servidor demorou demais para responder. Tente novamente",
+  "sync.slow": "O servidor está lento para responder. Toque para tentar de novo",
+  "sessions.loading": "Carregando sessões…"
 }

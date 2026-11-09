@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useState } from "react";
-import { FlatList, RefreshControl, View } from "react-native";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { ActivityIndicator, FlatList, RefreshControl, View } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { ApiError, api, isNetworkError } from "@/api/client";
+import { ApiError, api } from "@/api/client";
+import { requestSync } from "@/data/sync";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTheme } from "@/theme/ThemeProvider";
 import { radius, spacing } from "@/theme/tokens";
@@ -87,39 +88,52 @@ export default function SessionsScreen() {
   const toast = useToast();
   const bottomSpace = useBottomSpace();
   const [sessions, setSessions] = useState<Session[] | null>(null);
-  const [offline, setOffline] = useState(false);
+  // Why the list couldn't be loaded (an i18n code), or null.
+  const [failure, setFailure] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+  const alive = useRef(true);
+  const listed = useRef(false);
 
+  // A list already on screen stays there when a reload fails; only the first load turns into the failure view.
   const load = useCallback(
     () =>
       api.get<{ sessions: Session[] }>("/sessions").then(
         ({ sessions: list }) => {
+          if (!alive.current) return;
+          listed.current = true;
           setSessions(list);
-          setOffline(false);
+          setFailure(null);
         },
         (error) => {
-          if (isNetworkError(error)) setOffline(true);
-          else toast.show(t(error instanceof ApiError ? error.code : "common.serverError"), { kind: "error" });
+          if (!alive.current) return;
+          const code = error instanceof ApiError ? error.code : "common.serverError";
+          setFailure(code);
+          // The failure view says it already when nothing is listed yet.
+          if (listed.current) toast.show(t(code), { kind: "error" });
         }
       ),
     [t, toast]
   );
 
   useEffect(() => {
-    let alive = true;
-    api.get<{ sessions: Session[] }>("/sessions").then(
-      ({ sessions: list }) => alive && setSessions(list),
-      (error) => alive && isNetworkError(error) && setOffline(true)
-    );
+    alive.current = true;
+    load();
     return () => {
-      alive = false;
+      alive.current = false;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- once on opening
   }, []);
 
   const refresh = async () => {
     setRefreshing(true);
     await load();
-    setRefreshing(false);
+    if (alive.current) setRefreshing(false);
+  };
+
+  // The button on the failure view also runs a data sync, which wakes the server for the next try too.
+  const retry = () => {
+    requestSync();
+    refresh();
   };
 
   const fail = (error: unknown) => toast.show(t(error instanceof ApiError ? error.code : "common.serverError"), { kind: "error" });
@@ -196,13 +210,21 @@ export default function SessionsScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
       <ScreenHeader title={t("sessions.title")} left="back" />
-      {offline && !sessions ? (
+      {!sessions && !failure ? (
+        // The first load can take up to a minute while a sleeping server wakes.
         <View style={{ alignItems: "center", gap: spacing.sm, padding: spacing.xl }}>
-          <MaterialCommunityIcons name="wifi-off" size={48} color={colors.textSecondary} />
+          <ActivityIndicator size="large" color={colors.accent} />
           <AppText secondary style={{ textAlign: "center" }}>
-            {t("common.noInternet")}
+            {t("sessions.loading")}
           </AppText>
-          <Button title={t("sessions.retry")} variant="secondary" onPress={refresh} loading={refreshing} />
+        </View>
+      ) : !sessions && failure ? (
+        <View style={{ alignItems: "center", gap: spacing.sm, padding: spacing.xl }}>
+          <MaterialCommunityIcons name={failure === "common.noInternet" ? "wifi-off" : "sync-alert"} size={48} color={colors.textSecondary} />
+          <AppText secondary style={{ textAlign: "center" }}>
+            {t(failure)}
+          </AppText>
+          <Button title={t("sync.retry")} icon="sync" variant="secondary" onPress={retry} loading={refreshing} />
         </View>
       ) : (
         <FlatList

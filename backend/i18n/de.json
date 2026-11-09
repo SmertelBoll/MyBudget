@@ -719,5 +719,8 @@
   "password.offline": "Zum Ändern des Passworts ist eine Internetverbindung nötig",
   "auth.wrongPassword": "Aktuelles Passwort ist falsch",
   "settings.receiptComments": "Kommentare beim Scannen von Belegen ausfüllen",
-  "receipt.fillComments": "Kommentare ausfüllen (Position · Geschäft)"
+  "receipt.fillComments": "Kommentare ausfüllen (Position · Geschäft)",
+  "common.timeout": "Der Server hat zu lange nicht geantwortet. Bitte versuche es erneut",
+  "sync.slow": "Der Server antwortet langsam. Tippe, um es erneut zu versuchen",
+  "sessions.loading": "Sitzungen werden geladen…"
 }

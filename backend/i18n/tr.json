@@ -719,5 +719,8 @@
   "password.offline": "Şifreyi değiştirmek için internet gerekir",
   "auth.wrongPassword": "Mevcut şifre yanlış",
   "settings.receiptComments": "Fiş tararken açıklamaları doldur",
-  "receipt.fillComments": "Açıklamaları doldur (kalem · mağaza)"
+  "receipt.fillComments": "Açıklamaları doldur (kalem · mağaza)",
+  "common.timeout": "Sunucunun yanıt vermesi çok uzun sürdü. Tekrar deneyin",
+  "sync.slow": "Sunucu yavaş yanıt veriyor. Tekrar denemek için dokunun",
+  "sessions.loading": "Oturumlar yükleniyor…"
 }

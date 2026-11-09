@@ -739,5 +739,8 @@
   "password.offline": "Ke změně hesla je potřeba internet",
   "auth.wrongPassword": "Nesprávné současné heslo",
   "settings.receiptComments": "Vyplňovat komentáře při skenování účtenek",
-  "receipt.fillComments": "Vyplnit komentáře (položka · obchod)"
+  "receipt.fillComments": "Vyplnit komentáře (položka · obchod)",
+  "common.timeout": "Server odpovídal příliš dlouho. Zkuste to znovu",
+  "sync.slow": "Server odpovídá pomalu. Klepnutím to zkusíte znovu",
+  "sessions.loading": "Načítání relací…"
 }

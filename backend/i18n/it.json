@@ -729,5 +729,8 @@
   "password.offline": "Per cambiare la password serve una connessione a internet",
   "auth.wrongPassword": "Password attuale errata",
   "settings.receiptComments": "Compila i commenti durante la scansione degli scontrini",
-  "receipt.fillComments": "Compila i commenti (voce · negozio)"
+  "receipt.fillComments": "Compila i commenti (voce · negozio)",
+  "common.timeout": "Il server ha impiegato troppo a rispondere. Riprova",
+  "sync.slow": "Il server risponde lentamente. Tocca per riprovare",
+  "sessions.loading": "Caricamento sessioni…"
 }

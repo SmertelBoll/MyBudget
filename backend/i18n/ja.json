@@ -709,5 +709,8 @@
   "password.offline": "パスワードの変更にはインターネット接続が必要です",
   "auth.wrongPassword": "現在のパスワードが正しくありません",
   "settings.receiptComments": "レシート読み取り時にコメントを入力",
-  "receipt.fillComments": "コメントを入力（品目 · 店舗）"
+  "receipt.fillComments": "コメントを入力（品目 · 店舗）",
+  "common.timeout": "サーバーの応答に時間がかかりすぎました。もう一度お試しください",
+  "sync.slow": "サーバーの応答が遅れています。タップして再試行",
+  "sessions.loading": "セッションを読み込み中…"
 }

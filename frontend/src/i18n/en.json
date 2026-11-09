@@ -754,5 +754,8 @@
   "password.offline": "Changing the password needs an internet connection",
   "auth.wrongPassword": "Wrong current password",
   "settings.receiptComments": "Fill comments when scanning receipts",
-  "receipt.fillComments": "Fill comments (item · store)"
+  "receipt.fillComments": "Fill comments (item · store)",
+  "common.timeout": "The server took too long to answer. Please try again",
+  "sync.slow": "The server is slow to answer. Tap to retry",
+  "sessions.loading": "Loading sessions…"
 }

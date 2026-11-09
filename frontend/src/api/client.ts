@@ -4,6 +4,7 @@ import type { AuthPayload } from "./types";
 const ORIGIN = (process.env.EXPO_PUBLIC_API_URL || "http://localhost:4444").replace(/\/$/, "");
 const BASE_URL = `${ORIGIN}/api/v1`;
 const TIMEOUT_MS = 20000;
+const REFRESH_TIMEOUT_MS = 90_000;
 const REFRESH_TOKEN_KEY = "auth.refreshToken";
 
 // The server answers with { code } only; the UI shows t(code). status 0 = no connection.
@@ -23,7 +24,31 @@ export const wakeServer = () => {
   fetch(`${ORIGIN}/health`).catch(() => {});
 };
 
+// After a request timed out: wait (up to a minute, shared by all callers) until the server answers its health check.
+// True means it is up now, so the timeout was the server waking, not a missing connection.
+const WAKE_WAIT_MS = 60_000;
+let waking: Promise<boolean> | null = null;
+const serverAwake = () => {
+  waking ??= (async () => {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), WAKE_WAIT_MS);
+    try {
+      return (await fetch(`${ORIGIN}/health`, { signal: controller.signal })).ok;
+    } catch {
+      return false;
+    } finally {
+      clearTimeout(timer);
+    }
+  })().finally(() => {
+    waking = null;
+  });
+  return waking;
+};
+
+// Status 0: no answer at all. "common.noInternet" when the server couldn't be reached, "common.timeout" when it was
+// reachable but didn't answer in time.
 export const isNetworkError = (error: unknown) => error instanceof ApiError && error.status === 0;
+export const isOffline = (error: unknown) => isNetworkError(error) && (error as ApiError).code === "common.noInternet";
 
 // The access token lives in memory only; the refresh token in the secure store (spec 3.2).
 let accessToken: string | null = null;
@@ -52,9 +77,15 @@ export const clearTokens = async () => {
 
 type Method = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
-const send = async <T,>(method: Method, path: string, body?: unknown, token?: string | null, timeoutMs = TIMEOUT_MS): Promise<T> => {
+type SendOptions = { token?: string | null; timeoutMs?: number; retry?: boolean };
+
+const send = async <T,>(method: Method, path: string, body: unknown, { token, timeoutMs = TIMEOUT_MS, retry }: SendOptions = {}): Promise<T> => {
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  let timedOut = false;
+  const timer = setTimeout(() => {
+    timedOut = true;
+    controller.abort();
+  }, timeoutMs);
   // Photos go up as multipart: fetch sets that Content-Type (with the boundary) itself.
   const isForm = typeof FormData !== "undefined" && body instanceof FormData;
   let res: Response;
@@ -70,9 +101,14 @@ const send = async <T,>(method: Method, path: string, body?: unknown, token?: st
       signal: controller.signal,
     });
   } catch (error) {
-    // Anything fetch throws reads as "no connection" to the user; the real reason stays visible in development.
     if (__DEV__) console.warn(`${method} ${path} failed before a response:`, error);
-    throw new ApiError(0, "common.noInternet");
+    clearTimeout(timer);
+    if (!timedOut) throw new ApiError(0, "common.noInternet");
+    // A sleeping free server takes up to a minute to wake, longer than one request waits. Once it answers, a
+    // request that is safe to repeat goes again; any other reports the timeout, not a missing connection.
+    if (!(await serverAwake())) throw new ApiError(0, "common.noInternet");
+    if (retry) return send<T>(method, path, body, { token, timeoutMs, retry: false });
+    throw new ApiError(0, "common.timeout");
   } finally {
     clearTimeout(timer);
   }
@@ -90,7 +126,9 @@ export const refreshSession = (): Promise<AuthPayload> => {
     const refreshToken = await getRefreshToken();
     if (!refreshToken) throw new ApiError(401, "session.invalid");
     try {
-      const payload = await send<AuthPayload>("POST", "/auth/refresh", { refreshToken });
+      // Never repeated, and waits out a waking server: a refresh the server carried out but whose answer the app gave
+      // up on would leave the app with the retired token, and presenting that one ends the session.
+      const payload = await send<AuthPayload>("POST", "/auth/refresh", { refreshToken }, { timeoutMs: REFRESH_TIMEOUT_MS });
       await saveTokens(payload);
       return payload;
     } catch (error) {
@@ -108,19 +146,20 @@ export const refreshSession = (): Promise<AuthPayload> => {
 
 // timeoutMs: longer for a request the server works on for a while (restoring a backup), so the app doesn't give up
 // on it and report "no connection" while the server is still finishing.
-type RequestOptions = { body?: unknown; auth?: boolean; timeoutMs?: number };
+// retry: the request is safe to send twice (reads always are), so after a timeout on a waking server it goes again.
+type RequestOptions = { body?: unknown; auth?: boolean; timeoutMs?: number; retry?: boolean };
 
-export const request = async <T,>(method: Method, path: string, { body, auth = true, timeoutMs }: RequestOptions = {}) => {
-  if (!auth) return send<T>(method, path, body, null, timeoutMs);
+export const request = async <T,>(method: Method, path: string, { body, auth = true, timeoutMs, retry = method === "GET" }: RequestOptions = {}) => {
+  if (!auth) return send<T>(method, path, body, { timeoutMs, retry });
 
   if (!accessToken) await refreshSession();
   try {
-    return await send<T>(method, path, body, accessToken, timeoutMs);
+    return await send<T>(method, path, body, { token: accessToken, timeoutMs, retry });
   } catch (error) {
     const expired = error instanceof ApiError && (error.code === "auth.tokenExpired" || error.code === "auth.invalidToken");
     if (!expired) throw error;
     await refreshSession();
-    return send<T>(method, path, body, accessToken, timeoutMs);
+    return send<T>(method, path, body, { token: accessToken, timeoutMs, retry });
   }
 };
 

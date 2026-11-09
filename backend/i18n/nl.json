@@ -719,5 +719,8 @@
   "password.offline": "Voor het wijzigen van het wachtwoord is internet nodig",
   "auth.wrongPassword": "Huidig wachtwoord is onjuist",
   "settings.receiptComments": "Opmerkingen invullen bij het scannen van bonnen",
-  "receipt.fillComments": "Opmerkingen invullen (artikel · winkel)"
+  "receipt.fillComments": "Opmerkingen invullen (artikel · winkel)",
+  "common.timeout": "De server deed er te lang over om te antwoorden. Probeer het opnieuw",
+  "sync.slow": "De server reageert traag. Tik om opnieuw te proberen",
+  "sessions.loading": "Sessies laden…"
 }

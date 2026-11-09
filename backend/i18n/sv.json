@@ -719,5 +719,8 @@
   "password.offline": "Det krävs internet för att byta lösenord",
   "auth.wrongPassword": "Fel nuvarande lösenord",
   "settings.receiptComments": "Fyll i kommentarer när kvitton skannas",
-  "receipt.fillComments": "Fyll i kommentarer (vara · butik)"
+  "receipt.fillComments": "Fyll i kommentarer (vara · butik)",
+  "common.timeout": "Servern tog för lång tid att svara. Försök igen",
+  "sync.slow": "Servern svarar långsamt. Tryck för att försöka igen",
+  "sessions.loading": "Läser in sessioner…"
 }

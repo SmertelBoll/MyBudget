@@ -719,5 +719,8 @@
   "password.offline": "Det kræver internet at skifte adgangskode",
   "auth.wrongPassword": "Forkert nuværende adgangskode",
   "settings.receiptComments": "Udfyld kommentarer ved scanning af kvitteringer",
-  "receipt.fillComments": "Udfyld kommentarer (vare · butik)"
+  "receipt.fillComments": "Udfyld kommentarer (vare · butik)",
+  "common.timeout": "Serveren var for længe om at svare. Prøv igen",
+  "sync.slow": "Serveren svarer langsomt. Tryk for at prøve igen",
+  "sessions.loading": "Indlæser sessioner…"
 }

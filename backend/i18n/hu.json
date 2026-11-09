@@ -719,5 +719,8 @@
   "password.offline": "A jelszó módosításához internet kell",
   "auth.wrongPassword": "Hibás jelenlegi jelszó",
   "settings.receiptComments": "Megjegyzések kitöltése blokk beolvasásakor",
-  "receipt.fillComments": "Megjegyzések kitöltése (tétel · üzlet)"
+  "receipt.fillComments": "Megjegyzések kitöltése (tétel · üzlet)",
+  "common.timeout": "A szerver túl sokáig nem válaszolt. Próbáld újra",
+  "sync.slow": "A szerver lassan válaszol. Koppints az újrapróbáláshoz",
+  "sessions.loading": "Munkamenetek betöltése…"
 }

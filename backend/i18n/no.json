@@ -719,5 +719,8 @@
   "password.offline": "Du trenger internett for å endre passordet",
   "auth.wrongPassword": "Feil nåværende passord",
   "settings.receiptComments": "Fyll ut kommentarer ved skanning av kvitteringer",
-  "receipt.fillComments": "Fyll ut kommentarer (vare · butikk)"
+  "receipt.fillComments": "Fyll ut kommentarer (vare · butikk)",
+  "common.timeout": "Serveren brukte for lang tid på å svare. Prøv igjen",
+  "sync.slow": "Serveren svarer tregt. Trykk for å prøve igjen",
+  "sessions.loading": "Laster inn økter…"
 }

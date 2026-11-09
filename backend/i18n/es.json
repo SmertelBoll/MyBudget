@@ -729,5 +729,8 @@
   "password.offline": "Para cambiar la contraseña hace falta internet",
   "auth.wrongPassword": "La contraseña actual no es correcta",
   "settings.receiptComments": "Rellenar comentarios al escanear recibos",
-  "receipt.fillComments": "Rellenar comentarios (artículo · tienda)"
+  "receipt.fillComments": "Rellenar comentarios (artículo · tienda)",
+  "common.timeout": "El servidor tardó demasiado en responder. Inténtalo de nuevo",
+  "sync.slow": "El servidor responde despacio. Toca para reintentar",
+  "sessions.loading": "Cargando sesiones…"
 }

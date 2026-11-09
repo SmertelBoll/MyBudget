@@ -719,5 +719,8 @@
   "password.offline": "Salasanan vaihtaminen vaatii internetyhteyden",
   "auth.wrongPassword": "Nykyinen salasana on väärä",
   "settings.receiptComments": "Täytä kommentit kuitteja skannatessa",
-  "receipt.fillComments": "Täytä kommentit (tuote · kauppa)"
+  "receipt.fillComments": "Täytä kommentit (tuote · kauppa)",
+  "common.timeout": "Palvelin vastasi liian hitaasti. Yritä uudelleen",
+  "sync.slow": "Palvelin vastaa hitaasti. Yritä uudelleen napauttamalla",
+  "sessions.loading": "Ladataan istuntoja…"
 }

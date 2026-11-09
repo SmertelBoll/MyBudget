@@ -1,0 +1,12 @@
+{
+  "name": "mybudget-logo",
+  "private": true,
+  "description": "Generates the app icons and splash image from one letter drawn on a 64-unit grid. See LOGO.md.",
+  "scripts": {
+    "build": "node make-logo.cjs"
+  },
+  "devDependencies": {
+    "@resvg/resvg-js": "2.6.2",
+    "pngjs": "7.0.0"
+  }
+}

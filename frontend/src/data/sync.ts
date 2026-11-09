@@ -1,4 +1,4 @@
-import { ApiError, api, isNetworkError } from "@/api/client";
+import { ApiError, api, isOffline } from "@/api/client";
 import {
   applyRemote,
   countOutbox,
@@ -73,7 +73,8 @@ const push = async (rejected: { collection: Collection; id: string }[]) => {
 
     let results: PushResult[];
     try {
-      ({ results } = await api.post<{ results: PushResult[] }>("/sync/push", { epoch: await readEpoch(), changes }));
+      // Safe to send twice: every change is an upsert or delete by id.
+      ({ results } = await api.post<{ results: PushResult[] }>("/sync/push", { epoch: await readEpoch(), changes }, { retry: true }));
     } catch (error) {
       if (error instanceof ApiError && error.code === "sync.reset") {
         // The pull that follows learns the new epoch and starts over.
@@ -139,7 +140,8 @@ const runOnce = async () => {
     setState({ status: "idle", lastSyncedAt: now, pending: await countOutbox() });
     flushSupportQueue().catch(() => {});
   } catch (error) {
-    const offline = isNetworkError(error);
+    // A server that answered too slowly is an error worth retrying, not "offline".
+    const offline = isOffline(error);
     setState({
       status: offline ? "offline" : "error",
       errorCode: error instanceof ApiError ? error.code : "common.serverError",

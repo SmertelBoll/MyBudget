@@ -19,7 +19,7 @@ const formatTime = (iso: string, lang: string) => {
 export function SyncIndicator() {
   const { colors } = useTheme();
   const { t, lang } = useI18n();
-  const { status, pending, lastSyncedAt } = useSyncState();
+  const { status, pending, lastSyncedAt, errorCode } = useSyncState();
 
   let icon: keyof typeof MaterialCommunityIcons.glyphMap = "sync";
   let color = colors.textSecondary;
@@ -29,7 +29,7 @@ export function SyncIndicator() {
   } else if (status === "error") {
     icon = "sync-alert";
     color = colors.danger;
-    text = t("sync.error");
+    text = t(errorCode === "common.timeout" ? "sync.slow" : "sync.error");
   } else if (status === "offline") {
     icon = "cloud-off-outline";
     text = pending ? t("sync.pending", { count: pending }) : t("sync.offline");

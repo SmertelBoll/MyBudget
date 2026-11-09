@@ -72,12 +72,15 @@ const formFile = async (id: string, uri: string) => {
 // Called by sync before the outbox goes up. Re-sending an id is harmless (the server returns the existing photo).
 // Never throws: a photo that fails stays pending for the next sync, and the transactions still go up (they show a
 // placeholder elsewhere until the photo arrives). Returns the last error code, or null when everything went up.
+const PHOTO_TIMEOUT_MS = 60_000;
+
 export const uploadPendingPhotos = async (): Promise<string | null> => {
   const pending = await (await getDb()).getAllAsync<{ id: string; uri: string }>("SELECT id, uri FROM photos WHERE uploaded = 0");
   let lastError: string | null = null;
   for (const { id, uri } of pending) {
     try {
-      await api.post("/photos", await formFile(id, uri));
+      // A photo over mobile data can take longer than an ordinary request; re-sending is harmless.
+      await api.post("/photos", await formFile(id, uri), { timeoutMs: PHOTO_TIMEOUT_MS, retry: true });
       await serialWrite((db) => db.runAsync("UPDATE photos SET uploaded = 1 WHERE id = ?", id));
     } catch (error) {
       lastError = error instanceof ApiError ? error.code : "photos.failed";

@@ -739,5 +739,8 @@
   "password.offline": "Do zmiany hasła potrzebny jest internet",
   "auth.wrongPassword": "Nieprawidłowe obecne hasło",
   "settings.receiptComments": "Wypełniaj komentarze przy skanowaniu paragonów",
-  "receipt.fillComments": "Wypełnij komentarze (pozycja · sklep)"
+  "receipt.fillComments": "Wypełnij komentarze (pozycja · sklep)",
+  "common.timeout": "Serwer zbyt długo nie odpowiadał. Spróbuj ponownie",
+  "sync.slow": "Serwer odpowiada powoli. Dotknij, aby ponowić",
+  "sessions.loading": "Wczytywanie sesji…"
 }
