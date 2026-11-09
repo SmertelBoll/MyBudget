@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { Modal, Pressable, View } from "react-native";
+import { Modal, Pressable, ScrollView, View } from "react-native";
 import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTheme } from "@/theme/ThemeProvider";
@@ -155,11 +155,12 @@ function ChoiceView({ dialog, onClose }: { dialog: ChooseOptions; onClose: (valu
         <Pressable
           onPress={() => {}}
           accessibilityRole="alert"
-          style={{ backgroundColor: colors.surface, borderRadius: radius.md, padding: spacing.lg, gap: spacing.md }}
+          style={{ backgroundColor: colors.surface, borderRadius: radius.md, padding: spacing.lg, gap: spacing.md, maxHeight: "100%" }}
         >
           <AppText variant="heading">{dialog.title}</AppText>
           {dialog.message ? <AppText secondary>{dialog.message}</AppText> : null}
-          <View style={{ gap: spacing.sm }}>
+          {/* Meant for a few options; should there be more than fit, they scroll and Cancel stays in view. */}
+          <ScrollView style={{ flexShrink: 1 }} contentContainerStyle={{ gap: spacing.sm }}>
             {dialog.options.map((option) => (
               <Button
                 key={option.value}
@@ -168,8 +169,8 @@ function ChoiceView({ dialog, onClose }: { dialog: ChooseOptions; onClose: (valu
                 onPress={() => onClose(option.value)}
               />
             ))}
-            <Button variant="text" title={dialog.cancelText ?? t("common.cancel")} onPress={() => onClose(null)} />
-          </View>
+          </ScrollView>
+          <Button variant="text" title={dialog.cancelText ?? t("common.cancel")} onPress={() => onClose(null)} />
         </Pressable>
       </Pressable>
     </Modal>

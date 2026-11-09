@@ -20,7 +20,7 @@ import { IconButton } from "@/components/IconButton";
 import { IconCircle } from "@/components/IconCircle";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import { TextField } from "@/components/TextField";
-import { ChoiceField } from "@/components/settings/PickerFields";
+import { SelectField } from "@/components/SelectField";
 
 type FormValues = { name: string; parentId: string; color: string };
 
@@ -141,7 +141,8 @@ function TagForm({ initial, existingId }: { initial: FormValues; existingId: str
             <AppText secondary>{t("tags.parentLocked")}</AppText>
           </View>
         ) : (
-          <ChoiceField label={t("tags.parent")} value={values.parentId} options={parentOptions} onChange={changeParent} capitalize={false} />
+          // A searchable list: there can be many tags.
+          <SelectField label={t("tags.parent")} value={values.parentId} options={parentOptions} onChange={changeParent} />
         )}
 
         <ColorPicker
