@@ -60,7 +60,18 @@ function Thumb({ id, onRemove }: { id: string; onRemove: () => void }) {
 }
 
 // Spec 2.10, 4.6: up to 3 photos from the camera or the gallery, compressed before they're kept.
-export function PhotoStrip({ value, onChange }: { value: string[]; onChange: (photoIds: string[]) => void }) {
+// max / label: the support form takes one screenshot.
+export function PhotoStrip({
+  value,
+  onChange,
+  max = MAX_PHOTOS,
+  label,
+}: {
+  value: string[];
+  onChange: (photoIds: string[]) => void;
+  max?: number;
+  label?: string;
+}) {
   const { colors } = useTheme();
   const { t } = useI18n();
   const dialog = useDialog();
@@ -102,12 +113,12 @@ export function PhotoStrip({ value, onChange }: { value: string[]; onChange: (ph
 
   return (
     <View style={{ gap: spacing.xs }}>
-      <AppText variant="label">{t("photos.title")}</AppText>
+      <AppText variant="label">{label ?? t("photos.title")}</AppText>
       <View style={{ flexDirection: "row", gap: spacing.sm }}>
         {value.map((id) => (
           <Thumb key={id} id={id} onRemove={() => onChange(value.filter((photoId) => photoId !== id))} />
         ))}
-        {value.length < MAX_PHOTOS && (
+        {value.length < max && (
           <Pressable
             onPress={pick}
             disabled={busy}

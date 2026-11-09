@@ -216,6 +216,70 @@ describe("delete all data", () => {
   });
 });
 
+describe("restore a backup", () => {
+  const backup = (overrides = {}) => ({
+    schemaVersion: 1,
+    collections: {
+      accounts: [{ id: "r-acc", ...account({ name: "Restored" }) }],
+      categories: [{ id: "r-food", nameKey: "category.food", type: "expense", icon: "food", color: "#ff7043" }],
+      tags: [{ id: "r-tag", name: "Trip" }],
+      transactions: [{ id: "r-tx", ...transaction({ accountId: "r-acc", categoryId: "r-food", tagIds: ["r-tag"] }) }],
+    },
+    settings: { homeAccount: "r-acc", showCents: true },
+    baseCurrency: "EUR",
+    ...overrides,
+  });
+
+  it("replaces every record and bumps the epoch", async () => {
+    const before = await http.get("/me", bob.accessToken);
+    await push(bob, [{ collection: "accounts", id: "bob-old", op: "upsert", data: account() }], before.body.user.dataEpoch);
+
+    const res = await http.post("/data/restore", backup(), bob.accessToken);
+    assert.equal(res.status, 200, JSON.stringify(res.body));
+    assert.equal(res.body.user.dataEpoch, before.body.user.dataEpoch + 1);
+    assert.equal(res.body.user.settings.homeAccount, "r-acc");
+    assert.equal(res.body.user.settings.showCents, true);
+    assert.equal(res.body.user.baseCurrency, "EUR");
+
+    const all = await pull(bob, 0);
+    const ids = all.body.changes.map((c) => c.id);
+    assert.ok(ids.includes("r-acc") && ids.includes("r-tx") && !ids.includes("bob-old"));
+    // "Other" is added for both types when the file has none.
+    const cats = all.body.changes.filter((c) => c.collection === "categories");
+    assert.equal(cats.length, 3);
+  });
+
+  it("changes nothing when one record is invalid", async () => {
+    const bad = backup();
+    bad.collections.transactions.push({ id: "r-bad", ...transaction({ amount: -5 }) });
+    const res = await http.post("/data/restore", bad, bob.accessToken);
+    assert.equal(res.status, 400);
+    assert.equal(res.body.code, "backup.invalid");
+    const all = await pull(bob, 0);
+    assert.ok(all.body.changes.some((c) => c.id === "r-acc"));
+  });
+
+  it("refuses another schema version", async () => {
+    const res = await http.post("/data/restore", backup({ schemaVersion: 99 }), bob.accessToken);
+    assert.equal(res.body.code, "backup.version");
+  });
+
+  it("gives new ids to records another account still owns", async () => {
+    const res = await http.post("/data/restore", backup(), anna.accessToken);
+    assert.equal(res.status, 200, JSON.stringify(res.body));
+    const all = await pull(anna, 0);
+    const accounts = all.body.changes.filter((c) => c.collection === "accounts");
+    const tx = all.body.changes.find((c) => c.collection === "transactions");
+    assert.equal(accounts.length, 1);
+    assert.notEqual(accounts[0].id, "r-acc");
+    assert.equal(tx.data.accountId, accounts[0].id);
+    assert.equal(res.body.user.settings.homeAccount, accounts[0].id);
+    // Bob's copy is untouched.
+    const bobAll = await pull(bob, 0);
+    assert.ok(bobAll.body.changes.some((c) => c.id === "r-acc"));
+  });
+});
+
 describe("photo type detection", () => {
   it("reads the type from the file content", () => {
     assert.equal(detectImageType(Buffer.from([0xff, 0xd8, 0xff, 0xe0, 0, 0])), "jpg");

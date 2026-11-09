@@ -91,3 +91,50 @@ export const uploadPendingPhotos = async (): Promise<string | null> => {
 
 export const countPendingPhotos = async () =>
   (await (await getDb()).getFirstAsync<{ n: number }>("SELECT COUNT(*) AS n FROM photos WHERE uploaded = 0"))?.n ?? 0;
+
+// A photo's file for a backup: from this device, or downloaded when it only lives on the server. Null when neither
+// works (offline and never on this device).
+export const photoBytes = async (id: string): Promise<Uint8Array | null> => {
+  try {
+    const local = await localUri(id);
+    if (local && Platform.OS !== "web") {
+      const file = new File(local);
+      if (file.exists) return await file.bytes();
+    }
+    const source = local ?? (await photoSource(id));
+    const response = await fetch(source);
+    if (!response.ok) return null;
+    return new Uint8Array(await response.arrayBuffer());
+  } catch {
+    return null;
+  }
+};
+
+// A photo from a restored backup: kept on the device and uploaded by the next sync (re-sending an id the server
+// already has is harmless).
+export const storePhotoBytes = async (id: string, bytes: Uint8Array) => {
+  let uri: string;
+  if (Platform.OS === "web") {
+    uri = URL.createObjectURL(new Blob([bytes as BlobPart], { type: "image/jpeg" }));
+  } else {
+    const dir = photosDir();
+    if (!dir.exists) dir.create({ intermediates: true });
+    const file = new File(dir, `${id}.jpg`);
+    if (file.exists) file.delete();
+    file.create();
+    await file.write(bytes);
+    uri = file.uri;
+  }
+  await serialWrite((db) => db.runAsync("INSERT OR REPLACE INTO photos (id, uri, uploaded) VALUES (?, ?, 0)", id, uri));
+};
+
+// After the local data was wiped: the photo files go too.
+export const deleteLocalPhotoFiles = () => {
+  if (Platform.OS === "web") return;
+  try {
+    const dir = photosDir();
+    if (dir.exists) dir.delete();
+  } catch (error) {
+    console.warn("photo files not deleted:", error);
+  }
+};

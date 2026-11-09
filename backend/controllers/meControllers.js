@@ -2,6 +2,7 @@ import UserModel from "../models/user.js";
 import { AppError } from "../utils/AppError.js";
 import { deleteUserData } from "../utils/userData.js";
 import { logSecurityEvent } from "../utils/securityLog.js";
+import { restoreBackup } from "../utils/restore.js";
 
 const findUser = async (userId) => {
   const user = await UserModel.findById(userId);
@@ -47,4 +48,12 @@ export const deleteAllData = async (req, res) => {
   logSecurityEvent("data_deleted", { userId: req.userId, sessionId: req.sessionId, req });
   const user = await findUser(req.userId);
   res.json({ user: user.toPublic() });
+};
+
+// Settings -> Data -> "Restore a backup": every record of the account is replaced by the file's (spec 13.4).
+export const restoreData = async (req, res) => {
+  await findUser(req.userId);
+  const result = await restoreBackup(req.userId, req.body);
+  logSecurityEvent("data_restored", { userId: req.userId, sessionId: req.sessionId, req });
+  res.json(result);
 };

@@ -20,6 +20,8 @@ app.use(compression());
 
 // A sync batch can be large; every other body is small. The first parser to run wins.
 app.use("/api/v1/sync", express.json({ limit: "2mb" }));
+// A backup holds every record of the account.
+app.use("/api/v1/data/restore", express.json({ limit: "20mb" }));
 app.use(express.json({ limit: "100kb" }));
 app.use(rejectOperators);
 

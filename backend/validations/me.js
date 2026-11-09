@@ -2,7 +2,7 @@ import { z } from "zod";
 import { LANGUAGE_CODES } from "../utils/languages.js";
 import { color, currency, icon } from "./common.js";
 
-const settings = z
+export const settingsSchema = z
   .object({
     homeAccount: z.string().trim().min(1).max(64),
     defaultPeriod: z.enum(["day", "week", "month", "year"]),
@@ -24,7 +24,7 @@ export const updateMeSchema = z
     language: z.enum(LANGUAGE_CODES),
     theme: z.enum(["system", "light", "dark"]),
     onboarded: z.boolean(),
-    settings,
+    settings: settingsSchema,
   })
   .partial();
 

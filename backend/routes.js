@@ -7,7 +7,7 @@ import { supportSchema, updateMeSchema } from "./validations/me.js";
 import { pullSchema, pushSchema } from "./validations/entities.js";
 import { googleLogin, login, logout, refresh, register } from "./controllers/authControllers.js";
 import { getSessions, revokeOtherSessions, revokeSession } from "./controllers/sessionControllers.js";
-import { deleteAllData, deleteMe, getMe, updateMe } from "./controllers/meControllers.js";
+import { deleteAllData, deleteMe, getMe, restoreData, updateMe } from "./controllers/meControllers.js";
 import { deleteEntity, getEntity, listEntities, pull, push, putEntity } from "./controllers/syncControllers.js";
 import { getPhoto, photoUpload, uploadPhoto } from "./controllers/photoControllers.js";
 import { getCurrencies, getLanguages, getRates, getTranslations } from "./controllers/dictionaryControllers.js";
@@ -44,6 +44,7 @@ router.post("/photos", photoUpload, uploadPhoto);
 router.get("/photos/:id", getPhoto);
 
 router.delete("/data/all", deleteAllData);
+router.post("/data/restore", restoreData);
 
 router.post("/support", supportLimiter, validate(supportSchema), createSupportMessage);
 

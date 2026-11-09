@@ -39,6 +39,22 @@ export const ACCOUNT_ICON_SECTIONS: IconSection[] = [
   },
 ];
 
+// Screen 12: the profile icon.
+export const AVATAR_ICON_SECTIONS: IconSection[] = [
+  {
+    title: "icons.people",
+    icons: ["account", "face-man", "face-woman", "emoticon-happy-outline", "emoticon-cool-outline", "robot-happy-outline", "alien-outline", "account-tie", "account-cowboy-hat", "face-man-profile", "face-woman-profile", "emoticon-excited-outline", "baby-face-outline", "ghost-outline"],
+  },
+  {
+    title: "icons.animals",
+    icons: ["cat", "dog", "panda", "owl", "rabbit", "penguin", "fish", "koala", "duck", "bee", "butterfly", "turtle", "unicorn"],
+  },
+  {
+    title: "icons.symbols",
+    icons: ["star", "heart", "crown", "rocket-launch", "flower", "pine-tree", "coffee", "music", "gamepad-variant", "bike", "airplane", "palette", "book-open-variant", "briefcase", "school", "weather-sunny", "moon-waning-crescent", "lightning-bolt", "fire", "snowflake", "leaf"],
+  },
+];
+
 export const DEFAULT_ACCOUNT_ICON: IconName = "credit-card-outline";
 
 // Spec 7.2: expense and income categories get different icon sets, many of them.

@@ -12,6 +12,7 @@ import {
   type RemoteChange,
 } from "./store";
 import { uploadPendingPhotos } from "./photos";
+import { flushSupportQueue } from "./support";
 import type { Collection } from "./types";
 
 // Spec 4.1: the outbox goes up in batches, then everything changed on the server since our cursor comes down.
@@ -136,6 +137,7 @@ const runOnce = async () => {
     const now = new Date().toISOString();
     await setMeta({ lastSyncedAt: now });
     setState({ status: "idle", lastSyncedAt: now, pending: await countOutbox() });
+    flushSupportQueue().catch(() => {});
   } catch (error) {
     const offline = isNetworkError(error);
     setState({

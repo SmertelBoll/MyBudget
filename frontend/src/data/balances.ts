@@ -10,6 +10,11 @@ import type { Account, Transaction, Transfer } from "./types";
 // every screen that shows balances (forms, pickers, Home) mounts without going through all entries again.
 let cached: { accounts: Account[]; transactions: Transaction[]; transfers: Transfer[]; result: Map<string, number> } | null = null;
 
+// Settings -> Recalculate balance: the next read works everything out again.
+export const resetBalanceCache = () => {
+  cached = null;
+};
+
 export const computeBalances = (accounts: Account[], transactions: Transaction[], transfers: Transfer[]) => {
   if (cached && cached.accounts === accounts && cached.transactions === transactions && cached.transfers === transfers) {
     return cached.result;

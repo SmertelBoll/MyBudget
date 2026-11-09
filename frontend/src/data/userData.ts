@@ -1,0 +1,207 @@
+import { strFromU8, strToU8, unzipSync, zipSync, type Zippable } from "fflate";
+import { api } from "@/api/client";
+import type { User } from "@/api/types";
+import { fileDate, shareFile } from "@/utils/files";
+import { buildXlsx, XLSX_MIME, type Cell } from "@/utils/xlsx";
+import { resetBalanceCache } from "./balances";
+import { categoryName } from "./categories";
+import { deleteLocalPhotoFiles, photoBytes, storePhotoBytes } from "./photos";
+import { getSnapshot, loadAll, setMeta, wipeLocal } from "./store";
+import { requestSync } from "./sync";
+import { COLLECTIONS, type Collection, type EntityMap, type Transaction, type Transfer } from "./types";
+
+// Settings -> Data and storage (spec 13.4).
+
+export const BACKUP_SCHEMA_VERSION = 1;
+const PHOTO_DIR = "photos/";
+
+type Translate = (key: string, params?: Record<string, string | number>) => string;
+
+const decimal = (minor: number) => minor / 100;
+
+// ---- Excel ------------------------------------------------------------------------------------------------------
+
+const lookups = (t: Translate) => {
+  const accounts = new Map(getSnapshot("accounts").map((account) => [account.id, account]));
+  const categories = new Map(getSnapshot("categories").map((category) => [category.id, categoryName(category, t)]));
+  const tags = new Map(getSnapshot("tags").map((tag) => [tag.id, tag.name]));
+  return { accounts, categories, tags };
+};
+
+const byDate = <T extends { date: string; clientCreatedAt: string }>(items: T[]) =>
+  [...items].sort((a, b) => a.date.localeCompare(b.date) || a.clientCreatedAt.localeCompare(b.clientCreatedAt));
+
+export const transferRows = (transfers: Transfer[], t: Translate): Cell[][] => {
+  const { accounts } = lookups(t);
+  const header = [t("export.date"), t("export.from"), t("export.amountFrom"), t("export.currency"), t("export.to"), t("export.amountTo"), t("export.currency"), t("export.rate"), t("export.comment")];
+  return [
+    header,
+    ...byDate(transfers).map((transfer) => {
+      const from = accounts.get(transfer.fromAccountId);
+      const to = accounts.get(transfer.toAccountId);
+      return [
+        transfer.date,
+        from?.name ?? "",
+        decimal(transfer.amountFrom),
+        from?.currency ?? "",
+        to?.name ?? "",
+        decimal(transfer.amountTo),
+        to?.currency ?? "",
+        transfer.rate,
+        transfer.comment,
+      ];
+    }),
+  ];
+};
+
+export const TRANSFER_WIDTHS = [12, 20, 14, 9, 20, 14, 9, 10, 30];
+
+// Three sheets: expenses, income, transfers; every field, both amounts and the rate (spec 13.4). Photos are listed
+// by id: a link to a private photo would stop working within the hour.
+export const exportToExcel = async (t: Translate) => {
+  const { accounts, categories, tags } = lookups(t);
+  const transactions = getSnapshot("transactions");
+  const header = [
+    t("export.date"),
+    t("export.account"),
+    t("export.category"),
+    t("export.tags"),
+    t("export.amount"),
+    t("export.currency"),
+    t("export.accountAmount"),
+    t("export.accountCurrency"),
+    t("export.rate"),
+    t("export.comment"),
+    t("export.photos"),
+  ];
+  const rows = (type: Transaction["type"]): Cell[][] => [
+    header,
+    ...byDate(transactions.filter((tx) => tx.type === type)).map((tx) => {
+      const account = accounts.get(tx.accountId);
+      return [
+        tx.date,
+        account?.name ?? "",
+        categories.get(tx.categoryId) ?? "",
+        tx.tagIds.map((id) => tags.get(id)).filter(Boolean).join(", "),
+        decimal(tx.amount),
+        tx.currency,
+        decimal(tx.accountAmount),
+        account?.currency ?? "",
+        tx.rate,
+        tx.comment,
+        tx.photos.join(", "),
+      ];
+    }),
+  ];
+  const widths = [12, 20, 20, 24, 14, 9, 14, 9, 10, 30, 20];
+  const bytes = buildXlsx([
+    { name: t("entries.expenses"), rows: rows("expense"), widths },
+    { name: t("entries.income"), rows: rows("income"), widths },
+    { name: t("export.transfers"), rows: transferRows(getSnapshot("transfers"), t), widths: TRANSFER_WIDTHS },
+  ]);
+  await shareFile(`MyBudget-${fileDate()}.xlsx`, bytes, XLSX_MIME);
+};
+
+// ---- Backup -----------------------------------------------------------------------------------------------------
+
+type BackupFile = {
+  app: "MyBudget";
+  schemaVersion: number;
+  createdAt: string;
+  baseCurrency: string | null;
+  settings: User["settings"];
+  collections: { [C in Collection]: EntityMap[C][] };
+};
+
+// A ZIP with data.json (with the schema version) and a photos folder (spec 13.4). Works offline; photos that only
+// live on the server are downloaded when there's a connection. Returns how many photos couldn't be included.
+export const createBackup = async (user: User) => {
+  const collections = Object.fromEntries(COLLECTIONS.map((name) => [name, getSnapshot(name)])) as BackupFile["collections"];
+  const data: BackupFile = {
+    app: "MyBudget",
+    schemaVersion: BACKUP_SCHEMA_VERSION,
+    createdAt: new Date().toISOString(),
+    baseCurrency: user.baseCurrency,
+    settings: user.settings,
+    collections,
+  };
+  const files: Zippable = { "data.json": strToU8(JSON.stringify(data, null, 1)) };
+  const photoIds = [...new Set(collections.transactions.flatMap((tx) => tx.photos))];
+  let missing = 0;
+  for (const id of photoIds) {
+    const bytes = await photoBytes(id);
+    if (bytes) files[`${PHOTO_DIR}${id}.jpg`] = [bytes, { level: 0 }];
+    else missing += 1;
+  }
+  await shareFile(`MyBudget-backup-${fileDate()}.zip`, zipSync(files, { level: 6 }), "application/zip");
+  return { photos: photoIds.length - missing, missing };
+};
+
+export class BackupFileError extends Error {}
+
+// Reads and checks a backup before anything is sent: the server checks every record again.
+export const readBackup = (bytes: Uint8Array) => {
+  let entries: Record<string, Uint8Array>;
+  try {
+    entries = unzipSync(bytes);
+  } catch {
+    throw new BackupFileError("backup.notZip");
+  }
+  const json = entries["data.json"];
+  if (!json) throw new BackupFileError("backup.noData");
+  let data: BackupFile;
+  try {
+    data = JSON.parse(strFromU8(json));
+  } catch {
+    throw new BackupFileError("backup.noData");
+  }
+  if (data?.schemaVersion !== BACKUP_SCHEMA_VERSION) throw new BackupFileError("backup.version");
+  if (!data.collections || typeof data.collections !== "object") throw new BackupFileError("backup.noData");
+  const photos = Object.entries(entries)
+    .filter(([path]) => path.startsWith(PHOTO_DIR) && path.endsWith(".jpg"))
+    .map(([path, content]) => ({ id: path.slice(PHOTO_DIR.length, -4), bytes: content }));
+  const count = Object.values(data.collections).reduce((sum, items) => sum + (Array.isArray(items) ? items.length : 0), 0);
+  return { data, photos, count, transactions: data.collections.transactions?.length ?? 0, createdAt: data.createdAt };
+};
+
+// Online only: the server replaces the account's records in one go, then this device starts over from it.
+export const restoreBackup = async (backup: ReturnType<typeof readBackup>) => {
+  const { data, photos } = backup;
+  const { user, photoIds } = await api.post<{ user: User; photoIds: Record<string, string> }>("/data/restore", {
+    schemaVersion: data.schemaVersion,
+    collections: data.collections,
+    settings: data.settings,
+    baseCurrency: data.baseCurrency,
+  });
+  await startOver(user);
+  for (const photo of photos) await storePhotoBytes(photoIds[photo.id] ?? photo.id, photo.bytes);
+  requestSync();
+  return user;
+};
+
+// The local copy is dropped and downloaded again under the server's new data epoch.
+const startOver = async (user: User) => {
+  await wipeLocal({ keepMeta: true });
+  deleteLocalPhotoFiles();
+  await setMeta({ epoch: String(user.dataEpoch), cursor: "0" });
+};
+
+// ---- Delete all data, recalculate -------------------------------------------------------------------------------
+
+// Online only. Accounts, entries, transfers, tags, payments, reminders and photos go; categories are back to the
+// defaults; the account and settings stay (spec 13.4).
+export const deleteAllData = async () => {
+  const { user } = await api.del<{ user: User }>("/data/all");
+  await startOver(user);
+  requestSync();
+  return user;
+};
+
+// Spec 5.4. Balances are never stored here: they're always worked out from each account's anchor and its entries.
+// "Recalculate" reads everything from the device's database again and works the balances out from scratch, then
+// syncs, so the result also includes what other devices added.
+export const recalculateBalances = async () => {
+  resetBalanceCache();
+  await loadAll();
+  await requestSync();
+};
