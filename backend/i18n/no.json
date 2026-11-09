@@ -678,5 +678,12 @@
   "logs.filterCategories": "Kategorier",
   "logs.filterTags": "Tagger",
   "logs.filterReset": "Tøm",
-  "logs.filterAll": "Velg alle"
+  "logs.filterAll": "Velg alle",
+  "tags.edit": "Rediger tagg",
+  "tags.parent": "Overordnet tagg",
+  "tags.noParent": "Ingen (tagg på øverste nivå)",
+  "tags.parentLocked": "Denne taggen har undertagger og kan derfor ikke selv være en undertagg",
+  "tags.ownOnly": "{{name}} uten undertagger",
+  "tags.deleteChildren": "Undertaggene blir vanlige tagger",
+  "tags.subtagCount": "Undertagger: {{count}}"
 }

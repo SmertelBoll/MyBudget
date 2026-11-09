@@ -166,6 +166,19 @@ describe("business rules", () => {
     assert.equal(res.body.results[1].code, "tag.duplicate");
   });
 
+  it("keeps a tag's color and parent", async () => {
+    const res = await push(anna, [
+      { collection: "tags", id: "tag-food", op: "upsert", data: { name: "Food", color: "#ef5350" } },
+      { collection: "tags", id: "tag-lunch", op: "upsert", data: { name: "Lunch", parentId: "tag-food" } },
+      { collection: "tags", id: "tag-bad", op: "upsert", data: { name: "Bad", color: "red" } },
+    ]);
+    assert.deepEqual(res.body.results.map((r) => r.status), ["applied", "applied", "rejected"]);
+    const all = await pull(anna, 0);
+    const lunch = all.body.changes.find((c) => c.id === "tag-lunch");
+    assert.equal(lunch.data.parentId, "tag-food");
+    assert.equal(lunch.data.color, null);
+  });
+
   it("validates repeat rules", async () => {
     const base = {
       type: "expense", name: "Rent", startDate: "2026-12-01", time: "09:00",
@@ -257,6 +270,16 @@ describe("restore a backup", () => {
     assert.equal(res.body.code, "backup.invalid");
     const all = await pull(bob, 0);
     assert.ok(all.body.changes.some((c) => c.id === "r-acc"));
+  });
+
+  it("drops a subtag's parent that isn't a top-level tag of the backup", async () => {
+    const file = backup();
+    file.collections.tags.push({ id: "r-sub", name: "Hotel", parentId: "r-tag" }, { id: "r-deep", name: "Deep", parentId: "r-sub" });
+    const res = await http.post("/data/restore", file, bob.accessToken);
+    assert.equal(res.status, 200, JSON.stringify(res.body));
+    const tags = (await pull(bob, 0)).body.changes.filter((c) => c.collection === "tags");
+    assert.equal(tags.find((c) => c.id === "r-sub").data.parentId, "r-tag");
+    assert.equal(tags.find((c) => c.id === "r-deep").data.parentId, null);
   });
 
   it("refuses another schema version", async () => {

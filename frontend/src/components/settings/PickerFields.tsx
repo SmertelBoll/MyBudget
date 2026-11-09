@@ -49,11 +49,14 @@ export function ChoiceField({
   value,
   options,
   onChange,
+  capitalize = true,
 }: {
   label: string;
   value: string;
   options: { value: string; label: string }[];
   onChange: (value: string) => void;
+  // Day names start with a capital letter; names the user typed are shown as typed.
+  capitalize?: boolean;
 }) {
   const dialog = useDialog();
   const current = options.find((option) => option.value === value);
@@ -63,7 +66,7 @@ export function ChoiceField({
   };
   return (
     <FieldBox label={label} onPress={open}>
-      <AppText style={{ flex: 1, textTransform: "capitalize" }} numberOfLines={1}>
+      <AppText style={{ flex: 1, textTransform: capitalize ? "capitalize" : "none" }} numberOfLines={1}>
         {current?.label ?? ""}
       </AppText>
     </FieldBox>

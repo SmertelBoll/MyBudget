@@ -4,7 +4,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useCollection } from "@/data/hooks";
 import { reportWriteError } from "@/data/store";
 import { useRankedTags } from "@/data/tagRanking";
-import { TAG_MAX_LENGTH, createTag, findTagByName } from "@/data/tags";
+import { TAG_MAX_LENGTH, createTag, findTagByName, nextTagColor, useTagTree } from "@/data/tags";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTheme } from "@/theme/ThemeProvider";
 import { fontSize, fonts, radius, spacing } from "@/theme/tokens";
@@ -12,9 +12,9 @@ import { useDialog } from "../AppDialog";
 import { AppText, NO_LIGATURES } from "../AppText";
 import { IconButton } from "../IconButton";
 
-type ChipProps = { label: string; active?: boolean; onPress: () => void; icon?: "plus"; hidden?: boolean };
+type ChipProps = { label: string; active?: boolean; onPress: () => void; icon?: "plus"; hidden?: boolean; color?: string };
 
-function Chip({ label, active, onPress, icon, hidden }: ChipProps) {
+function Chip({ label, active, onPress, icon, hidden, color }: ChipProps) {
   const { colors } = useTheme();
   return (
     <Pressable
@@ -38,6 +38,7 @@ function Chip({ label, active, onPress, icon, hidden }: ChipProps) {
       })}
     >
       {icon && <MaterialCommunityIcons name={icon} size={18} color={colors.text} />}
+      {color && <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: color, borderWidth: active ? 1 : 0, borderColor: colors.onAccent }} />}
       <AppText variant="label" color={active ? colors.onAccent : colors.text}>
         {label}
       </AppText>
@@ -70,6 +71,7 @@ export function TagChips({
   const { t, lang } = useI18n();
   const dialog = useDialog();
   const tags = useCollection("tags");
+  const tagTree = useTagTree();
   const [searching, setSearching] = useState(false);
   const [query, setQuery] = useState("");
   const inputRef = useRef<ComponentRef<typeof TextInput>>(null);
@@ -100,7 +102,7 @@ export function TagChips({
       validate: (text) => (findTagByName(text) ? t("tag.duplicate") : null),
     });
     if (!name) return;
-    const tag = await createTag(name).catch((error) => {
+    const tag = await createTag(name, { color: nextTagColor(tagTree) }).catch((error) => {
       reportWriteError(error);
       return null;
     });
@@ -109,7 +111,7 @@ export function TagChips({
   };
 
   const chips = [
-    ...visible.map((tag) => <Chip key={tag.id} label={tag.name} active={value.includes(tag.id)} onPress={() => toggle(tag.id)} />),
+    ...visible.map((tag) => <Chip key={tag.id} label={tag.name} color={tagTree.colorOf(tag.id)} active={value.includes(tag.id)} onPress={() => toggle(tag.id)} />),
     <Chip key="--add--" label={t("tags.add")} icon="plus" onPress={add} />,
   ];
   // Two rows: chips alternate between them, so both rows grow at the same pace.

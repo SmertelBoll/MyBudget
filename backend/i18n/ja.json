@@ -668,5 +668,12 @@
   "logs.filterCategories": "カテゴリ",
   "logs.filterTags": "タグ",
   "logs.filterReset": "クリア",
-  "logs.filterAll": "すべて選択"
+  "logs.filterAll": "すべて選択",
+  "tags.edit": "タグを編集",
+  "tags.parent": "親タグ",
+  "tags.noParent": "なし（最上位のタグ）",
+  "tags.parentLocked": "このタグにはサブタグがあるため、サブタグにはできません",
+  "tags.ownOnly": "{{name}}（サブタグなし）",
+  "tags.deleteChildren": "サブタグは通常のタグになります",
+  "tags.subtagCount": "サブタグ: {{count}}"
 }

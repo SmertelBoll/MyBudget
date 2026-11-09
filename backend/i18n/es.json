@@ -688,5 +688,12 @@
   "logs.filterCategories": "Categorías",
   "logs.filterTags": "Etiquetas",
   "logs.filterReset": "Borrar",
-  "logs.filterAll": "Seleccionar todo"
+  "logs.filterAll": "Seleccionar todo",
+  "tags.edit": "Editar etiqueta",
+  "tags.parent": "Etiqueta principal",
+  "tags.noParent": "Ninguna (etiqueta de nivel superior)",
+  "tags.parentLocked": "Esta etiqueta tiene subetiquetas, así que no puede ser una subetiqueta",
+  "tags.ownOnly": "{{name}} sin subetiquetas",
+  "tags.deleteChildren": "Sus subetiquetas pasarán a ser etiquetas normales",
+  "tags.subtagCount": "Subetiquetas: {{count}}"
 }

@@ -678,5 +678,12 @@
   "logs.filterCategories": "Kategorien",
   "logs.filterTags": "Tags",
   "logs.filterReset": "Zurücksetzen",
-  "logs.filterAll": "Alle auswählen"
+  "logs.filterAll": "Alle auswählen",
+  "tags.edit": "Tag bearbeiten",
+  "tags.parent": "Übergeordneter Tag",
+  "tags.noParent": "Keiner (Tag der obersten Ebene)",
+  "tags.parentLocked": "Dieser Tag hat Unter-Tags und kann daher selbst kein Unter-Tag sein",
+  "tags.ownOnly": "{{name}} ohne Unter-Tags",
+  "tags.deleteChildren": "Seine Unter-Tags werden zu normalen Tags",
+  "tags.subtagCount": "Unter-Tags: {{count}}"
 }

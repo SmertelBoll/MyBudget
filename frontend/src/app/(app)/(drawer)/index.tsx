@@ -5,6 +5,7 @@ import { useNavigation } from "expo-router";
 import type { EntryType } from "@/api/types";
 import { useAuth } from "@/auth/AuthProvider";
 import { useCollection } from "@/data/hooks";
+import { useTagTree } from "@/data/tags";
 import { groupEntries, usePeriodEntries, type AccountFilter, type Group } from "@/data/stats";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTheme } from "@/theme/ThemeProvider";
@@ -47,7 +48,6 @@ function HomeContent() {
   const { user } = useAuth();
   const bottomSpace = useBottomSpace();
   const settings = user?.settings;
-  const tags = useCollection("tags");
   const accounts = useCollection("accounts");
 
   // Starting point from Settings (spec 13.1, 13.3): Home account, period and focus.
@@ -102,8 +102,8 @@ function HomeContent() {
   const fingerDrag = useRef({ changed: false });
 
   const entries = usePeriodEntries(type, filter, range);
-  const knownTagIds = useMemo(() => tags.map((tag) => tag.id), [tags]);
-  const { total, groups } = useMemo(() => groupEntries(entries, by, new Set(knownTagIds)), [entries, by, knownTagIds]);
+  const tagTree = useTagTree();
+  const { total, groups } = useMemo(() => groupEntries(entries, by, tagTree), [entries, by, tagTree]);
 
   const { look } = useGroupLook(by);
   const segments = groups.map((group) => ({ id: group.id, value: group.amount, color: look(group.id).color }));

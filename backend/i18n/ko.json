@@ -668,5 +668,12 @@
   "logs.filterCategories": "카테고리",
   "logs.filterTags": "태그",
   "logs.filterReset": "지우기",
-  "logs.filterAll": "모두 선택"
+  "logs.filterAll": "모두 선택",
+  "tags.edit": "태그 편집",
+  "tags.parent": "상위 태그",
+  "tags.noParent": "없음(최상위 태그)",
+  "tags.parentLocked": "이 태그에는 하위 태그가 있어 하위 태그가 될 수 없습니다",
+  "tags.ownOnly": "{{name}} (하위 태그 없음)",
+  "tags.deleteChildren": "하위 태그는 일반 태그가 됩니다",
+  "tags.subtagCount": "하위 태그: {{count}}"
 }

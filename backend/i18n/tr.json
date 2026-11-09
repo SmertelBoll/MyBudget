@@ -678,5 +678,12 @@
   "logs.filterCategories": "Kategoriler",
   "logs.filterTags": "Etiketler",
   "logs.filterReset": "Temizle",
-  "logs.filterAll": "Tümünü seç"
+  "logs.filterAll": "Tümünü seç",
+  "tags.edit": "Etiketi düzenle",
+  "tags.parent": "Üst etiket",
+  "tags.noParent": "Yok (üst düzey etiket)",
+  "tags.parentLocked": "Bu etiketin alt etiketleri var, bu yüzden kendisi alt etiket olamaz",
+  "tags.ownOnly": "{{name}} (alt etiketsiz)",
+  "tags.deleteChildren": "Alt etiketleri normal etiket olacak",
+  "tags.subtagCount": "Alt etiketler: {{count}}"
 }

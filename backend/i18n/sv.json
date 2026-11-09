@@ -678,5 +678,12 @@
   "logs.filterCategories": "Kategorier",
   "logs.filterTags": "Taggar",
   "logs.filterReset": "Rensa",
-  "logs.filterAll": "Välj alla"
+  "logs.filterAll": "Välj alla",
+  "tags.edit": "Redigera tagg",
+  "tags.parent": "Överordnad tagg",
+  "tags.noParent": "Ingen (tagg på högsta nivå)",
+  "tags.parentLocked": "Den här taggen har undertaggar och kan därför inte själv vara en undertagg",
+  "tags.ownOnly": "{{name}} utan undertaggar",
+  "tags.deleteChildren": "Dess undertaggar blir vanliga taggar",
+  "tags.subtagCount": "Undertaggar: {{count}}"
 }

@@ -45,6 +45,9 @@ const parseCollections = (collections) => {
     if (tagNames.has(data.nameLower)) throw invalid("tags", `repeated name "${data.name}"`);
     tagNames.add(data.nameLower);
   }
+  // Subtags hang off top-level tags in the same backup; any other parent is dropped.
+  const topLevel = new Set(result.tags.filter(({ data }) => !data.parentId).map(({ id }) => id));
+  for (const { data } of result.tags) if (data.parentId && !topLevel.has(data.parentId)) data.parentId = null;
   // Exactly one "Other" per type: it's where entries of deleted categories go.
   for (const type of ["expense", "income"]) {
     const others = result.categories.filter(({ data }) => data.type === type && data.isSystemOther);
@@ -78,7 +81,7 @@ const remapForeignIds = async (userId, parsed) => {
     for (const item of parsed[collection]) {
       item.id = to(item.id);
       const { data } = item;
-      for (const key of ["accountId", "categoryId", "fromAccountId", "toAccountId", "recurringId"]) {
+      for (const key of ["accountId", "categoryId", "fromAccountId", "toAccountId", "recurringId", "parentId"]) {
         if (key in data) data[key] = to(data[key]);
       }
       if (data.tagIds) data.tagIds = data.tagIds.map(to);

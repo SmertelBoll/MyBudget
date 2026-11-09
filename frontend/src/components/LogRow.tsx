@@ -25,7 +25,7 @@ export function LogRow({
   account: string;
   amount: string;
   original?: string;
-  tags: string[];
+  tags: { name: string; color: string }[];
   comment?: string;
   hasPhotos?: boolean;
   onPress: () => void;
@@ -67,8 +67,12 @@ export function LogRow({
       {tags.length > 0 && (
         <View style={{ flexDirection: "row", flexWrap: "wrap", gap: spacing.xs }}>
           {tags.map((tag) => (
-            <View key={tag} style={{ paddingHorizontal: spacing.sm, paddingVertical: 2, borderRadius: radius.md, backgroundColor: colors.tonal }}>
-              <AppText variant="caption">{tag}</AppText>
+            <View
+              key={tag.name}
+              style={{ flexDirection: "row", alignItems: "center", gap: 4, paddingHorizontal: spacing.sm, paddingVertical: 2, borderRadius: radius.md, backgroundColor: colors.tonal }}
+            >
+              <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: tag.color }} />
+              <AppText variant="caption">{tag.name}</AppText>
             </View>
           ))}
         </View>

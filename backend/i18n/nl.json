@@ -678,5 +678,12 @@
   "logs.filterCategories": "Categorieën",
   "logs.filterTags": "Tags",
   "logs.filterReset": "Wissen",
-  "logs.filterAll": "Alles selecteren"
+  "logs.filterAll": "Alles selecteren",
+  "tags.edit": "Tag bewerken",
+  "tags.parent": "Bovenliggende tag",
+  "tags.noParent": "Geen (tag op hoogste niveau)",
+  "tags.parentLocked": "Deze tag heeft subtags en kan dus zelf geen subtag zijn",
+  "tags.ownOnly": "{{name}} zonder subtags",
+  "tags.deleteChildren": "De subtags worden gewone tags",
+  "tags.subtagCount": "Subtags: {{count}}"
 }

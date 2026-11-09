@@ -58,6 +58,10 @@ export const entitySchemas = {
     .refine((c) => c.name || c.nameKey, { message: "name or nameKey is required" }),
   tags: z.object({
     name: z.string().trim().min(1).max(20),
+    // null: the parent tag's color, or one picked from the id.
+    color: color.nullable().default(null),
+    // One level: a subtag belongs to a top-level tag.
+    parentId: id.nullable().default(null),
   }),
   transactions: z.object({
     type,

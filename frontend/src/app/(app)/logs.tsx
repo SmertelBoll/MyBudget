@@ -7,6 +7,7 @@ import { useAuth } from "@/auth/AuthProvider";
 import { categoryName } from "@/data/categories";
 import { useCollection } from "@/data/hooks";
 import { useRates } from "@/data/rates";
+import { useTagTree } from "@/data/tags";
 import { NO_TAG, filterTransactions, inBaseCurrency, type AccountFilter } from "@/data/stats";
 import type { Transaction } from "@/data/types";
 import { useI18n } from "@/i18n/I18nProvider";
@@ -32,7 +33,7 @@ import { SegmentedSwitch } from "@/components/SegmentedSwitch";
 import { SortMenu, type SortValue } from "@/components/SortMenu";
 import { LogFilter, NO_NARROW, passesNarrow, type LogNarrow } from "@/components/LogFilter";
 
-type Params = { type?: string; accounts?: string; kind?: string; start?: string; end?: string; category?: string; tag?: string };
+type Params = { type?: string; accounts?: string; kind?: string; start?: string; end?: string; category?: string; tag?: string; exact?: string };
 
 
 
@@ -59,7 +60,6 @@ export default function LogsScreen() {
   const transactions = useCollection("transactions");
   const accounts = useCollection("accounts");
   const categories = useCollection("categories");
-  const tags = useCollection("tags");
   const rates = useRates();
 
   const [type, setType] = useState<EntryType>(
@@ -75,12 +75,15 @@ export default function LogsScreen() {
   // Categories and tags chosen in the filter sheet (next to sorting).
   const [narrow, setNarrow] = useState<LogNarrow>(NO_NARROW);
   const onlyCategory = params.category || null;
+  // A top-level tag brings its subtags; exact: the tag without any of its subtags.
   const onlyTag = params.tag || null;
+  const exactTag = params.exact === "1";
   const narrowed = Boolean(onlyCategory || onlyTag);
 
   const accountById = useMemo(() => new Map(accounts.map((account) => [account.id, account])), [accounts]);
   const categoryById = useMemo(() => new Map(categories.map((category) => [category.id, category])), [categories]);
-  const tagById = useMemo(() => new Map(tags.map((tag) => [tag.id, tag])), [tags]);
+  const tagTree = useTagTree();
+  const tagById = tagTree.byId;
 
   const needle = normalize(query.trim());
   const rows = useMemo(() => {
@@ -90,7 +93,9 @@ export default function LogsScreen() {
       if (!passesNarrow(narrow, tx.categoryId, tx.tagIds, (id) => tagById.has(id))) return false;
       if (!onlyTag) return true;
       const known = tx.tagIds.filter((id) => tagById.has(id));
-      return onlyTag === NO_TAG ? known.length === 0 : known.includes(onlyTag);
+      if (onlyTag === NO_TAG) return known.length === 0;
+      const underIt = (id: string) => id !== onlyTag && tagTree.rootOf(id) === onlyTag;
+      return exactTag ? known.includes(onlyTag) && !known.some(underIt) : known.some((id) => id === onlyTag || underIt(id));
     });
     const withValue = list.map((tx) => ({ tx, value: inBaseCurrency(tx, accountById, baseCurrency, rates) }));
     if (!needle) return withValue;
@@ -107,7 +112,7 @@ export default function LogsScreen() {
       ];
       return texts.some((text) => normalize(text).includes(needle));
     });
-  }, [transactions, type, filter, range, needle, onlyCategory, onlyTag, narrow, accountById, categoryById, tagById, baseCurrency, rates, t, toInput]);
+  }, [transactions, type, filter, range, needle, onlyCategory, onlyTag, exactTag, narrow, accountById, categoryById, tagById, tagTree, baseCurrency, rates, t, toInput]);
 
   const total = rows.reduce((sum, row) => sum + row.value, 0);
   const byAmount = sort.key === "amount";
@@ -134,7 +139,8 @@ export default function LogsScreen() {
   };
 
   const onlyCategoryRecord = onlyCategory ? categoryById.get(onlyCategory) : undefined;
-  const tagTitle = onlyTag ? (onlyTag === NO_TAG ? t("home.noTag") : (tagById.get(onlyTag)?.name ?? "?")) : null;
+  const tagName = onlyTag ? (onlyTag === NO_TAG ? t("home.noTag") : (tagById.get(onlyTag)?.name ?? "?")) : null;
+  const tagTitle = tagName && exactTag ? t("tags.ownOnly", { name: tagName }) : tagName;
   const narrowTitle = [
     onlyCategoryRecord ? categoryName(onlyCategoryRecord, t) : onlyCategory ? "?" : null,
     tagTitle ? `#${tagTitle}` : null,
@@ -159,7 +165,7 @@ export default function LogsScreen() {
         account={byAmount ? `${account?.name ?? "?"} · ${formatShortDate(tx.date, lang)}` : (account?.name ?? "?")}
         amount={money(value, baseCurrency, true)}
         original={tx.currency !== baseCurrency ? money(tx.amount, tx.currency, true) : undefined}
-        tags={tx.tagIds.map((id) => tagById.get(id)?.name).filter((name): name is string => Boolean(name))}
+        tags={tx.tagIds.filter((id) => tagById.has(id)).map((id) => ({ name: tagById.get(id)!.name, color: tagTree.colorOf(id) }))}
         comment={user?.settings.showComment === false ? undefined : tx.comment}
         hasPhotos={tx.photos.length > 0}
         onPress={() => openTransaction(tx.id)}

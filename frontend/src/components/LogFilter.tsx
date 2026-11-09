@@ -4,6 +4,7 @@ import type { EntryType } from "@/api/types";
 import { categoriesOfType, categoryName } from "@/data/categories";
 import { useCollection } from "@/data/hooks";
 import { NO_TAG } from "@/data/stats";
+import { useTagTree } from "@/data/tags";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTheme } from "@/theme/ThemeProvider";
 import { spacing } from "@/theme/tokens";
@@ -27,9 +28,8 @@ export const passesNarrow = (narrow: LogNarrow, categoryId: string, tagIds: stri
   return known.some((id) => narrow.tags.includes(id));
 };
 
-const toggle = (list: string[], id: string) => (list.includes(id) ? list.filter((item) => item !== id) : [...list, id]);
-
-type Option = { id: string; icon: string; color: string; title: string };
+// A top-level tag lists its subtags after it (depth 1, indented); ticking it ticks them too.
+type Option = { id: string; icon: string; color: string; title: string; depth?: number; children?: string[] };
 
 // One filter button next to sorting in the transaction log ("categories" or "tags") and its sheet from the bottom;
 // several can be chosen. A dot on the button means it narrows the list.
@@ -47,7 +47,7 @@ export function LogFilter({
   const { colors } = useTheme();
   const { t } = useI18n();
   const categories = useCollection("categories");
-  const tags = useCollection("tags");
+  const tagTree = useTagTree();
   const [open, setOpen] = useState(false);
   const [draft, setDraft] = useState<string[]>(value[kind]);
 
@@ -61,12 +61,17 @@ export function LogFilter({
             title: categoryName(category, t),
           }))
         : [
-            ...[...tags]
-              .sort((a, b) => a.name.localeCompare(b.name))
-              .map((tag) => ({ id: tag.id, icon: TAG_ICON, color: colors.iconIdle, title: tag.name })),
+            ...tagTree.ordered.map(({ tag, depth }) => ({
+              id: tag.id,
+              icon: TAG_ICON,
+              color: tagTree.colorOf(tag.id),
+              title: tag.name,
+              depth,
+              children: depth ? undefined : tagTree.children.get(tag.id)?.map((child) => child.id),
+            })),
             { id: NO_TAG, icon: NO_TAG_ICON, color: NO_TAG_COLOR, title: t("home.noTag") },
           ],
-    [kind, categories, tags, type, t, colors.iconIdle]
+    [kind, categories, tagTree, type, t]
   );
   const title = t(kind === "categories" ? "logs.filterCategories" : "logs.filterTags");
   // No narrowing is shown as everything ticked; everything ticked is saved as no narrowing (so a category or tag
@@ -96,14 +101,21 @@ export function LogFilter({
         <ScrollView style={{ maxHeight: 440 }} contentContainerStyle={{ gap: spacing.xs }}>
           <Choice icon="check-all" color={colors.accent} title={t("logs.filterAll")} selected={allChosen} highlight onPress={() => setDraft(allChosen ? [] : allIds)} />
           {options.map((option) => (
-            <Choice
-              key={option.id}
-              icon={option.icon}
-              color={option.color}
-              title={option.title}
-              selected={draft.includes(option.id)}
-              onPress={() => setDraft((current) => toggle(current, option.id))}
-            />
+            <View key={option.id} style={{ paddingLeft: option.depth ? spacing.xl : 0 }}>
+              <Choice
+                icon={option.icon}
+                color={option.color}
+                title={option.title}
+                selected={draft.includes(option.id)}
+                onPress={() =>
+                  setDraft((current) => {
+                    const on = !current.includes(option.id);
+                    const ids = [option.id, ...(option.children ?? [])];
+                    return on ? [...current.filter((id) => !ids.includes(id)), ...ids] : current.filter((id) => !ids.includes(id));
+                  })
+                }
+              />
+            </View>
           ))}
         </ScrollView>
         <View style={{ flexDirection: "row", gap: spacing.sm }}>

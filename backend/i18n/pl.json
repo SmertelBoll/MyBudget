@@ -698,5 +698,12 @@
   "logs.filterCategories": "Kategorie",
   "logs.filterTags": "Tagi",
   "logs.filterReset": "Wyczyść",
-  "logs.filterAll": "Zaznacz wszystko"
+  "logs.filterAll": "Zaznacz wszystko",
+  "tags.edit": "Edytuj tag",
+  "tags.parent": "Tag nadrzędny",
+  "tags.noParent": "Brak (tag najwyższego poziomu)",
+  "tags.parentLocked": "Ten tag ma podtagi, więc sam nie może być podtagiem",
+  "tags.ownOnly": "{{name}} bez podtagów",
+  "tags.deleteChildren": "Jego podtagi staną się zwykłymi tagami",
+  "tags.subtagCount": "Podtagi: {{count}}"
 }

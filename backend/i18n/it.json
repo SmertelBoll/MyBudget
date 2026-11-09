@@ -688,5 +688,12 @@
   "logs.filterCategories": "Categorie",
   "logs.filterTags": "Tag",
   "logs.filterReset": "Azzera",
-  "logs.filterAll": "Seleziona tutto"
+  "logs.filterAll": "Seleziona tutto",
+  "tags.edit": "Modifica tag",
+  "tags.parent": "Tag principale",
+  "tags.noParent": "Nessuno (tag di primo livello)",
+  "tags.parentLocked": "Questo tag ha dei sottotag, quindi non può essere a sua volta un sottotag",
+  "tags.ownOnly": "{{name}} senza sottotag",
+  "tags.deleteChildren": "I suoi sottotag diventeranno tag normali",
+  "tags.subtagCount": "Sottotag: {{count}}"
 }

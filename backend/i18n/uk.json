@@ -704,5 +704,12 @@
   "logs.filterCategories": "Категорії",
   "logs.filterTags": "Теги",
   "logs.filterReset": "Очистити",
-  "logs.filterAll": "Вибрати всі"
+  "logs.filterAll": "Вибрати всі",
+  "tags.edit": "Редагувати тег",
+  "tags.parent": "Батьківський тег",
+  "tags.noParent": "Немає (тег верхнього рівня)",
+  "tags.parentLocked": "У цього тегу є підтеги, тому він сам не може бути підтегом",
+  "tags.ownOnly": "{{name}} без підтегів",
+  "tags.deleteChildren": "Його підтеги стануть звичайними тегами",
+  "tags.subtagCount": "Підтегів: {{count}}"
 }

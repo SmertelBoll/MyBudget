@@ -718,5 +718,12 @@
   "logs.filterCategories": "الفئات",
   "logs.filterTags": "الوسوم",
   "logs.filterReset": "مسح",
-  "logs.filterAll": "تحديد الكل"
+  "logs.filterAll": "تحديد الكل",
+  "tags.edit": "تعديل الوسم",
+  "tags.parent": "الوسم الأب",
+  "tags.noParent": "لا شيء (وسم رئيسي)",
+  "tags.parentLocked": "لهذا الوسم وسوم فرعية، لذا لا يمكن أن يكون وسمًا فرعيًا",
+  "tags.ownOnly": "{{name}} بدون وسوم فرعية",
+  "tags.deleteChildren": "ستصبح وسومه الفرعية وسومًا عادية",
+  "tags.subtagCount": "الوسوم الفرعية: {{count}}"
 }

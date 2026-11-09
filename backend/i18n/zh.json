@@ -668,5 +668,12 @@
   "logs.filterCategories": "类别",
   "logs.filterTags": "标签",
   "logs.filterReset": "清除",
-  "logs.filterAll": "全选"
+  "logs.filterAll": "全选",
+  "tags.edit": "编辑标签",
+  "tags.parent": "父标签",
+  "tags.noParent": "无（顶级标签）",
+  "tags.parentLocked": "此标签有子标签，因此不能作为子标签",
+  "tags.ownOnly": "{{name}}（不含子标签）",
+  "tags.deleteChildren": "其子标签将变为普通标签",
+  "tags.subtagCount": "子标签：{{count}}"
 }

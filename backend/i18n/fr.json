@@ -688,5 +688,12 @@
   "logs.filterCategories": "Catégories",
   "logs.filterTags": "Étiquettes",
   "logs.filterReset": "Effacer",
-  "logs.filterAll": "Tout sélectionner"
+  "logs.filterAll": "Tout sélectionner",
+  "tags.edit": "Modifier le tag",
+  "tags.parent": "Tag parent",
+  "tags.noParent": "Aucun (tag de premier niveau)",
+  "tags.parentLocked": "Ce tag a des sous-tags, il ne peut donc pas être lui-même un sous-tag",
+  "tags.ownOnly": "{{name}} sans sous-tags",
+  "tags.deleteChildren": "Ses sous-tags deviendront des tags normaux",
+  "tags.subtagCount": "Sous-tags : {{count}}"
 }

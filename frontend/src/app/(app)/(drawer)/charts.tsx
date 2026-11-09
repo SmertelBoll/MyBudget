@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { Pressable, ScrollView, View } from "react-native";
 import type { EntryType, Period } from "@/api/types";
 import { useChartBuckets, type ChartMode } from "@/data/chartBuckets";
-import { useCollection } from "@/data/hooks";
+import { useTagTree } from "@/data/tags";
 import { groupEntries, usePeriodEntries, type AccountFilter } from "@/data/stats";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTheme } from "@/theme/ThemeProvider";
@@ -56,7 +56,6 @@ export default function ChartsScreen() {
   const { colors } = useTheme();
   const { t, lang } = useI18n();
   const bottomSpace = useBottomSpace();
-  const tags = useCollection("tags");
 
   const [mode, setMode] = useState<ChartMode>("general");
   const [granularity, setGranularity] = useState<Period>("month");
@@ -81,8 +80,8 @@ export default function ChartsScreen() {
   const listBy: GroupBy = mode === "general" ? "category" : by;
   const range = selected?.range ?? NO_RANGE;
   const entries = usePeriodEntries(listType ?? "expense", filter, range);
-  const knownTagIds = useMemo(() => new Set(tags.map((tag) => tag.id)), [tags]);
-  const { groups } = useMemo(() => groupEntries(listType ? entries : [], listBy, knownTagIds), [entries, listType, listBy, knownTagIds]);
+  const tagTree = useTagTree();
+  const { groups } = useMemo(() => groupEntries(listType ? entries : [], listBy, tagTree), [entries, listType, listBy, tagTree]);
 
   const toggle = (id: string) =>
     setExpanded((current) => {

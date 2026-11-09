@@ -7,7 +7,7 @@ import { radius, spacing } from "@/theme/tokens";
 import { AppText } from "./AppText";
 import { IconCircle } from "./IconCircle";
 
-export type StatsChild = { id: string; icon: string; title: string; amount: string };
+export type StatsChild = { id: string; icon: string; color?: string; title: string; amount: string };
 
 const percent = (share: number) => {
   const value = share * 100;
@@ -134,7 +134,7 @@ export function StatsRow({
               backgroundColor: pressed ? colors.selected : colors.tonal,
             })}
           >
-            <MaterialCommunityIcons name={child.icon as "pound"} size={18} color={colors.textSecondary} />
+            <MaterialCommunityIcons name={child.icon as "pound"} size={18} color={child.color ?? colors.textSecondary} />
             <AppText numberOfLines={1} style={{ flex: 1 }}>
               {child.title}
             </AppText>

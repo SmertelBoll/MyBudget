@@ -678,5 +678,12 @@
   "logs.filterCategories": "Kategorier",
   "logs.filterTags": "Tags",
   "logs.filterReset": "Ryd",
-  "logs.filterAll": "Vælg alle"
+  "logs.filterAll": "Vælg alle",
+  "tags.edit": "Rediger tag",
+  "tags.parent": "Overordnet tag",
+  "tags.noParent": "Ingen (tag på øverste niveau)",
+  "tags.parentLocked": "Dette tag har undertags og kan derfor ikke selv være et undertag",
+  "tags.ownOnly": "{{name}} uden undertags",
+  "tags.deleteChildren": "Dets undertags bliver almindelige tags",
+  "tags.subtagCount": "Undertags: {{count}}"
 }

@@ -678,5 +678,12 @@
   "logs.filterCategories": "Kategóriák",
   "logs.filterTags": "Címkék",
   "logs.filterReset": "Törlés",
-  "logs.filterAll": "Összes kijelölése"
+  "logs.filterAll": "Összes kijelölése",
+  "tags.edit": "Címke szerkesztése",
+  "tags.parent": "Szülőcímke",
+  "tags.noParent": "Nincs (legfelső szintű címke)",
+  "tags.parentLocked": "Ennek a címkének vannak alcímkéi, ezért maga nem lehet alcímke",
+  "tags.ownOnly": "{{name}} alcímkék nélkül",
+  "tags.deleteChildren": "Az alcímkéi hagyományos címkék lesznek",
+  "tags.subtagCount": "Alcímkék: {{count}}"
 }

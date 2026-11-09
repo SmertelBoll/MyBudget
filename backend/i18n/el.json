@@ -678,5 +678,12 @@
   "logs.filterCategories": "Κατηγορίες",
   "logs.filterTags": "Ετικέτες",
   "logs.filterReset": "Καθαρισμός",
-  "logs.filterAll": "Επιλογή όλων"
+  "logs.filterAll": "Επιλογή όλων",
+  "tags.edit": "Επεξεργασία ετικέτας",
+  "tags.parent": "Γονική ετικέτα",
+  "tags.noParent": "Καμία (ετικέτα ανώτατου επιπέδου)",
+  "tags.parentLocked": "Αυτή η ετικέτα έχει υποετικέτες, οπότε δεν μπορεί να είναι υποετικέτα",
+  "tags.ownOnly": "{{name}} χωρίς υποετικέτες",
+  "tags.deleteChildren": "Οι υποετικέτες της θα γίνουν κανονικές ετικέτες",
+  "tags.subtagCount": "Υποετικέτες: {{count}}"
 }

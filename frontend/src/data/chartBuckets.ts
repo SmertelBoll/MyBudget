@@ -6,6 +6,7 @@ import { periodContaining, type PeriodRange } from "@/utils/periods";
 import { useCollection } from "./hooks";
 import { useRates } from "./rates";
 import { NO_TAG, inBaseCurrency, type AccountFilter } from "./stats";
+import { buildTagTree, rootsOf } from "./tags";
 
 export type ChartMode = "general" | EntryType;
 export type Stack = { id: string; value: number };
@@ -27,7 +28,7 @@ export const useChartBuckets = (filter: AccountFilter, granularity: Period, mode
     const today = todayLocal();
     const allowed = filter ? new Set(filter) : null;
     const accountById = new Map(accounts.map((account) => [account.id, account]));
-    const knownTags = new Set(tags.map((tag) => tag.id));
+    const tree = buildTagTree(tags);
     const entries = transactions.filter((tx) => !allowed || allowed.has(tx.accountId));
 
     const shift = (range: PeriodRange, steps: number) => {
@@ -57,7 +58,8 @@ export const useChartBuckets = (filter: AccountFilter, granularity: Period, mode
       if (tx.type === "income") bucket.income += value;
       else bucket.expense += value;
       if (mode === "general" || tx.type !== mode) continue;
-      const ids = by === "category" ? [tx.categoryId] : tx.tagIds.filter((id) => knownTags.has(id));
+      // By tag: a subtag counts in its top-level tag.
+      const ids = by === "category" ? [tx.categoryId] : rootsOf(tx.tagIds, tree);
       for (const id of ids.length ? ids : [NO_TAG]) bucket.stackMap.set(id, (bucket.stackMap.get(id) ?? 0) + value);
     }
 

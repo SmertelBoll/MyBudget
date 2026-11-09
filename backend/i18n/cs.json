@@ -698,5 +698,12 @@
   "logs.filterCategories": "Kategorie",
   "logs.filterTags": "Štítky",
   "logs.filterReset": "Vymazat",
-  "logs.filterAll": "Vybrat vše"
+  "logs.filterAll": "Vybrat vše",
+  "tags.edit": "Upravit štítek",
+  "tags.parent": "Nadřazený štítek",
+  "tags.noParent": "Žádný (štítek nejvyšší úrovně)",
+  "tags.parentLocked": "Tento štítek má podštítky, takže sám nemůže být podštítkem",
+  "tags.ownOnly": "{{name}} bez podštítků",
+  "tags.deleteChildren": "Jeho podštítky se stanou běžnými štítky",
+  "tags.subtagCount": "Podštítky: {{count}}"
 }

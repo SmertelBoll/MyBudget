@@ -678,5 +678,12 @@
   "logs.filterCategories": "Luokat",
   "logs.filterTags": "Tunnisteet",
   "logs.filterReset": "Tyhjennä",
-  "logs.filterAll": "Valitse kaikki"
+  "logs.filterAll": "Valitse kaikki",
+  "tags.edit": "Muokkaa tunnistetta",
+  "tags.parent": "Ylätunniste",
+  "tags.noParent": "Ei mitään (ylimmän tason tunniste)",
+  "tags.parentLocked": "Tällä tunnisteella on alatunnisteita, joten se ei voi itse olla alatunniste",
+  "tags.ownOnly": "{{name}} ilman alatunnisteita",
+  "tags.deleteChildren": "Sen alatunnisteista tulee tavallisia tunnisteita",
+  "tags.subtagCount": "Alatunnisteet: {{count}}"
 }

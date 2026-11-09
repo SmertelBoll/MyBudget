@@ -36,6 +36,10 @@ export type Category = Base & {
 
 export type Tag = Base & {
   name: string;
+  // Missing on tags saved before they existed. null color: the parent's, or one picked from the id (TagTree.colorOf).
+  color?: string | null;
+  // A top-level tag this one is a subtag of (one level only).
+  parentId?: string | null;
 };
 
 export type Transaction = Base & {

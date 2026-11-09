@@ -678,5 +678,12 @@
   "logs.filterCategories": "श्रेणियाँ",
   "logs.filterTags": "टैग",
   "logs.filterReset": "साफ़ करें",
-  "logs.filterAll": "सभी चुनें"
+  "logs.filterAll": "सभी चुनें",
+  "tags.edit": "टैग संपादित करें",
+  "tags.parent": "मूल टैग",
+  "tags.noParent": "कोई नहीं (शीर्ष-स्तरीय टैग)",
+  "tags.parentLocked": "इस टैग के उप-टैग हैं, इसलिए यह स्वयं उप-टैग नहीं हो सकता",
+  "tags.ownOnly": "{{name}} (उप-टैग के बिना)",
+  "tags.deleteChildren": "इसके उप-टैग सामान्य टैग बन जाएंगे",
+  "tags.subtagCount": "उप-टैग: {{count}}"
 }
