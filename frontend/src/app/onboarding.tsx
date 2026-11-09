@@ -4,7 +4,7 @@ import { getLocales } from "expo-localization";
 import { ApiError } from "@/api/client";
 import { useAuth } from "@/auth/AuthProvider";
 import { deviceLanguage, useI18n } from "@/i18n/I18nProvider";
-import { LANGUAGE_OPTIONS } from "@/i18n/languages";
+import { useLanguageOptions } from "@/i18n/languages";
 import { useTheme } from "@/theme/ThemeProvider";
 import { spacing } from "@/theme/tokens";
 import { useBottomSpace } from "@/utils/useBottomSpace";
@@ -28,6 +28,7 @@ export default function OnboardingScreen() {
   const languageGuessed = useRef(false);
 
   const currencyOptions = useCurrencyOptions();
+  const languageOptions = useLanguageOptions(user?.language);
   const pinnedCurrencies = usePinnedCurrencies();
 
   // The phone's currency and language are preselected: most people just press "Get started".
@@ -69,7 +70,7 @@ export default function OnboardingScreen() {
         <SelectField
           label={t("onboarding.language")}
           value={user?.language ?? null}
-          options={LANGUAGE_OPTIONS}
+          options={languageOptions}
           onChange={(language) => updateMe({ language }).catch(() => {})}
         />
 

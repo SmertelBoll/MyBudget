@@ -4,10 +4,8 @@ import { router } from "expo-router";
 import { ApiError } from "@/api/client";
 import type { EntryType, Period, UserPatch, UserSettings } from "@/api/types";
 import { useAuth } from "@/auth/AuthProvider";
-import { sortAccounts } from "@/data/accounts";
-import { useCollection } from "@/data/hooks";
 import { useI18n } from "@/i18n/I18nProvider";
-import { LANGUAGE_OPTIONS } from "@/i18n/languages";
+import { useLanguageOptions } from "@/i18n/languages";
 import { useTheme, type ThemeMode } from "@/theme/ThemeProvider";
 import { spacing } from "@/theme/tokens";
 import { useCurrencyOptions, usePinnedCurrencies } from "@/utils/currency";
@@ -15,15 +13,15 @@ import { useBottomSpace } from "@/utils/useBottomSpace";
 import { AppText } from "@/components/AppText";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import { SegmentedSwitch } from "@/components/SegmentedSwitch";
-import { SelectField, type SelectOption } from "@/components/SelectField";
+import { SelectField } from "@/components/SelectField";
 import { useToast } from "@/components/Toast";
 import { ToggleRow } from "@/components/ToggleRow";
 import { DataSection } from "@/components/settings/DataSection";
+import { AccountSettingField, ChoiceField } from "@/components/settings/PickerFields";
 import { SettingsCard, SettingsLink } from "@/components/settings/SettingsCard";
 
 const THEMES: ThemeMode[] = ["system", "light", "dark"];
 const PERIODS: Period[] = ["day", "week", "month", "year"];
-const NO_ACCOUNT = "none";
 // Monday first, as in the calendar.
 const WEEKDAYS = [1, 2, 3, 4, 5, 6, 0];
 
@@ -52,15 +50,11 @@ export default function SettingsScreen() {
   const toast = useToast();
   const bottomSpace = useBottomSpace();
   const { user, updateMe } = useAuth();
-  const accounts = useCollection("accounts");
   const currencyOptions = useCurrencyOptions();
   const pinnedCurrencies = usePinnedCurrencies();
+  const languageOptions = useLanguageOptions(user?.language);
 
-  const accountOptions = useMemo<SelectOption[]>(
-    () => sortAccounts(accounts.filter((account) => account.isActive)).map((account) => ({ value: account.id, label: account.name, trailing: account.currency })),
-    [accounts]
-  );
-  const weekdayOptions = useMemo<SelectOption[]>(() => WEEKDAYS.map((day) => ({ value: String(day), label: weekdayLong(day, lang) })), [lang]);
+  const weekdayOptions = useMemo(() => WEEKDAYS.map((day) => ({ value: String(day), label: weekdayLong(day, lang) })), [lang]);
 
   if (!user) return null;
   const { settings } = user;
@@ -69,20 +63,17 @@ export default function SettingsScreen() {
     updateMe(patch).catch((error) => toast.show(t(error instanceof ApiError ? error.code : "common.serverError"), { kind: "error" }));
   const setSetting = <K extends keyof UserSettings>(key: K, value: UserSettings[K]) => save({ settings: { [key]: value } });
 
-  // An account that was deleted or hidden falls back to Total / nothing.
-  const homeAccount = accountOptions.some((option) => option.value === settings.homeAccount) ? settings.homeAccount : "total";
-  const entryAccount = accountOptions.some((option) => option.value === settings.defaultAccountId) ? settings.defaultAccountId! : NO_ACCOUNT;
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
       <ScreenHeader title={t("nav.settings")} />
       <ScrollView contentContainerStyle={{ padding: spacing.md, gap: spacing.lg, paddingBottom: bottomSpace }}>
         <SettingsCard title={t("settings.personalisation")}>
-          <SelectField
+          <AccountSettingField
             label={t("settings.homeAccount")}
-            value={homeAccount}
-            options={[{ value: "total", label: t("accounts.total") }, ...accountOptions]}
-            onChange={(value) => setSetting("homeAccount", value)}
+            value={settings.homeAccount}
+            empty="total"
+            onChange={(id) => setSetting("homeAccount", id ?? "total")}
           />
           <Labeled label={t("settings.defaultPeriod")}>
             <SegmentedSwitch
@@ -91,11 +82,11 @@ export default function SettingsScreen() {
               onChange={(value) => setSetting("defaultPeriod", value)}
             />
           </Labeled>
-          <SelectField
+          <AccountSettingField
             label={t("settings.entryAccount")}
-            value={entryAccount}
-            options={[{ value: NO_ACCOUNT, label: t("settings.noAccount") }, ...accountOptions]}
-            onChange={(value) => setSetting("defaultAccountId", value === NO_ACCOUNT ? null : value)}
+            value={settings.defaultAccountId}
+            empty="none"
+            onChange={(id) => setSetting("defaultAccountId", id)}
           />
           <SelectField
             label={t("settings.baseCurrency")}
@@ -114,7 +105,7 @@ export default function SettingsScreen() {
         </SettingsCard>
 
         <SettingsCard title={t("settings.appearance")}>
-          <SelectField label={t("settings.language")} value={user.language} options={LANGUAGE_OPTIONS} onChange={(language) => save({ language })} />
+          <SelectField label={t("settings.language")} value={user.language} options={languageOptions} onChange={(language) => save({ language })} />
           <Labeled label={t("settings.theme")}>
             <SegmentedSwitch
               options={THEMES.map((value) => ({ value, label: t(`settings.theme.${value}`) }))}
@@ -125,7 +116,7 @@ export default function SettingsScreen() {
         </SettingsCard>
 
         <SettingsCard title={t("settings.advanced")}>
-          <SelectField
+          <ChoiceField
             label={t("settings.firstDay")}
             value={String(settings.firstDayOfWeek)}
             options={weekdayOptions}

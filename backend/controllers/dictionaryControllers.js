@@ -7,8 +7,11 @@ import { getLatestRates, refreshRates } from "../jobs/rates.js";
 // Bundled English: served when the database has no dictionary yet (before scripts/seed-i18n.js has run).
 const BUNDLED_EN = JSON.parse(fs.readFileSync(new URL("../i18n/en.json", import.meta.url), "utf8"));
 
-export const getLanguages = (req, res) => {
-  res.json({ languages: LANGUAGES, default: DEFAULT_LANGUAGE });
+// "available": languages that have a dictionary (English always does); the app offers only these.
+export const getLanguages = async (req, res) => {
+  const translated = await TranslationModel.distinct("lang");
+  const available = LANGUAGE_CODES.filter((code) => code === DEFAULT_LANGUAGE || translated.includes(code));
+  res.json({ languages: LANGUAGES, default: DEFAULT_LANGUAGE, available });
 };
 
 // The whole dictionary of one language. updatedAt lets the client skip re-downloading an unchanged one.

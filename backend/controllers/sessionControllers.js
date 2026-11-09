@@ -42,3 +42,12 @@ export const revokeSession = async (req, res) => {
   logSecurityEvent("session_revoked", { userId: req.userId, sessionId: req.sessionId, req, meta: { revoked: id } });
   res.status(204).end();
 };
+
+// Any of the user's active sessions, this device included, can get a name of the user's choice ("Work phone").
+export const renameSession = async (req, res) => {
+  const { id } = req.params;
+  if (!mongoose.isValidObjectId(id)) throw new AppError(404, "session.notFound");
+  const result = await SessionModel.updateOne({ ...activeFilter(req.userId), _id: id }, { $set: { deviceName: req.valid.name } });
+  if (!result.matchedCount) throw new AppError(404, "session.notFound");
+  res.status(204).end();
+};

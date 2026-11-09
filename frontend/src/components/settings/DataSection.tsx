@@ -35,8 +35,10 @@ export function DataSection() {
       await work();
     } catch (error) {
       const code = error instanceof ApiError ? error.code : error instanceof BackupFileError ? error.message : "common.serverError";
-      if (!(error instanceof ApiError || error instanceof BackupFileError)) console.warn(`${name} failed:`, error);
-      toast.show(t(code), { kind: "error" });
+      console.warn(`${name} failed:`, error, error instanceof ApiError ? JSON.stringify(error.details ?? null) : "");
+      // Which record the server refused, so a damaged backup can be traced.
+      const details = error instanceof ApiError && Array.isArray(error.details) ? (error.details[0] as { path?: string } | undefined) : undefined;
+      toast.show(details?.path ? `${t(code)} (${details.path})` : t(code), { kind: "error" });
     } finally {
       setJob(null);
     }
@@ -50,7 +52,7 @@ export function DataSection() {
 
   const restore = () =>
     run("restore", async () => {
-      const file = await pickFile(["application/zip", "application/x-zip-compressed", "application/octet-stream"]);
+      const file = await pickFile(["*/*"]);
       if (!file) return;
       const backupFile = readBackup(file.bytes);
       const created = backupFile.createdAt ? formatLongDate(toLocalDate(new Date(backupFile.createdAt)), lang) : "—";

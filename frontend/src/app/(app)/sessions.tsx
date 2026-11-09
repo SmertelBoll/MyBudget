@@ -9,6 +9,7 @@ import { formatLongDate, toLocalDate } from "@/utils/dates";
 import { useBottomSpace } from "@/utils/useBottomSpace";
 import { AppText } from "@/components/AppText";
 import { Button } from "@/components/Button";
+import { IconButton } from "@/components/IconButton";
 import { useDialog } from "@/components/AppDialog";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import { useToast } from "@/components/Toast";
@@ -32,7 +33,7 @@ const formatMoment = (iso: string, lang: string) => {
   return `${formatLongDate(toLocalDate(date), lang)}, ${pad(date.getHours())}:${pad(date.getMinutes())}`;
 };
 
-function SessionCard({ session, onEnd }: { session: Session; onEnd: () => void }) {
+function SessionCard({ session, onEnd, onRename }: { session: Session; onEnd: () => void; onRename: () => void }) {
   const { colors } = useTheme();
   const { t, lang } = useI18n();
   const details = [t(`sessions.platform.${session.platform}`), session.appVersion && (/^\d/.test(session.appVersion) ? `v${session.appVersion}` : session.appVersion), session.location].filter(Boolean).join(" · ");
@@ -57,6 +58,7 @@ function SessionCard({ session, onEnd }: { session: Session; onEnd: () => void }
             {t("sessions.thisDevice")}
           </AppText>
         )}
+        <IconButton icon="pencil-outline" label={t("sessions.rename")} onPress={onRename} size={36} />
       </View>
       {details ? (
         <AppText variant="caption" secondary>
@@ -136,6 +138,22 @@ export default function SessionsScreen() {
     }
   };
 
+  const rename = async (session: Session) => {
+    const name = await dialog.prompt({
+      title: t("sessions.rename"),
+      label: t("sessions.name"),
+      initial: session.deviceName,
+      maxLength: 60,
+    });
+    if (!name || name === session.deviceName) return;
+    try {
+      await api.patch("/sessions/" + session.id, { name });
+      setSessions((list) => list?.map((item) => (item.id === session.id ? { ...item, deviceName: name } : item)) ?? null);
+    } catch (error) {
+      fail(error);
+    }
+  };
+
   const endOthers = async () => {
     const ok = await dialog.confirm({
       title: t("sessions.endOthersTitle"),
@@ -172,7 +190,7 @@ export default function SessionsScreen() {
           keyExtractor={(session) => session.id}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} colors={[colors.accent]} tintColor={colors.accent} />}
           contentContainerStyle={{ padding: spacing.md, gap: spacing.sm, paddingBottom: bottomSpace }}
-          renderItem={({ item }) => <SessionCard session={item} onEnd={() => endOne(item)} />}
+          renderItem={({ item }) => <SessionCard session={item} onEnd={() => endOne(item)} onRename={() => rename(item)} />}
           ListFooterComponent={
             others > 0 ? <Button title={t("sessions.endOthers")} icon="logout-variant" variant="danger" onPress={endOthers} style={{ marginTop: spacing.md }} /> : undefined
           }

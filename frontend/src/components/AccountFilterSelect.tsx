@@ -33,7 +33,7 @@ export const useFilterBalance = (filter: AccountFilter) => {
   }, [filter, totals, balances, accounts, rates]);
 };
 
-function Choice({ icon, color, title, subtitle, selected, highlight, onPress }: {
+export function Choice({ icon, color, title, subtitle, selected, highlight, onPress }: {
   icon: string;
   color: string;
   title: string;

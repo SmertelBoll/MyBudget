@@ -691,5 +691,8 @@
   "support.deviceNote": "The app version and your phone model are added to the message",
   "support.send": "Send",
   "support.sent": "Message sent. Thank you!",
-  "support.queued": "No connection: the message will be sent when you're online"
+  "support.queued": "No connection: the message will be sent when you're online",
+  "settings.noAccountHint": "Choose the account in each entry",
+  "sessions.rename": "Rename",
+  "sessions.name": "Device name"
 }

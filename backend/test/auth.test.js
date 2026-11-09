@@ -133,6 +133,22 @@ describe("sessions", () => {
   });
 });
 
+describe("rename a session", () => {
+  it("renames own sessions only", async () => {
+    const mine = await login(app, "multi@gmail.com", "Galaxy S24");
+    const res = await http.patch("/sessions/" + mine.sessionId, { name: "  Work phone " }, mine.accessToken);
+    assert.equal(res.status, 204);
+    const list = await http.get("/sessions", mine.accessToken);
+    assert.equal(list.body.sessions.find((s) => s.isCurrent).deviceName, "Work phone");
+
+    const anna = await login(app, "anna@gmail.com", "Phone");
+    const foreign = await http.patch("/sessions/" + anna.sessionId, { name: "Mine now" }, mine.accessToken);
+    assert.equal(foreign.status, 404);
+    const empty = await http.patch("/sessions/" + mine.sessionId, { name: " " }, mine.accessToken);
+    assert.equal(empty.status, 400);
+  });
+});
+
 describe("profile", () => {
   it("updates fields and merges settings", async () => {
     const { accessToken } = await login(app, "anna@gmail.com");

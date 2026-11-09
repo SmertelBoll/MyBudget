@@ -32,7 +32,15 @@ const WEB_COLLAPSE_AT = 24;
 const TOP_TOLERANCE = 2;
 // Screen 2. Home: the chosen accounts' balance, Expenses / Income, a period with its chart, and the period's sums
 // by category or by tag.
+// Changing the Home account, the period or the focus in Settings starts Home over from them the next time it's
+// opened (it stays mounted in the drawer, so its own choices would otherwise win).
 export default function HomeScreen() {
+  const { user } = useAuth();
+  const settings = user?.settings;
+  return <HomeContent key={[settings?.homeAccount, settings?.defaultPeriod, settings?.firstDayOfWeek, settings?.focus].join("|")} />;
+}
+
+function HomeContent() {
   const { colors } = useTheme();
   const { t } = useI18n();
   const { money, baseCurrency } = useMoney();

@@ -65,7 +65,7 @@ export function ToggleRow({
           borderRadius: TRACK_HEIGHT / 2,
           justifyContent: "center",
           paddingHorizontal: 3,
-          backgroundColor: progress.interpolate({ inputRange: [0, 1], outputRange: [colors.selected, colors.accent] }),
+          backgroundColor: progress.interpolate({ inputRange: [0, 1], outputRange: [colors.selected, colors.mark] }),
         }}
       >
         <Animated.View
@@ -73,7 +73,7 @@ export function ToggleRow({
             width: THUMB,
             height: THUMB,
             borderRadius: THUMB / 2,
-            backgroundColor: progress.interpolate({ inputRange: [0, 1], outputRange: [colors.surface, colors.onAccent] }),
+            backgroundColor: progress.interpolate({ inputRange: [0, 1], outputRange: [colors.surface, colors.onMark] }),
             transform: [{ translateX: progress.interpolate({ inputRange: [0, 1], outputRange: [0, TRAVEL] }) }],
           }}
         />

@@ -26,7 +26,8 @@ type ConfirmOptions = {
 
 export type ChoiceOption = { value: string; label: string; destructive?: boolean };
 
-type ChooseOptions = { title: string; message?: string; options: ChoiceOption[]; cancelText?: string };
+// selected: the current value, shown filled.
+type ChooseOptions = { title: string; message?: string; options: ChoiceOption[]; cancelText?: string; selected?: string };
 
 type PromptOptions = {
   title: string;
@@ -162,7 +163,7 @@ function ChoiceView({ dialog, onClose }: { dialog: ChooseOptions; onClose: (valu
             {dialog.options.map((option) => (
               <Button
                 key={option.value}
-                variant={option.destructive ? "danger" : "secondary"}
+                variant={option.destructive ? "danger" : option.value === dialog.selected ? "primary" : "secondary"}
                 title={option.label}
                 onPress={() => onClose(option.value)}
               />

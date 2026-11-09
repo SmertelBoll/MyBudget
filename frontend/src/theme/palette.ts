@@ -41,6 +41,8 @@ export type Palette = typeof SHARED & {
   // Thin highlights: the line under a chosen tab, rings, check marks, a focused field. Yellow reads well on the dark
   // theme but disappears on the light one, where these are near-black instead. Filled yellow areas stay `accent`.
   mark: string;
+  // Content on a `mark` fill, e.g. the knob of a switch that is on.
+  onMark: string;
 };
 
 const LIGHT: Palette = {
@@ -55,6 +57,7 @@ const LIGHT: Palette = {
   iconIdle: "#a9a9a9",
   tonal: "#d6d4ca",
   mark: CONTRAST_DARK,
+  onMark: CONTRAST_LIGHT,
 };
 
 const DARK: Palette = {
@@ -68,6 +71,7 @@ const DARK: Palette = {
   iconIdle: "#7c8580",
   tonal: "#4a4a4a",
   mark: SHARED.accent,
+  onMark: CONTRAST_DARK,
 };
 
 export const getPalette = (scheme: SchemeName): Palette => (scheme === "dark" ? DARK : LIGHT);

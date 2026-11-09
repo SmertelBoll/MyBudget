@@ -1,4 +1,7 @@
+import { useEffect, useMemo, useState } from "react";
+import { api } from "@/api/client";
 import type { SelectOption } from "@/components/SelectField";
+import { readJson, writeJson } from "@/storage/json";
 
 // Same list as backend/utils/languages.js (and the MovieList site). Native names are never translated; the English
 // name is shown under it and is searchable too.
@@ -31,8 +34,42 @@ export const DEFAULT_LANGUAGE = "en";
 
 export const LANGUAGE_CODES: string[] = LANGUAGES.map((lang) => lang.code);
 
-export const LANGUAGE_OPTIONS: SelectOption[] = LANGUAGES.map((lang) => ({
+const toOption = (lang: (typeof LANGUAGES)[number]): SelectOption => ({
   value: lang.code,
   label: lang.nativeName,
   subtitle: lang.name === lang.nativeName ? undefined : lang.name,
-}));
+});
+
+export const LANGUAGE_OPTIONS: SelectOption[] = LANGUAGES.map(toOption);
+
+// Only languages with a dictionary on the server (spec 2.4: a new language is added there, without an app update).
+// The list is cached; the current language is always offered.
+const AVAILABLE_KEY = "i18n.available";
+let available: string[] | null = null;
+const subscribers = new Set<(codes: string[]) => void>();
+
+const loadAvailable = async () => {
+  if (!available) available = (await readJson<string[]>(AVAILABLE_KEY)) ?? [DEFAULT_LANGUAGE];
+  try {
+    const { available: fresh } = await api.get<{ available?: string[] }>("/i18n", { auth: false });
+    if (fresh?.length) {
+      available = fresh;
+      await writeJson(AVAILABLE_KEY, fresh);
+    }
+  } catch {
+    // Offline: the cached list stays.
+  }
+  subscribers.forEach((notify) => notify(available!));
+};
+
+export const useLanguageOptions = (current?: string | null) => {
+  const [codes, setCodes] = useState<string[]>(() => available ?? [DEFAULT_LANGUAGE]);
+  useEffect(() => {
+    subscribers.add(setCodes);
+    loadAvailable();
+    return () => {
+      subscribers.delete(setCodes);
+    };
+  }, []);
+  return useMemo(() => LANGUAGES.filter((lang) => codes.includes(lang.code) || lang.code === current).map(toOption), [codes, current]);
+};

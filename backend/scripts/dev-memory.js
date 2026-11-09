@@ -19,3 +19,18 @@ process.on("SIGTERM", stop);
 
 console.log("in-memory MongoDB:", process.env.MONGODB_URI);
 await import("../index.js");
+
+// The in-memory database starts empty: load the dictionaries from i18n/ so every language can be tried.
+const { default: mongoose } = await import("mongoose");
+const { TranslationModel } = await import("../models/misc.js");
+const fs = await import("fs");
+if (mongoose.connection.readyState !== 1) await new Promise((resolve) => mongoose.connection.once("connected", resolve));
+const dir = new URL("../i18n/", import.meta.url);
+for (const file of fs.readdirSync(dir).filter((name) => name.endsWith(".json"))) {
+  const lang = file.replace(/\.json$/, "");
+  const strings = JSON.parse(fs.readFileSync(new URL(file, dir), "utf8"));
+  await TranslationModel.bulkWrite(
+    Object.entries(strings).map(([key, value]) => ({ updateOne: { filter: { lang, key }, update: { $set: { value } }, upsert: true } }))
+  );
+}
+console.log("dictionaries loaded");
