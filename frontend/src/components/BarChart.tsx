@@ -1,11 +1,12 @@
-import { memo, useCallback, useEffect, useRef, useState, type ReactNode } from "react";
-import { FlatList, Pressable, View } from "react-native";
+import { memo, useEffect, useRef, useState, type ReactNode } from "react";
+import { FlatList, Text, View } from "react-native";
+import { GestureDetector, useTapGesture } from "react-native-gesture-handler";
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming, type SharedValue } from "react-native-reanimated";
 import type { Period } from "@/api/types";
 import { bucketPeak, stackSum, type Bucket, type ChartMode } from "@/data/chartBuckets";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTheme } from "@/theme/ThemeProvider";
-import { radius, spacing } from "@/theme/tokens";
+import { fontSize, fonts, radius, spacing } from "@/theme/tokens";
 import { parseLocalDate } from "@/utils/dates";
 import { useMoney } from "@/utils/useMoney";
 import { AppText } from "./AppText";
@@ -31,10 +32,25 @@ const GROW_MS = 320;
 // is what it was when the period appeared; bars that outgrow the area are cut at its top.
 const share = (value: number, base: number) => (value > 0 ? `${(value / base) * 100}%` : 0) as `${number}%` | 0;
 
-function ScaledBars({ base, peak, children }: { base: number; peak: SharedValue<number>; children: ReactNode }) {
+// selected: the chosen period's index (-1 = none); the other periods are dimmed here, so choosing a bar doesn't
+// draw every period again.
+function ScaledBars({
+  base,
+  peak,
+  index,
+  selected,
+  children,
+}: {
+  base: number;
+  peak: SharedValue<number>;
+  index: number;
+  selected: SharedValue<number>;
+  children: ReactNode;
+}) {
   const sized = useAnimatedStyle(() => {
     const top = peak.get();
-    return { height: top > 0 ? (BAR_AREA * base) / top : BAR_AREA };
+    const chosen = selected.get();
+    return { height: top > 0 ? (BAR_AREA * base) / top : BAR_AREA, opacity: chosen < 0 || chosen === index ? 1 : 0.45 };
   });
   return (
     <Animated.View
@@ -78,7 +94,28 @@ const labels = (start: string, granularity: Period, lang: string): [string, stri
 
 const heightFor = (value: number, peak: number) => (peak > 0 && value > 0 ? Math.min(BAR_AREA, Math.max(2, (value / peak) * BAR_AREA)) : 0);
 
-type BarPress = (index: number, part: BarPart, barCenter: number, value: number) => void;
+const generalParts = (bucket: Bucket) => {
+  const diff = bucket.income - bucket.expense;
+  return [
+    { part: "income" as BarPart, value: bucket.income, color: CHART_COLORS.income },
+    { part: "expense" as BarPart, value: bucket.expense, color: CHART_COLORS.expense },
+    { part: "diff" as BarPart, value: diff, color: diff >= 0 ? CHART_COLORS.profit : CHART_COLORS.loss },
+  ];
+};
+const generalGap = (itemWidth: number) => (itemWidth - GENERAL_BAR * 3) / 4;
+const generalCenter = (itemWidth: number, position: number) => {
+  const gap = generalGap(itemWidth);
+  return gap + position * (GENERAL_BAR + gap) + GENERAL_BAR / 2;
+};
+
+// The bar a tap at `x` (inside the period) means: in the general view the nearest of the three.
+const hitBar = (bucket: Bucket, mode: ChartMode, itemWidth: number, x: number) => {
+  if (mode !== "general") return { part: mode as BarPart, center: itemWidth / 2, value: stackSum(bucket) };
+  const step = GENERAL_BAR + generalGap(itemWidth);
+  const position = Math.max(0, Math.min(2, Math.round((x - generalCenter(itemWidth, 0)) / step)));
+  const chosen = generalParts(bucket)[position];
+  return { part: chosen.part, center: generalCenter(itemWidth, position), value: chosen.value };
+};
 
 // One period. Memoized: a tap redraws only the bars whose selection state changed, not the whole list.
 // selectedPart: undefined = nothing is selected; "none" = another period is; otherwise this period's chosen bar.
@@ -90,8 +127,8 @@ const BarItem = memo(function BarItem({
   itemWidth,
   peak,
   selectedPart,
+  selectedIndex,
   colorOf,
-  onBarPress,
 }: {
   bucket: Bucket;
   index: number;
@@ -99,9 +136,10 @@ const BarItem = memo(function BarItem({
   granularity: Period;
   itemWidth: number;
   peak: SharedValue<number>;
-  selectedPart: BarPart | "none" | undefined;
+  // Only for the chosen period: which of its bars; its other bars are dimmed.
+  selectedPart: BarPart | undefined;
+  selectedIndex: SharedValue<number>;
   colorOf: (id: string) => string;
-  onBarPress: BarPress;
 }) {
   const { colors } = useTheme();
   const { lang } = useI18n();
@@ -111,22 +149,8 @@ const BarItem = memo(function BarItem({
   const opacity = (part: BarPart) => (selectedPart === undefined || selectedPart === part ? 1 : 0.45);
 
   let bars;
-  // One touch area for the whole period; in the general view the bar nearest to the finger is the one tapped.
-  let press: (x: number) => void;
   if (mode === "general") {
-    const diff = bucket.income - bucket.expense;
-    const parts: { part: BarPart; value: number; color: string }[] = [
-      { part: "income", value: bucket.income, color: CHART_COLORS.income },
-      { part: "expense", value: bucket.expense, color: CHART_COLORS.expense },
-      { part: "diff", value: diff, color: diff >= 0 ? CHART_COLORS.profit : CHART_COLORS.loss },
-    ];
-    const gap = (itemWidth - GENERAL_BAR * 3) / 4;
-    const center = (position: number) => gap + position * (GENERAL_BAR + gap) + GENERAL_BAR / 2;
-    press = (x) => {
-      const position = Math.max(0, Math.min(2, Math.round((x - center(0)) / (GENERAL_BAR + gap))));
-      onBarPress(index, parts[position].part, center(position), parts[position].value);
-    };
-    bars = parts.map(({ part, value, color }) => (
+    bars = generalParts(bucket).map(({ part, value, color }) => (
       <View
         key={part}
         style={{
@@ -142,7 +166,6 @@ const BarItem = memo(function BarItem({
     ));
   } else {
     const total = stackSum(bucket);
-    press = () => onBarPress(index, mode, itemWidth / 2, total);
     bars = (
       <View
         style={{
@@ -162,25 +185,30 @@ const BarItem = memo(function BarItem({
       </View>
     );
   }
-  const chosen = selectedPart !== undefined && selectedPart !== "none";
+  const chosen = selectedPart !== undefined;
+  // Fewer views per period: no touch area of its own (one for the whole chart), the axis is a border, and both label
+  // lines are one text.
   return (
     <View style={{ width: itemWidth }}>
-      <Pressable onPress={(event) => press(event.nativeEvent.locationX)} style={{ height: BAR_AREA, overflow: "hidden" }}>
-        <ScaledBars base={base} peak={peak}>
+      <View style={{ height: BAR_AREA + 1, overflow: "hidden", borderBottomWidth: 1, borderBottomColor: colors.textSecondary }}>
+        <ScaledBars base={base} peak={peak} index={index} selected={selectedIndex}>
           {bars}
         </ScaledBars>
-      </Pressable>
-      <View style={{ height: 1, backgroundColor: colors.textSecondary }} />
-      <View style={{ height: LABEL_HEIGHT, alignItems: "center", paddingTop: 4 }}>
-        <AppText variant="caption" color={chosen ? colors.text : colors.textSecondary} style={{ textTransform: "capitalize" }}>
-          {line1}
-        </AppText>
-        {line2 ? (
-          <AppText variant="caption" secondary style={{ fontSize: 11, textTransform: "capitalize" }}>
-            {line2}
-          </AppText>
-        ) : null}
       </View>
+      <Text
+        style={{
+          height: LABEL_HEIGHT,
+          paddingTop: 4,
+          textAlign: "center",
+          textTransform: "capitalize",
+          fontFamily: fonts.regular,
+          fontSize: fontSize.caption,
+          color: chosen ? colors.text : colors.textSecondary,
+        }}
+      >
+        {line1}
+        {line2 ? <Text style={{ fontSize: 11, color: colors.textSecondary }}>{"\n" + line2}</Text> : null}
+      </Text>
     </View>
   );
 });
@@ -221,6 +249,10 @@ function Bars({ buckets, todayIndex, granularity, mode, colorOf, selection, onSe
   const startIndex = Math.max(0, todayIndex + 1 - Math.floor(viewport / itemWidth));
   const startX = startIndex * itemWidth;
   const scrollX = useRef(startX);
+  // The list can't scroll past its end, so at first it may sit left of startX without telling (no scroll event):
+  // the offset is kept within what the content allows.
+  const contentWidth = useRef(Infinity);
+  const offset = () => Math.min(scrollX.current, Math.max(0, contentWidth.current - viewport));
   const settleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   // Where the list last came to rest; the scale and the years follow it (and new data), not the moving list.
   const [restX, setRestX] = useState(startX);
@@ -257,25 +289,28 @@ function Bars({ buckets, todayIndex, granularity, mode, colorOf, selection, onSe
     settleTimer.current = setTimeout(() => setRestX(scrollX.current), SETTLE_MS);
   };
 
-  // Read only inside the tap handler, so a new selection doesn't hand every bar a new handler.
-  const selectionRef = useRef(selection);
+  // The chosen period, for dimming the others on the UI thread.
+  const selectedIndex = useSharedValue(selection?.index ?? -1);
   useEffect(() => {
-    selectionRef.current = selection;
-  }, [selection]);
+    selectedIndex.set(selection?.index ?? -1);
+  }, [selection, selectedIndex]);
 
-  const onBarPress = useCallback<BarPress>(
-    (index, part, barCenter, value) => {
-      const current = selectionRef.current;
-      if (current?.index === index && current.part === part) {
-        setPlate(null);
-        onSelect(null);
-        return;
-      }
-      setPlate({ x: index * itemWidth - scrollX.current + barCenter, index, part });
-      onSelect({ index, part });
-    },
-    [itemWidth, onSelect]
-  );
+  // One tap area for the whole chart: the period under the finger from the scroll position, then its bar.
+  const tapAt = (x: number) => {
+    const contentX = offset() + x;
+    const index = Math.floor(contentX / itemWidth);
+    const bucket = buckets[index];
+    if (!bucket) return;
+    const hit = hitBar(bucket, mode, itemWidth, contentX - index * itemWidth);
+    if (selection?.index === index && selection.part === hit.part) {
+      setPlate(null);
+      onSelect(null);
+      return;
+    }
+    setPlate({ x: index * itemWidth - offset() + hit.center, index, part: hit.part });
+    onSelect({ index, part: hit.part });
+  };
+  const tap = useTapGesture({ runOnJS: true, onActivate: (event) => tapAt(event.x) });
 
   // Shown only while it still belongs to the selected bar.
   const plateShown = plate && selection && plate.index === selection.index && plate.part === selection.part ? plate : null;
@@ -299,14 +334,16 @@ function Bars({ buckets, todayIndex, granularity, mode, colorOf, selection, onSe
       granularity={granularity}
       itemWidth={itemWidth}
       peak={peakShared}
-      selectedPart={!selection ? undefined : selection.index === index ? selection.part : "none"}
+      selectedPart={selection?.index === index ? selection.part : undefined}
+      selectedIndex={selectedIndex}
       colorOf={colorOf}
-      onBarPress={onBarPress}
     />
   );
 
   return (
     <View>
+      <GestureDetector gesture={tap}>
+      <View>
       <FlatList
         data={buckets}
         horizontal
@@ -323,6 +360,10 @@ function Bars({ buckets, todayIndex, granularity, mode, colorOf, selection, onSe
         // Off-screen periods aren't drawn by the system while scrolling (Android).
         removeClippedSubviews
         extraData={selection}
+        onContentSizeChange={(width) => {
+          contentWidth.current = width;
+          setRestX((current) => Math.min(current, Math.max(0, width - viewport)));
+        }}
         onScrollBeginDrag={() => setPlate(null)}
         onScroll={(event) => {
           scrollX.current = event.nativeEvent.contentOffset.x;
@@ -330,6 +371,8 @@ function Bars({ buckets, todayIndex, granularity, mode, colorOf, selection, onSe
         }}
         scrollEventThrottle={32}
       />
+      </View>
+      </GestureDetector>
       {plateShown && (
         <View
           pointerEvents="none"
