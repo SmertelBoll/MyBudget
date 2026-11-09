@@ -36,4 +36,4 @@ export const supportSchema = z.object({
   screenshotPhotoId: z.string().trim().min(1).max(64).optional(),
 });
 
-export const renameSessionSchema = z.object({ name: z.string().trim().min(1).max(60) });
+export const renameSessionSchema = z.object({ name: z.string().trim().min(1).max(60).nullable() });

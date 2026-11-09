@@ -23,6 +23,9 @@ type Session = {
   createdAt: string;
   lastActiveAt: string;
   isCurrent: boolean;
+  // The name the device reported; deviceName is the user's own name when renamed.
+  originalName?: string;
+  renamed?: boolean;
 };
 
 const PLATFORM_ICON = { ios: "apple-ios", android: "android", web: "web", other: "devices" } as const;
@@ -138,7 +141,29 @@ export default function SessionsScreen() {
     }
   };
 
+  const saveName = async (session: Session, name: string | null) => {
+    try {
+      await api.patch("/sessions/" + session.id, { name });
+      const shown = name ?? session.originalName ?? session.deviceName;
+      setSessions((list) => list?.map((item) => (item.id === session.id ? { ...item, deviceName: shown, renamed: name !== null } : item)) ?? null);
+    } catch (error) {
+      fail(error);
+    }
+  };
+
+  // A renamed session also offers to go back to the device's own name.
   const rename = async (session: Session) => {
+    if (session.renamed) {
+      const choice = await dialog.choose({
+        title: session.deviceName,
+        options: [
+          { value: "rename", label: t("sessions.rename") },
+          { value: "reset", label: t("sessions.resetName", { name: session.originalName || t("sessions.unknownDevice") }) },
+        ],
+      });
+      if (choice === "reset") return saveName(session, null);
+      if (choice !== "rename") return;
+    }
     const name = await dialog.prompt({
       title: t("sessions.rename"),
       label: t("sessions.name"),
@@ -146,12 +171,7 @@ export default function SessionsScreen() {
       maxLength: 60,
     });
     if (!name || name === session.deviceName) return;
-    try {
-      await api.patch("/sessions/" + session.id, { name });
-      setSessions((list) => list?.map((item) => (item.id === session.id ? { ...item, deviceName: name } : item)) ?? null);
-    } catch (error) {
-      fail(error);
-    }
+    await saveName(session, name);
   };
 
   const endOthers = async () => {

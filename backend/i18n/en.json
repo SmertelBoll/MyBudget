@@ -694,5 +694,6 @@
   "support.queued": "No connection: the message will be sent when you're online",
   "settings.noAccountHint": "Choose the account in each entry",
   "sessions.rename": "Rename",
-  "sessions.name": "Device name"
+  "sessions.name": "Device name",
+  "sessions.resetName": "Back to “{{name}}”"
 }

@@ -685,5 +685,6 @@
   "support.queued": "Немає мережі: повідомлення надішлеться, щойно з’явиться інтернет",
   "settings.noAccountHint": "Рахунок обирається в кожному записі",
   "sessions.rename": "Перейменувати",
-  "sessions.name": "Назва пристрою"
+  "sessions.name": "Назва пристрою",
+  "sessions.resetName": "Повернути «{{name}}»"
 }

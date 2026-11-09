@@ -140,15 +140,25 @@ export const createBackup = async (user: User) => {
 export class BackupFileError extends Error {}
 
 // Reads and checks a backup before anything is sent: the server checks every record again.
+// Takes the ZIP as made, a ZIP someone repacked (data.json inside a folder), or data.json on its own (then without
+// photos).
 export const readBackup = (bytes: Uint8Array) => {
   let entries: Record<string, Uint8Array>;
-  try {
-    entries = unzipSync(bytes);
-  } catch {
-    throw new BackupFileError("backup.notZip");
+  // "{" (after an optional UTF-8 BOM and whitespace): a plain JSON file.
+  const start = bytes.findIndex((byte) => byte !== 0xef && byte !== 0xbb && byte !== 0xbf && byte !== 0x20 && byte !== 0x0a && byte !== 0x0d && byte !== 0x09);
+  if (bytes[start] === 0x7b) {
+    entries = { "data.json": bytes.subarray(start) };
+  } else {
+    try {
+      entries = unzipSync(bytes);
+    } catch {
+      throw new BackupFileError("backup.notZip");
+    }
   }
-  const json = entries["data.json"];
+  const dataPath = Object.keys(entries).find((path) => path === "data.json" || path.endsWith("/data.json"));
+  const json = dataPath ? entries[dataPath] : undefined;
   if (!json) throw new BackupFileError("backup.noData");
+  const root = dataPath!.slice(0, -"data.json".length);
   let data: BackupFile;
   try {
     data = JSON.parse(strFromU8(json));
@@ -158,8 +168,8 @@ export const readBackup = (bytes: Uint8Array) => {
   if (data?.schemaVersion !== BACKUP_SCHEMA_VERSION) throw new BackupFileError("backup.version");
   if (!data.collections || typeof data.collections !== "object") throw new BackupFileError("backup.noData");
   const photos = Object.entries(entries)
-    .filter(([path]) => path.startsWith(PHOTO_DIR) && path.endsWith(".jpg"))
-    .map(([path, content]) => ({ id: path.slice(PHOTO_DIR.length, -4), bytes: content }));
+    .filter(([path]) => path.startsWith(root + PHOTO_DIR) && path.endsWith(".jpg"))
+    .map(([path, content]) => ({ id: path.slice(root.length + PHOTO_DIR.length, -4), bytes: content }));
   const count = Object.values(data.collections).reduce((sum, items) => sum + (Array.isArray(items) ? items.length : 0), 0);
   return { data, photos, count, transactions: data.collections.transactions?.length ?? 0, createdAt: data.createdAt };
 };

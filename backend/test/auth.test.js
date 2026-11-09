@@ -146,6 +146,12 @@ describe("rename a session", () => {
     assert.equal(foreign.status, 404);
     const empty = await http.patch("/sessions/" + mine.sessionId, { name: " " }, mine.accessToken);
     assert.equal(empty.status, 400);
+
+    await http.patch("/sessions/" + mine.sessionId, { name: null }, mine.accessToken);
+    const reset = await http.get("/sessions", mine.accessToken);
+    const current = reset.body.sessions.find((s) => s.isCurrent);
+    assert.equal(current.deviceName, "Galaxy S24");
+    assert.equal(current.renamed, false);
   });
 });
 

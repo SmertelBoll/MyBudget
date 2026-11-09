@@ -9,6 +9,8 @@ const SessionSchema = new mongoose.Schema(
     prevRefreshTokenHash: { type: String, default: null },
     deviceId: { type: String, default: "" },
     deviceName: { type: String, default: "" },
+    // Set by the user in the sessions list; null shows the device's own name again.
+    customName: { type: String, default: null },
     platform: { type: String, default: "other" },
     appVersion: { type: String, default: "" },
     ip: { type: String, default: "" },
@@ -24,7 +26,10 @@ const SessionSchema = new mongoose.Schema(
 SessionSchema.methods.toPublic = function (currentSessionId) {
   return {
     id: this._id,
-    deviceName: this.deviceName,
+    deviceName: this.customName || this.deviceName,
+    // The name the device reported, shown when a custom one is reset.
+    originalName: this.deviceName,
+    renamed: Boolean(this.customName),
     platform: this.platform,
     appVersion: this.appVersion,
     location: this.location,
