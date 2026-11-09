@@ -61,7 +61,8 @@
     "lint": "expo lint",
     "i18n:copy": "node scripts/copy-i18n.js",
     "typecheck": "tsc --noEmit",
-    "skia:web": "setup-skia-web public"
+    "skia:web": "setup-skia-web public",
+    "test:receipt": "node --experimental-strip-types --no-warnings scripts/receipt-parser.test.mts"
   },
   "private": true
 }

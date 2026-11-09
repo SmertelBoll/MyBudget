@@ -2,7 +2,7 @@ import { useMemo, useRef, useState } from "react";
 import { View } from "react-native";
 import { KeyboardAwareScrollView, type KeyboardAwareScrollViewRef } from "react-native-keyboard-controller";
 import { KEYBOARD_GAP } from "@/utils/keyboard";
-import { useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import type { EntryType } from "@/api/types";
 import { useAuth } from "@/auth/AuthProvider";
 import { categoryName } from "@/data/categories";
@@ -260,7 +260,14 @@ function TransactionForm({ initial, existingId }: { initial: FormValues; existin
       <ScreenHeader
         title={t(existing ? "entry.editTitle" : "entry.addTitle")}
         left="back"
-        right={existing ? <IconButton icon="trash-can-outline" label={t("common.delete")} onPress={remove} /> : undefined}
+        right={
+          existing ? (
+            <IconButton icon="trash-can-outline" label={t("common.delete")} onPress={remove} />
+          ) : (
+            // A receipt photo instead: each of its lines becomes an expense.
+            <IconButton icon="receipt-text-outline" label={t("receipt.scan")} onPress={() => router.replace("/receipt")} />
+          )
+        }
       >
         <View style={{ paddingHorizontal: spacing.md, paddingTop: spacing.xs }}>
           <SegmentedSwitch

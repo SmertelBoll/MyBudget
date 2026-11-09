@@ -27,7 +27,11 @@ const purgeTombstones = async () => {
     .select("userId photos")
     .lean();
   for (const { userId, photos } of deletedTransactions) {
-    const records = await PhotoModel.find({ _id: { $in: photos }, userId }).lean();
+    // One receipt photo can belong to several entries: it stays while any entry that isn't deleted still has it.
+    const stillUsed = await TransactionModel.distinct("photos", { userId, deletedAt: null, photos: { $in: photos } });
+    const unused = photos.filter((id) => !stillUsed.includes(id));
+    if (!unused.length) continue;
+    const records = await PhotoModel.find({ _id: { $in: unused }, userId }).lean();
     await Promise.all(records.map((photo) => destroyImage(photo.publicId)));
     await PhotoModel.deleteMany({ _id: { $in: records.map((photo) => photo._id) } });
   }

@@ -1,14 +1,13 @@
 import { useEffect, useState } from "react";
 import { ActivityIndicator, Image, Pressable, View } from "react-native";
-import * as ImagePicker from "expo-image-picker";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { MAX_PHOTOS, addPhoto, photoSource } from "@/data/photos";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTheme } from "@/theme/ThemeProvider";
 import { radius, spacing } from "@/theme/tokens";
-import { useDialog } from "../AppDialog";
 import { AppText } from "../AppText";
 import { useToast } from "../Toast";
+import { usePickImage } from "@/utils/usePickImage";
 
 const SIZE = 96;
 
@@ -74,29 +73,12 @@ export function PhotoStrip({
 }) {
   const { colors } = useTheme();
   const { t } = useI18n();
-  const dialog = useDialog();
   const toast = useToast();
+  const pickImage = usePickImage();
   const [busy, setBusy] = useState(false);
 
   const pick = async () => {
-    const source = await dialog.choose({
-      title: t("photos.add"),
-      options: [
-        { value: "camera", label: t("photos.camera") },
-        { value: "library", label: t("photos.library") },
-      ],
-    });
-    if (!source) return;
-
-    const permission =
-      source === "camera" ? await ImagePicker.requestCameraPermissionsAsync() : await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!permission.granted) {
-      toast.show(t("photos.permissionDenied"), { kind: "error" });
-      return;
-    }
-    const options: ImagePicker.ImagePickerOptions = { mediaTypes: ["images"], quality: 1 };
-    const result = source === "camera" ? await ImagePicker.launchCameraAsync(options) : await ImagePicker.launchImageLibraryAsync(options);
-    const asset = result.canceled ? null : result.assets[0];
+    const asset = await pickImage(t("photos.add"));
     if (!asset) return;
 
     setBusy(true);
