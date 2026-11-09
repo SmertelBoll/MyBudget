@@ -5,12 +5,22 @@ import { useTheme } from "@/theme/ThemeProvider";
 import { radius, spacing } from "@/theme/tokens";
 import { AppText } from "../AppText";
 
-export function SettingsCard({ title, children }: { title: string; children: ReactNode }) {
+// flush: no inner padding, for a card of SettingsLink rows, so a pressed row lights up edge to edge.
+export function SettingsCard({ title, children, flush }: { title: string; children: ReactNode; flush?: boolean }) {
   const { colors } = useTheme();
   return (
     <View style={{ gap: spacing.sm }}>
       <AppText variant="heading">{title}</AppText>
-      <View style={{ backgroundColor: colors.surface, borderRadius: radius.md, padding: spacing.md, gap: spacing.md }}>{children}</View>
+      <View
+        style={{
+          backgroundColor: colors.surface,
+          borderRadius: radius.md,
+          overflow: "hidden",
+          ...(flush ? {} : { padding: spacing.md, gap: spacing.md }),
+        }}
+      >
+        {children}
+      </View>
     </View>
   );
 }
@@ -43,10 +53,9 @@ export function SettingsLink({
         flexDirection: "row",
         alignItems: "center",
         gap: spacing.md,
-        minHeight: 48,
-        marginHorizontal: -spacing.sm,
-        paddingHorizontal: spacing.sm,
-        borderRadius: radius.md,
+        minHeight: 56,
+        paddingHorizontal: spacing.md,
+        paddingVertical: spacing.sm,
         backgroundColor: pressed ? colors.selected : "transparent",
         opacity: disabled ? 0.5 : 1,
       })}

@@ -695,5 +695,8 @@
   "settings.noAccountHint": "Choose the account in each entry",
   "sessions.rename": "Rename",
   "sessions.name": "Device name",
-  "sessions.resetName": "Back to “{{name}}”"
+  "sessions.resetName": "Back to “{{name}}”",
+  "data.saveToDevice": "Save on this device",
+  "data.share": "Share…",
+  "data.savedTo": "Saved to “{{folder}}”"
 }

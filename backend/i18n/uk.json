@@ -686,5 +686,8 @@
   "settings.noAccountHint": "Рахунок обирається в кожному записі",
   "sessions.rename": "Перейменувати",
   "sessions.name": "Назва пристрою",
-  "sessions.resetName": "Повернути «{{name}}»"
+  "sessions.resetName": "Повернути «{{name}}»",
+  "data.saveToDevice": "Зберегти на пристрої",
+  "data.share": "Поділитися…",
+  "data.savedTo": "Збережено в «{{folder}}»"
 }

@@ -147,7 +147,7 @@ export default function SettingsScreen() {
 
         <DataSection />
 
-        <SettingsCard title={t("settings.security")}>
+        <SettingsCard title={t("settings.security")} flush>
           <SettingsLink icon="cellphone-link" label={t("sessions.title")} hint={t("sessions.hint")} onPress={() => router.push("/sessions")} />
         </SettingsCard>
       </ScrollView>
