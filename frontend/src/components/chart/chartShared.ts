@@ -73,8 +73,13 @@ export const spanText = (buckets: Bucket[], first: number, last: number, granula
   return fromYear === toYear ? `${month(firstStart)} – ${monthYear(lastStart)}` : `${monthYear(firstStart)} – ${monthYear(lastStart)}`;
 };
 
-export const generalGap = (itemWidth: number) => (itemWidth - GENERAL_BAR * 3) / 4;
+// Worklets: the canvas calls them on the UI thread while drawing.
+export const generalGap = (itemWidth: number) => {
+  "worklet";
+  return (itemWidth - GENERAL_BAR * 3) / 4;
+};
 export const generalCenter = (itemWidth: number, position: number) => {
+  "worklet";
   const gap = generalGap(itemWidth);
   return gap + position * (GENERAL_BAR + gap) + GENERAL_BAR / 2;
 };
