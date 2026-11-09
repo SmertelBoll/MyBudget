@@ -10,7 +10,8 @@
         "buildType": "apk"
       },
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://mybudget-api-uqdt.onrender.com"
+        "EXPO_PUBLIC_API_URL": "https://mybudget-api-uqdt.onrender.com",
+        "ORG_GRADLE_PROJECT_reactNativeArchitectures": "arm64-v8a"
       }
     },
     "production": {
