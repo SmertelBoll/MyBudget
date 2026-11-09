@@ -689,5 +689,7 @@
   "sessions.resetName": "Повернути «{{name}}»",
   "data.saveToDevice": "Зберегти на пристрої",
   "data.share": "Поділитися…",
-  "data.savedTo": "Збережено в «{{folder}}»"
+  "data.savedTo": "Збережено в «{{folder}}»",
+  "data.restoring": "Відновлення бекапу…",
+  "data.deleting": "Видалення всіх даних…"
 }

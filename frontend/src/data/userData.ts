@@ -190,7 +190,9 @@ export const restoreBackup = async (backup: ReturnType<typeof readBackup>, step:
   await startOver(user);
   step("photos");
   for (const photo of photos) await storePhotoBytes(photoIds[photo.id] ?? photo.id, photo.bytes);
-  requestSync();
+  // Waits for the download from the server, so the app is whole again when this returns.
+  step("download");
+  await requestSync();
   return user;
 };
 
@@ -208,7 +210,7 @@ const startOver = async (user: User) => {
 export const deleteAllData = async () => {
   const { user } = await api.del<{ user: User }>("/data/all");
   await startOver(user);
-  requestSync();
+  await requestSync();
   return user;
 };
 

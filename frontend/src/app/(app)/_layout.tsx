@@ -3,6 +3,7 @@ import { useAuth } from "@/auth/AuthProvider";
 import { DataProvider } from "@/data/DataProvider";
 import "@/data/debug";
 import { RecurringRunner } from "@/notifications/RecurringRunner";
+import { BlockingOverlay } from "@/components/BlockingOverlay";
 import { useTheme } from "@/theme/ThemeProvider";
 
 // Signed-in part of the app: the local data layer around everything. The drawer screens sit at the bottom of this
@@ -18,6 +19,7 @@ export default function AppLayout() {
       <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background } }}>
         <Stack.Screen name="(drawer)" />
       </Stack>
+      <BlockingOverlay />
     </DataProvider>
   );
 }

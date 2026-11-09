@@ -698,5 +698,7 @@
   "sessions.resetName": "Back to “{{name}}”",
   "data.saveToDevice": "Save on this device",
   "data.share": "Share…",
-  "data.savedTo": "Saved to “{{folder}}”"
+  "data.savedTo": "Saved to “{{folder}}”",
+  "data.restoring": "Restoring the backup…",
+  "data.deleting": "Deleting all data…"
 }

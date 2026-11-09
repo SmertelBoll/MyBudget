@@ -10,6 +10,7 @@ import { formatLongDate, toLocalDate } from "@/utils/dates";
 import { canSaveToDevice, pickFile, saveFileToDevice, shareFile } from "@/utils/files";
 import { AppText } from "../AppText";
 import { useDialog } from "../AppDialog";
+import { whileBlocking } from "../BlockingOverlay";
 import { useToast } from "../Toast";
 import { SettingsCard, SettingsLink } from "./SettingsCard";
 
@@ -102,7 +103,7 @@ export function DataSection() {
         destructive: true,
       });
       if (!ok) return;
-      acceptUser(await restoreBackup(backupFile, step));
+      acceptUser(await whileBlocking(t("data.restoring"), () => restoreBackup(backupFile, step)));
       toast.show(t("data.restored"));
     });
 
@@ -138,7 +139,7 @@ export function DataSection() {
     });
     if (!final) return;
     await run("delete", async () => {
-      acceptUser(await deleteAllData());
+      acceptUser(await whileBlocking(t("data.deleting"), deleteAllData));
       toast.show(t("data.deleted"));
     });
   };
