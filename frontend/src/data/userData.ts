@@ -58,7 +58,7 @@ export const TRANSFER_WIDTHS = [12, 20, 14, 9, 20, 14, 9, 10, 30];
 
 // Q10: the transfers shown in the transfer history (its period or search), as one sheet.
 export const exportTransfers = (transfers: Transfer[], t: Translate, label: string): OutputFile => ({
-  name: `MyBudget-${t("export.transfers")}-${label}.xlsx`.replace(/[\/:*?"<>|]/g, "-"),
+  name: safeName(`MyBudget-${t("export.transfers")}-${label}.xlsx`),
   bytes: buildXlsx([{ name: t("export.transfers"), rows: transferRows(transfers, t), widths: TRANSFER_WIDTHS }]),
   mimeType: XLSX_MIME,
 });
@@ -68,9 +68,11 @@ export const exportTransfers = (transfers: Transfer[], t: Translate, label: stri
 // The file only; the screen decides where it goes (saved on the device or shared).
 export type OutputFile = { name: string; bytes: Uint8Array; mimeType: string };
 
-export const exportToExcel = (t: Translate): OutputFile => {
+const TRANSACTION_WIDTHS = [12, 20, 20, 24, 14, 9, 14, 9, 10, 30, 20];
+
+// One row per entry with every field: both amounts and the rate (spec 13.4).
+const transactionRows = (transactions: Transaction[], t: Translate): Cell[][] => {
   const { accounts, categories, tags } = lookups(t);
-  const transactions = getSnapshot("transactions");
   const header = [
     t("export.date"),
     t("export.account"),
@@ -84,9 +86,9 @@ export const exportToExcel = (t: Translate): OutputFile => {
     t("export.comment"),
     t("export.photos"),
   ];
-  const rows = (type: Transaction["type"]): Cell[][] => [
+  return [
     header,
-    ...byDate(transactions.filter((tx) => tx.type === type)).map((tx) => {
+    ...byDate(transactions).map((tx) => {
       const account = accounts.get(tx.accountId);
       return [
         tx.date,
@@ -103,7 +105,22 @@ export const exportToExcel = (t: Translate): OutputFile => {
       ];
     }),
   ];
-  const widths = [12, 20, 20, 24, 14, 9, 14, 9, 10, 30, 20];
+};
+
+// File names can't hold \ / : * ? " < > |
+const safeName = (name: string) => name.replace(/[\\/:*?"<>|]/g, "-");
+
+// The entries shown in the transaction log (its type, accounts, period, category or tag, search), as one sheet.
+export const exportTransactions = (transactions: Transaction[], t: Translate, sheet: string, label: string): OutputFile => ({
+  name: safeName(`MyBudget-${sheet}-${label}.xlsx`),
+  bytes: buildXlsx([{ name: sheet, rows: transactionRows(transactions, t), widths: TRANSACTION_WIDTHS }]),
+  mimeType: XLSX_MIME,
+});
+
+export const exportToExcel = (t: Translate): OutputFile => {
+  const transactions = getSnapshot("transactions");
+  const rows = (type: Transaction["type"]) => transactionRows(transactions.filter((tx) => tx.type === type), t);
+  const widths = TRANSACTION_WIDTHS;
   const bytes = buildXlsx([
     { name: t("entries.expenses"), rows: rows("expense"), widths },
     { name: t("entries.income"), rows: rows("income"), widths },

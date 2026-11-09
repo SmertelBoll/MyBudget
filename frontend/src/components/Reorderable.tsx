@@ -1,13 +1,16 @@
-import { useRef, useState, type ReactNode } from "react";
-import { type LayoutRectangle, type StyleProp, type ViewStyle } from "react-native";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import { View, type LayoutRectangle, type StyleProp, type ViewStyle } from "react-native";
 import { GestureDetector, usePanGesture } from "react-native-gesture-handler";
-import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
+import Animated, { useAnimatedStyle, useSharedValue, withTiming, type SharedValue } from "react-native-reanimated";
 
-// Spec 5.1, 7.1: a long press lifts an item, it follows the finger, the others make room, letting go puts it there.
-// Works for a column (accounts) and a wrapping grid (categories): the place is found from the items' measured
-// rectangles, not from a fixed row height.
+// Spec 5.1, 7.1: a long press lifts an item, it follows the finger, the others slide to make room, letting go puts
+// it there. Works for a column (accounts) and a wrapping grid (categories).
+// Nothing is laid out again while the finger moves: every place ("slot") is measured once when the item is lifted,
+// the lifted item is moved by the finger's travel and the others are shifted into their new slots. The new order is
+// saved on release, and only then does the list lay itself out again.
 
 const LIFT_AFTER_MS = 300;
+const SHIFT_MS = 160;
 
 type Props<T> = {
   items: T[];
@@ -22,123 +25,130 @@ type Props<T> = {
   itemStyle?: StyleProp<ViewStyle>;
 };
 
-type Drag = { key: string; origin: LayoutRectangle; dx: number; dy: number };
+type Shift = { x: SharedValue<number>; y: SharedValue<number> };
+type Drag = { from: number; to: number; slots: LayoutRectangle[] };
+
+const inside = (x: number, y: number, rect: LayoutRectangle) => x >= rect.x && x <= rect.x + rect.width && y >= rect.y && y <= rect.y + rect.height;
+
+// Where an item at `index` ends up when the one at `from` moves to `to`.
+const newIndex = (index: number, from: number, to: number) => {
+  if (index === from) return to;
+  if (from < to && index > from && index <= to) return index - 1;
+  if (to < from && index >= to && index < from) return index + 1;
+  return index;
+};
 
 export function Reorderable<T>({ items, keyOf, renderItem, onReorder, onDragChange, style, itemStyle }: Props<T>) {
-  // The live order while dragging, and the items it was made from: once the saved order arrives (new items), it's
-  // dropped by itself. The ref is what the gesture callbacks read.
-  const [live, setLive] = useState<{ keys: string[]; from: T[] } | null>(null);
-  const liveRef = useRef<string[] | null>(null);
-  const setOrder = (keys: string[] | null) => {
-    liveRef.current = keys;
-    setLive(keys ? { keys, from: items } : null);
-  };
+  const keys = items.map(keyOf);
   const [dragKey, setDragKey] = useState<string | null>(null);
   const layouts = useRef(new Map<string, LayoutRectangle>());
+  const [shifts] = useState(() => new Map<string, Shift>());
   const drag = useRef<Drag | null>(null);
-  // Right after a move the measured rectangles are the old ones until the items are laid out again; testing
-  // against them would swap the same two items back and forth.
-  const settling = useRef<ReturnType<typeof setTimeout> | null>(null);
   const tx = useSharedValue(0);
   const ty = useSharedValue(0);
   const lift = useSharedValue(0);
 
-  const byKey = new Map(items.map((item) => [keyOf(item), item]));
-  const order = live && (dragKey || live.from === items) ? live.keys : null;
-  const keys = (order ?? items.map(keyOf)).filter((key) => byKey.has(key));
-
-  // Where the lifted item is drawn: its first place plus the finger's travel, minus the slot it sits in now.
-  const place = () => {
-    const current = drag.current;
-    const slot = current && layouts.current.get(current.key);
-    if (!current || !slot) return;
-    tx.set(current.origin.x + current.dx - slot.x);
-    ty.set(current.origin.y + current.dy - slot.y);
+  const shiftOthers = (current: Drag) => {
+    keys.forEach((key, index) => {
+      if (index === current.from) return;
+      const shift = shifts.get(key);
+      if (!shift) return;
+      const target = current.slots[newIndex(index, current.from, current.to)];
+      const own = current.slots[index];
+      shift.x.set(withTiming(target.x - own.x, { duration: SHIFT_MS }));
+      shift.y.set(withTiming(target.y - own.y, { duration: SHIFT_MS }));
+    });
   };
 
   const start = (key: string) => {
-    const origin = layouts.current.get(key);
-    if (!origin) return;
-    drag.current = { key, origin, dx: 0, dy: 0 };
-    setOrder(items.map(keyOf));
-    setDragKey(key);
+    const slots = keys.map((k) => layouts.current.get(k));
+    const from = keys.indexOf(key);
+    if (from < 0 || slots.some((slot) => !slot)) return;
+    drag.current = { from, to: from, slots: slots as LayoutRectangle[] };
+    tx.set(0);
+    ty.set(0);
     lift.set(withTiming(1, { duration: 120 }));
+    setDragKey(key);
     onDragChange?.(true);
   };
 
   const move = (dx: number, dy: number) => {
     const current = drag.current;
     if (!current) return;
-    current.dx = dx;
-    current.dy = dy;
-    place();
-    if (settling.current) return;
-    // The item under the lifted one's center takes its place in the order.
-    const cx = current.origin.x + dx + current.origin.width / 2;
-    const cy = current.origin.y + dy + current.origin.height / 2;
-    const list = liveRef.current ?? items.map(keyOf);
-    const target = list.find((key) => {
-      if (key === current.key) return false;
-      const rect = layouts.current.get(key);
-      return rect && cx >= rect.x && cx <= rect.x + rect.width && cy >= rect.y && cy <= rect.y + rect.height;
-    });
-    if (!target) return;
-    const next = list.filter((key) => key !== current.key);
-    next.splice(list.indexOf(target), 0, current.key);
-    setOrder(next);
-    settling.current = setTimeout(() => {
-      settling.current = null;
-    }, 120);
+    tx.set(dx);
+    ty.set(dy);
+    // The slot under the lifted item's center is where it would go.
+    const own = current.slots[current.from];
+    const cx = own.x + dx + own.width / 2;
+    const cy = own.y + dy + own.height / 2;
+    const to = current.slots.findIndex((slot) => inside(cx, cy, slot));
+    if (to < 0 || to === current.to) return;
+    current.to = to;
+    shiftOthers(current);
   };
 
   const end = () => {
     const current = drag.current;
     if (!current) return;
     drag.current = null;
-    const final = liveRef.current ?? items.map(keyOf);
-    const changed = final.some((key, index) => key !== keyOf(items[index]));
-    tx.set(withTiming(0, { duration: 150 }));
-    ty.set(withTiming(0, { duration: 150 }));
-    lift.set(withTiming(0, { duration: 150 }));
-    setDragKey(null);
+    const { from, to, slots } = current;
+    lift.set(withTiming(0, { duration: 120 }));
     onDragChange?.(false);
-    if (changed) onReorder(final);
-    else setOrder(null);
+    if (from === to) {
+      tx.set(withTiming(0, { duration: SHIFT_MS }));
+      ty.set(withTiming(0, { duration: SHIFT_MS }));
+      setTimeout(() => setDragKey(null), SHIFT_MS);
+      return;
+    }
+    // Glides into its new slot; then the saved order lays the list out and every shift goes back to zero.
+    tx.set(withTiming(slots[to].x - slots[from].x, { duration: SHIFT_MS }));
+    ty.set(withTiming(slots[to].y - slots[from].y, { duration: SHIFT_MS }));
+    const order = [...keys];
+    const [moved] = order.splice(from, 1);
+    order.splice(to, 0, moved);
+    setTimeout(() => {
+      onReorder(order);
+      setDragKey(null);
+      tx.set(0);
+      ty.set(0);
+      shifts.forEach((shift) => {
+        shift.x.set(0);
+        shift.y.set(0);
+      });
+    }, SHIFT_MS);
   };
 
   return (
-    <Animated.View style={style}>
-      {keys.map((key) => (
-        <Item
-          key={key}
-          dragging={key === dragKey}
-          style={itemStyle}
-          tx={tx}
-          ty={ty}
-          lift={lift}
-          onLayout={(rect) => {
-            layouts.current.set(key, rect);
-            if (drag.current?.key === key) {
-              place();
-              if (settling.current) clearTimeout(settling.current);
-              settling.current = null;
-            }
-          }}
-          onStart={() => start(key)}
-          onMove={move}
-          onEnd={end}
-        >
-          {renderItem(byKey.get(key)!, { dragging: key === dragKey })}
-        </Item>
-      ))}
-    </Animated.View>
+    <View style={style}>
+      {items.map((item) => {
+        const key = keyOf(item);
+        return (
+          <Item
+            key={key}
+            id={key}
+            registry={shifts}
+            dragging={key === dragKey}
+            style={itemStyle}
+            tx={tx}
+            ty={ty}
+            lift={lift}
+            onLayout={(rect) => layouts.current.set(key, rect)}
+            onStart={() => start(key)}
+            onMove={move}
+            onEnd={end}
+          >
+            {renderItem(item, { dragging: key === dragKey })}
+          </Item>
+        );
+      })}
+    </View>
   );
 }
 
-type Shared = ReturnType<typeof useSharedValue<number>>;
-
 function Item({
   children,
+  id,
+  registry,
   dragging,
   style,
   tx,
@@ -150,16 +160,28 @@ function Item({
   onEnd,
 }: {
   children: ReactNode;
+  id: string;
+  // Where the list finds this item's shift to move it aside while another one is dragged.
+  registry: Map<string, Shift>;
   dragging: boolean;
   style?: StyleProp<ViewStyle>;
-  tx: Shared;
-  ty: Shared;
-  lift: Shared;
+  tx: SharedValue<number>;
+  ty: SharedValue<number>;
+  lift: SharedValue<number>;
   onLayout: (rect: LayoutRectangle) => void;
   onStart: () => void;
   onMove: (dx: number, dy: number) => void;
   onEnd: () => void;
 }) {
+  const sx = useSharedValue(0);
+  const sy = useSharedValue(0);
+  useEffect(() => {
+    registry.set(id, { x: sx, y: sy });
+    return () => {
+      registry.delete(id);
+    };
+  }, [registry, id, sx, sy]);
+
   const pan = usePanGesture({
     runOnJS: true,
     activateAfterLongPress: LIFT_AFTER_MS,
@@ -175,10 +197,10 @@ function Item({
     dragging
       ? {
           zIndex: 10,
-          transform: [{ translateX: tx.get() }, { translateY: ty.get() }, { scale: 1 + lift.get() * 0.04 }],
+          transform: [{ translateX: tx.get() }, { translateY: ty.get() }, { scale: 1 + lift.get() * 0.05 }],
           opacity: 1 - lift.get() * 0.1,
         }
-      : { zIndex: 0, transform: [{ translateX: 0 }, { translateY: 0 }, { scale: 1 }], opacity: 1 }
+      : { zIndex: 0, transform: [{ translateX: sx.get() }, { translateY: sy.get() }, { scale: 1 }], opacity: 1 }
   );
 
   return (

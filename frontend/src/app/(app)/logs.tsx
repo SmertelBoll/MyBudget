@@ -22,6 +22,9 @@ import { AppText } from "@/components/AppText";
 import { Fab } from "@/components/Fab";
 import { HeaderSearchInput } from "@/components/HeaderSearchInput";
 import { IconButton } from "@/components/IconButton";
+import { exportTransactions } from "@/data/userData";
+import { fileDate } from "@/utils/files";
+import { useDeliverFile } from "@/utils/useDeliverFile";
 import { LogRow } from "@/components/LogRow";
 import { PeriodSwitcher } from "@/components/PeriodSwitcher";
 import { ScreenHeader } from "@/components/ScreenHeader";
@@ -118,6 +121,14 @@ export default function LogsScreen() {
     return [...groups].map(([date, data]) => ({ date, data }));
   }, [rows, sort]);
 
+  // What's on the screen right now (filters, period or search) goes to Excel.
+  const deliver = useDeliverFile();
+  const exportShown = () => {
+    const sheet = t(type === "income" ? "entries.income" : "entries.expenses");
+    const label = needle ? fileDate() : `${range.start}_${range.end}`;
+    deliver(exportTransactions(rows.map((row) => row.tx), t, sheet, label)).catch((error) => console.warn("entries export failed:", error));
+  };
+
   const onlyCategoryRecord = onlyCategory ? categoryById.get(onlyCategory) : undefined;
   const tagTitle = onlyTag ? (onlyTag === NO_TAG ? t("home.noTag") : (tagById.get(onlyTag)?.name ?? "?")) : null;
   const narrowTitle = [
@@ -174,14 +185,17 @@ export default function LogsScreen() {
           )
         }
         right={
-          <IconButton
-            icon={searching ? "close" : "magnify"}
-            label={t(searching ? "common.close" : "logs.search")}
-            onPress={() => {
-              setSearching(!searching);
-              setQuery("");
-            }}
-          />
+          <View style={{ flexDirection: "row" }}>
+            {!searching && <IconButton icon="download" label={t("transfers.export")} onPress={exportShown} />}
+            <IconButton
+              icon={searching ? "close" : "magnify"}
+              label={t(searching ? "common.close" : "logs.search")}
+              onPress={() => {
+                setSearching(!searching);
+                setQuery("");
+              }}
+            />
+          </View>
         }
       >
         {!narrowed && (
