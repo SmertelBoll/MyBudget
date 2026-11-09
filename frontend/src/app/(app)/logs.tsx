@@ -252,7 +252,8 @@ export default function LogsScreen() {
                   {t("logs.total", { amount: money(total, baseCurrency, true) })}
                 </AppText>
               )}
-              <LogFilter type={type} value={narrow} onChange={setNarrow} />
+              <LogFilter kind="categories" type={type} value={narrow} onChange={setNarrow} />
+              <LogFilter kind="tags" type={type} value={narrow} onChange={setNarrow} />
               <SortMenu value={sort} onChange={setSort} />
             </View>
           </View>

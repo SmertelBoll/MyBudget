@@ -21,6 +21,10 @@ type Props = {
   children?: ReactNode;
 };
 
+// With a centered block (Transactions, Home) both sides get this same width, so the block sits in the middle of the
+// screen even with one button on the left and two on the right. Fits two header icons.
+const SIDE = 80;
+
 // One header for every screen (spec 2.9): rounded bottom corners, safe-area aware.
 export function ScreenHeader({ title, center, left = "menu", onBack, right, children }: Props) {
   const { colors } = useTheme();
@@ -45,6 +49,7 @@ export function ScreenHeader({ title, center, left = "menu", onBack, right, chil
       }}
     >
       <View style={{ flexDirection: "row", alignItems: "center", minHeight: 48, paddingHorizontal: spacing.sm }}>
+        <View style={center ? { width: SIDE, flexDirection: "row" } : undefined}>
         {left !== "none" && (
           <Pressable
             onPress={onLeft}
@@ -56,14 +61,15 @@ export function ScreenHeader({ title, center, left = "menu", onBack, right, chil
             <MaterialCommunityIcons name={left === "menu" ? "menu" : "arrow-left"} size={26} color={colors.text} />
           </Pressable>
         )}
+        </View>
         {center ? (
-          <View style={{ flex: 1, alignItems: "center", marginHorizontal: spacing.sm }}>{center}</View>
+          <View style={{ flex: 1, alignItems: "center" }}>{center}</View>
         ) : (
           <AppText variant="title" numberOfLines={1} style={{ flex: 1, marginHorizontal: spacing.sm }}>
             {title}
           </AppText>
         )}
-        {right}
+        {center ? <View style={{ width: SIDE, flexDirection: "row", justifyContent: "flex-end" }}>{right}</View> : right}
       </View>
       {children}
     </View>

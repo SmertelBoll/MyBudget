@@ -25,22 +25,20 @@ const STACKED_BAR = 30;
 const SETTLE_MS = 160;
 const GROW_MS = 320;
 
-// Bars are plain views drawn once against the scale ("base") the chart had when the period appeared. When the scale
-// changes, the period's whole bar area is stretched or squeezed from the bottom on the UI thread: one animated view
-// per period instead of one per bar, and nothing is drawn again in JS. Bars that outgrow the area are cut at its top.
-const rawHeight = (value: number, base: number) => (value > 0 ? Math.max(2, (value / base) * BAR_AREA) : 0);
+// Bars are plain views sized in percent of their period's bar box. The box's height follows the chart's scale (one
+// shared value for all periods) and animates on the UI thread: one animated view per period instead of one per bar,
+// nothing drawn again in JS, and the bars stay rectangles standing on the axis. The box is "base" tall when the scale
+// is what it was when the period appeared; bars that outgrow the area are cut at its top.
+const share = (value: number, base: number) => (value > 0 ? `${(value / base) * 100}%` : 0) as `${number}%` | 0;
 
 function ScaledBars({ base, peak, children }: { base: number; peak: SharedValue<number>; children: ReactNode }) {
-  const scaled = useAnimatedStyle(() => {
+  const sized = useAnimatedStyle(() => {
     const top = peak.get();
-    return { transform: [{ scaleY: top > 0 ? base / top : 1 }] };
+    return { height: top > 0 ? (BAR_AREA * base) / top : BAR_AREA };
   });
   return (
     <Animated.View
-      style={[
-        { height: BAR_AREA, flexDirection: "row", alignItems: "flex-end", justifyContent: "space-evenly", transformOrigin: "bottom" },
-        scaled,
-      ]}
+      style={[{ position: "absolute", left: 0, right: 0, bottom: 0, flexDirection: "row", alignItems: "flex-end", justifyContent: "space-evenly" }, sized]}
     >
       {children}
     </Animated.View>
@@ -133,7 +131,8 @@ const BarItem = memo(function BarItem({
         key={part}
         style={{
           width: GENERAL_BAR,
-          height: rawHeight(Math.abs(value), base),
+          height: share(Math.abs(value), base),
+          minHeight: value ? 2 : 0,
           backgroundColor: color,
           opacity: opacity(part),
           borderTopLeftRadius: 3,
@@ -148,7 +147,8 @@ const BarItem = memo(function BarItem({
       <View
         style={{
           width: STACKED_BAR,
-          height: rawHeight(total, base),
+          height: share(total, base),
+          minHeight: total ? 2 : 0,
           opacity: opacity(mode),
           overflow: "hidden",
           borderTopLeftRadius: 3,

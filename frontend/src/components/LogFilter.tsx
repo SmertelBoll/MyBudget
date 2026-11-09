@@ -9,7 +9,6 @@ import { useTheme } from "@/theme/ThemeProvider";
 import { spacing } from "@/theme/tokens";
 import { Choice } from "./AccountFilterSelect";
 import { AppSheet } from "./AppSheet";
-import { AppText } from "./AppText";
 import { Button } from "./Button";
 import { NO_TAG_COLOR, NO_TAG_ICON, TAG_ICON } from "./GroupRow";
 import { IconButton } from "./IconButton";
@@ -30,75 +29,84 @@ export const passesNarrow = (narrow: LogNarrow, categoryId: string, tagIds: stri
 
 const toggle = (list: string[], id: string) => (list.includes(id) ? list.filter((item) => item !== id) : [...list, id]);
 
-// The filter button next to sorting in the transaction log, and its sheet from the bottom: categories of the shown
-// type and tags, several of each.
-export function LogFilter({ type, value, onChange }: { type: EntryType; value: LogNarrow; onChange: (value: LogNarrow) => void }) {
+type Option = { id: string; icon: string; color: string; title: string };
+
+// One filter button next to sorting in the transaction log ("categories" or "tags") and its sheet from the bottom;
+// several can be chosen. A dot on the button means it narrows the list.
+export function LogFilter({
+  kind,
+  type,
+  value,
+  onChange,
+}: {
+  kind: "categories" | "tags";
+  type: EntryType;
+  value: LogNarrow;
+  onChange: (value: LogNarrow) => void;
+}) {
   const { colors } = useTheme();
   const { t } = useI18n();
   const categories = useCollection("categories");
   const tags = useCollection("tags");
   const [open, setOpen] = useState(false);
-  const [draft, setDraft] = useState<LogNarrow>(value);
+  const [draft, setDraft] = useState<string[]>(value[kind]);
 
-  const shownCategories = useMemo(() => categoriesOfType(categories, type), [categories, type]);
-  const sortedTags = useMemo(() => [...tags].sort((a, b) => a.name.localeCompare(b.name)), [tags]);
-  const active = value.categories.length + value.tags.length > 0;
+  const options = useMemo<Option[]>(
+    () =>
+      kind === "categories"
+        ? categoriesOfType(categories, type).map((category) => ({
+            id: category.id,
+            icon: category.icon,
+            color: category.color,
+            title: categoryName(category, t),
+          }))
+        : [
+            ...[...tags]
+              .sort((a, b) => a.name.localeCompare(b.name))
+              .map((tag) => ({ id: tag.id, icon: TAG_ICON, color: colors.iconIdle, title: tag.name })),
+            { id: NO_TAG, icon: NO_TAG_ICON, color: NO_TAG_COLOR, title: t("home.noTag") },
+          ],
+    [kind, categories, tags, type, t, colors.iconIdle]
+  );
+  const title = t(kind === "categories" ? "logs.filterCategories" : "logs.filterTags");
 
   return (
     <>
       <View>
         <IconButton
-          icon="filter-variant"
-          label={t("logs.filter")}
+          icon={kind === "categories" ? "shape-outline" : "pound"}
+          label={title}
           onPress={() => {
-            setDraft(value);
+            setDraft(value[kind]);
             setOpen(true);
           }}
           size={36}
           plain
         />
-        {active && (
+        {value[kind].length > 0 && (
           <View pointerEvents="none" style={{ position: "absolute", top: 2, right: 2, width: 9, height: 9, borderRadius: 5, backgroundColor: colors.mark }} />
         )}
       </View>
 
-      <AppSheet visible={open} title={t("logs.filter")} onClose={() => setOpen(false)}>
+      <AppSheet visible={open} title={title} onClose={() => setOpen(false)}>
         <ScrollView style={{ maxHeight: 440 }} contentContainerStyle={{ gap: spacing.xs }}>
-          <AppText variant="label" secondary>
-            {t("logs.filterCategories")}
-          </AppText>
-          {shownCategories.map((category) => (
+          {options.map((option) => (
             <Choice
-              key={category.id}
-              icon={category.icon}
-              color={category.color}
-              title={categoryName(category, t)}
-              selected={draft.categories.includes(category.id)}
-              onPress={() => setDraft((current) => ({ ...current, categories: toggle(current.categories, category.id) }))}
+              key={option.id}
+              icon={option.icon}
+              color={option.color}
+              title={option.title}
+              selected={draft.includes(option.id)}
+              onPress={() => setDraft((current) => toggle(current, option.id))}
             />
           ))}
-          <AppText variant="label" secondary style={{ marginTop: spacing.sm }}>
-            {t("logs.filterTags")}
-          </AppText>
-          {[...sortedTags.map((tag) => ({ id: tag.id, name: tag.name, icon: TAG_ICON, color: colors.iconIdle })), { id: NO_TAG, name: t("home.noTag"), icon: NO_TAG_ICON, color: NO_TAG_COLOR }].map(
-            (tag) => (
-              <Choice
-                key={tag.id}
-                icon={tag.icon}
-                color={tag.color}
-                title={tag.name}
-                selected={draft.tags.includes(tag.id)}
-                onPress={() => setDraft((current) => ({ ...current, tags: toggle(current.tags, tag.id) }))}
-              />
-            )
-          )}
         </ScrollView>
         <View style={{ flexDirection: "row", gap: spacing.sm }}>
-          <Button title={t("logs.filterReset")} variant="secondary" onPress={() => setDraft(NO_NARROW)} style={{ flex: 1 }} />
+          <Button title={t("logs.filterReset")} variant="secondary" onPress={() => setDraft([])} style={{ flex: 1 }} />
           <Button
             title={t("home.select")}
             onPress={() => {
-              onChange(draft);
+              onChange({ ...value, [kind]: draft });
               setOpen(false);
             }}
             style={{ flex: 1 }}
