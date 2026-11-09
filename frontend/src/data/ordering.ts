@@ -3,18 +3,14 @@ import type { Collection, EntityMap } from "./types";
 
 type Ordered = { id: string; sortOrder: number };
 
-// Moves one item to another item's place (spec 5.1, 7.1: rearranging by long press). Every item gets a fresh
-// 0..n-1 order, and only the ones whose number changed are saved and synced.
-export const moveItem = <C extends Collection>(collection: C, items: (EntityMap[C] & Ordered)[], fromId: string, toId: string) => {
-  const from = items.findIndex((item) => item.id === fromId);
-  const to = items.findIndex((item) => item.id === toId);
-  if (from < 0 || to < 0 || from === to) return Promise.resolve();
-
-  const reordered = [...items];
-  const [moved] = reordered.splice(from, 1);
-  reordered.splice(to, 0, moved);
-  const changed = reordered
-    .map((item, index) => (item.sortOrder === index ? null : { ...item, sortOrder: index }))
+// Saves a whole new order (drag and drop): items get 0..n-1 by their place in `keys`; only changed ones are saved.
+export const applyOrder = <C extends Collection>(collection: C, items: (EntityMap[C] & Ordered)[], keys: string[]) => {
+  const place = new Map(keys.map((key, index) => [key, index]));
+  const changed = items
+    .map((item) => {
+      const index = place.get(item.id);
+      return index === undefined || index === item.sortOrder ? null : { ...item, sortOrder: index };
+    })
     .filter((item): item is EntityMap[C] & Ordered => item !== null);
   return saveEntities(collection, changed);
 };

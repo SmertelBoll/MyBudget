@@ -29,6 +29,8 @@ const UserSchema = new mongoose.Schema(
       decimalSeparator: { type: String, enum: [".", ","], default: "." },
       showCents: { type: Boolean, default: false },
       focus: { type: String, enum: ["expense", "income"], default: "expense" },
+      // Home shows dots instead of the balance until the eye next to it is tapped.
+      hideBalance: { type: Boolean, default: false },
     },
     // Change counter: every synced write takes the next value, /sync/pull returns everything above the client's
     // cursor.

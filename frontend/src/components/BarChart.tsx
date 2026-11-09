@@ -1,6 +1,6 @@
 import { memo, useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { FlatList, Pressable, View, type StyleProp, type ViewStyle } from "react-native";
-import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
+import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming, type SharedValue } from "react-native-reanimated";
 import type { Period } from "@/api/types";
 import { bucketPeak, stackSum, type Bucket, type ChartMode } from "@/data/chartBuckets";
 import { useI18n } from "@/i18n/I18nProvider";
@@ -25,28 +25,31 @@ const STACKED_BAR = 30;
 const SETTLE_MS = 160;
 const GROW_MS = 320;
 
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
-
-// A bar whose height follows the scale smoothly (on the UI thread).
-function Bar({ height, onPress, style, children }: { height: number; onPress: () => void; style: StyleProp<ViewStyle>; children?: ReactNode }) {
-  const animated = useSharedValue(height);
-  useEffect(() => {
-    animated.set(withTiming(height, { duration: GROW_MS, easing: Easing.out(Easing.cubic) }));
-  }, [height, animated]);
-  const heightStyle = useAnimatedStyle(() => ({ height: animated.get() }));
-  return (
-    <AnimatedPressable onPress={onPress} hitSlop={{ top: BAR_AREA, left: 2, right: 2 }} style={[style, heightStyle]}>
-      {children}
-    </AnimatedPressable>
-  );
+// A bar's height comes from its value and the chart's peak, one shared value for all bars: when the scale changes
+// it animates on the UI thread, and no bar is drawn again in JS (that's what kept a fast fling from keeping up).
+function Bar({ value, peak, style, children }: { value: number; peak: SharedValue<number>; style: StyleProp<ViewStyle>; children?: ReactNode }) {
+  const heightStyle = useAnimatedStyle(() => {
+    const top = peak.get();
+    return { height: top > 0 && value > 0 ? Math.min(BAR_AREA, Math.max(2, (value / top) * BAR_AREA)) : 0 };
+  });
+  return <Animated.View style={[style, heightStyle]}>{children}</Animated.View>;
 }
 
+// Making an Intl formatter is slow on the phone's engine, and every bar needs one or two labels: one per language
+// and format is made and kept.
+const formatters = new Map<string, Intl.DateTimeFormat | null>();
 const format = (date: string, lang: string, options: Intl.DateTimeFormatOptions) => {
-  try {
-    return new Intl.DateTimeFormat(lang, options).format(parseLocalDate(date));
-  } catch {
-    return date;
+  const key = `${lang}|${JSON.stringify(options)}`;
+  let formatter = formatters.get(key);
+  if (formatter === undefined) {
+    try {
+      formatter = new Intl.DateTimeFormat(lang, options);
+    } catch {
+      formatter = null;
+    }
+    formatters.set(key, formatter);
   }
+  return formatter ? formatter.format(parseLocalDate(date)) : date;
 };
 
 // Two short lines under a bar: "Jul" | "2" + "Nov" | "6" + "Fri"; years show only their number.
@@ -85,7 +88,7 @@ const BarItem = memo(function BarItem({
   mode: ChartMode;
   granularity: Period;
   itemWidth: number;
-  peak: number;
+  peak: SharedValue<number>;
   selectedPart: BarPart | "none" | undefined;
   colorOf: (id: string) => string;
   onBarPress: BarPress;
@@ -96,6 +99,8 @@ const BarItem = memo(function BarItem({
   const opacity = (part: BarPart) => (selectedPart === undefined || selectedPart === part ? 1 : 0.45);
 
   let bars;
+  // One touch area for the whole period; in the general view the bar nearest to the finger is the one tapped.
+  let press: (x: number) => void;
   if (mode === "general") {
     const diff = bucket.income - bucket.expense;
     const parts: { part: BarPart; value: number; color: string }[] = [
@@ -104,20 +109,26 @@ const BarItem = memo(function BarItem({
       { part: "diff", value: diff, color: diff >= 0 ? CHART_COLORS.profit : CHART_COLORS.loss },
     ];
     const gap = (itemWidth - GENERAL_BAR * 3) / 4;
-    bars = parts.map(({ part, value, color }, position) => (
+    const center = (position: number) => gap + position * (GENERAL_BAR + gap) + GENERAL_BAR / 2;
+    press = (x) => {
+      const position = Math.max(0, Math.min(2, Math.round((x - center(0)) / (GENERAL_BAR + gap))));
+      onBarPress(index, parts[position].part, center(position), parts[position].value);
+    };
+    bars = parts.map(({ part, value, color }) => (
       <Bar
         key={part}
-        height={heightFor(Math.abs(value), peak)}
-        onPress={() => onBarPress(index, part, gap + position * (GENERAL_BAR + gap) + GENERAL_BAR / 2, value)}
+        value={Math.abs(value)}
+        peak={peak}
         style={{ width: GENERAL_BAR, backgroundColor: color, opacity: opacity(part), borderTopLeftRadius: 3, borderTopRightRadius: 3 }}
       />
     ));
   } else {
     const total = stackSum(bucket);
+    press = () => onBarPress(index, mode, itemWidth / 2, total);
     bars = (
       <Bar
-        height={heightFor(total, peak)}
-        onPress={() => onBarPress(index, mode, itemWidth / 2, total)}
+        value={total}
+        peak={peak}
         style={{
           width: STACKED_BAR,
           opacity: opacity(mode),
@@ -136,7 +147,12 @@ const BarItem = memo(function BarItem({
   const chosen = selectedPart !== undefined && selectedPart !== "none";
   return (
     <View style={{ width: itemWidth }}>
-      <View style={{ height: BAR_AREA, flexDirection: "row", alignItems: "flex-end", justifyContent: "space-evenly" }}>{bars}</View>
+      <Pressable
+        onPress={(event) => press(event.nativeEvent.locationX)}
+        style={{ height: BAR_AREA, flexDirection: "row", alignItems: "flex-end", justifyContent: "space-evenly" }}
+      >
+        {bars}
+      </Pressable>
       <View style={{ height: 1, backgroundColor: colors.textSecondary }} />
       <View style={{ height: LABEL_HEIGHT, alignItems: "center", paddingTop: 4 }}>
         <AppText variant="caption" color={chosen ? colors.text : colors.textSecondary} style={{ textTransform: "capitalize" }}>
@@ -198,6 +214,11 @@ function Bars({ buckets, todayIndex, granularity, mode, colorOf, selection, onSe
   const last = Math.min(buckets.length - 1, Math.floor((restX + viewport) / itemWidth - 0.5));
   let peak = 0;
   for (let i = first; i <= last; i++) peak = Math.max(peak, bucketPeak(buckets[i], mode));
+  // What the bars read; a new scale animates there instead of re-rendering every bar.
+  const peakShared = useSharedValue(peak);
+  useEffect(() => {
+    peakShared.set(withTiming(peak, { duration: GROW_MS, easing: Easing.out(Easing.cubic) }));
+  }, [peak, peakShared]);
   // Under the chart: the years on screen; for days the months too ("October – November 2026"), as the bars only
   // carry day numbers.
   const firstStart = buckets[first]?.range.start ?? "";
@@ -258,7 +279,7 @@ function Bars({ buckets, todayIndex, granularity, mode, colorOf, selection, onSe
       mode={mode}
       granularity={granularity}
       itemWidth={itemWidth}
-      peak={peak}
+      peak={peakShared}
       selectedPart={!selection ? undefined : selection.index === index ? selection.part : "none"}
       colorOf={colorOf}
       onBarPress={onBarPress}
@@ -277,10 +298,10 @@ function Bars({ buckets, todayIndex, granularity, mode, colorOf, selection, onSe
         initialScrollIndex={startIndex}
         // Bars are cheap: keep plenty ready on both sides so a fast fling never shows empty space.
         initialNumToRender={Math.ceil(viewport / itemWidth) * 3}
-        maxToRenderPerBatch={40}
+        maxToRenderPerBatch={24}
         updateCellsBatchingPeriod={16}
-        windowSize={21}
-        extraData={[peak, selection]}
+        windowSize={15}
+        extraData={selection}
         onScrollBeginDrag={() => setPlate(null)}
         onScroll={(event) => {
           scrollX.current = event.nativeEvent.contentOffset.x;

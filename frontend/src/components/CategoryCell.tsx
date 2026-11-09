@@ -1,4 +1,4 @@
-import { Pressable, View } from "react-native";
+import { Pressable, View, type DimensionValue } from "react-native";
 import { useTheme } from "@/theme/ThemeProvider";
 import { radius, spacing } from "@/theme/tokens";
 import { AppText } from "./AppText";
@@ -13,6 +13,7 @@ export function CategoryCell({
   onLongPress,
   picked,
   selected,
+  width = "25%",
 }: {
   icon: string;
   color: string;
@@ -23,6 +24,8 @@ export function CategoryCell({
   picked?: boolean;
   // Chosen in a form.
   selected?: boolean;
+  // "100%" when a wrapper (the drag-and-drop grid) already takes a quarter.
+  width?: DimensionValue;
 }) {
   const { colors } = useTheme();
   return (
@@ -34,7 +37,7 @@ export function CategoryCell({
       accessibilityLabel={label}
       accessibilityState={{ selected: Boolean(selected || picked) }}
       style={({ pressed }) => ({
-        width: "25%",
+        width,
         alignItems: "center",
         gap: spacing.xs,
         paddingVertical: spacing.sm,

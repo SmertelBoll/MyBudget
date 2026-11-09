@@ -675,5 +675,13 @@
   "data.share": "Condividi…",
   "data.savedTo": "Salvato in «{{folder}}»",
   "data.restoring": "Ripristino del backup…",
-  "data.deleting": "Eliminazione di tutti i dati…"
+  "data.deleting": "Eliminazione di tutti i dati…",
+  "settings.hideBalance": "Nascondi il saldo nella Home",
+  "home.showBalance": "Mostra saldo",
+  "home.hideBalance": "Nascondi saldo",
+  "settings.reset": "Ripristina impostazioni",
+  "settings.resetTitle": "Ripristinare tutte le impostazioni?",
+  "settings.resetMessage": "Tutte le impostazioni di questa schermata tornano allo stato iniziale. I tuoi dati, la lingua e la valuta principale restano",
+  "settings.resetDone": "Impostazioni ripristinate",
+  "transfers.export": "Esporta in Excel"
 }

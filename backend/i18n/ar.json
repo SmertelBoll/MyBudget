@@ -705,5 +705,13 @@
   "data.share": "مشاركة…",
   "data.savedTo": "تم الحفظ في «{{folder}}»",
   "data.restoring": "جارٍ استعادة النسخة الاحتياطية…",
-  "data.deleting": "جارٍ حذف كل البيانات…"
+  "data.deleting": "جارٍ حذف كل البيانات…",
+  "settings.hideBalance": "إخفاء الرصيد في الصفحة الرئيسية",
+  "home.showBalance": "إظهار الرصيد",
+  "home.hideBalance": "إخفاء الرصيد",
+  "settings.reset": "إعادة ضبط الإعدادات",
+  "settings.resetTitle": "إعادة ضبط كل الإعدادات؟",
+  "settings.resetMessage": "ستعود كل الإعدادات في هذه الشاشة إلى وضعها الأولي. تبقى بياناتك واللغة والعملة الرئيسية كما هي",
+  "settings.resetDone": "تمت إعادة ضبط الإعدادات",
+  "transfers.export": "تصدير إلى Excel"
 }

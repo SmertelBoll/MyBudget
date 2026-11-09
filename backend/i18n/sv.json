@@ -665,5 +665,13 @@
   "data.share": "Dela…",
   "data.savedTo": "Sparat i ”{{folder}}”",
   "data.restoring": "Återställer säkerhetskopian…",
-  "data.deleting": "Raderar all data…"
+  "data.deleting": "Raderar all data…",
+  "settings.hideBalance": "Dölj saldo på startsidan",
+  "home.showBalance": "Visa saldo",
+  "home.hideBalance": "Dölj saldo",
+  "settings.reset": "Återställ inställningar",
+  "settings.resetTitle": "Återställa alla inställningar?",
+  "settings.resetMessage": "Alla inställningar på den här skärmen går tillbaka till början. Dina data, språk och huvudvaluta behålls",
+  "settings.resetDone": "Inställningarna har återställts",
+  "transfers.export": "Exportera till Excel"
 }

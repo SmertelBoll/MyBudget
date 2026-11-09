@@ -665,5 +665,13 @@
   "data.share": "Jaa…",
   "data.savedTo": "Tallennettu kansioon ”{{folder}}”",
   "data.restoring": "Palautetaan varmuuskopiota…",
-  "data.deleting": "Poistetaan kaikkia tietoja…"
+  "data.deleting": "Poistetaan kaikkia tietoja…",
+  "settings.hideBalance": "Piilota saldo etusivulla",
+  "home.showBalance": "Näytä saldo",
+  "home.hideBalance": "Piilota saldo",
+  "settings.reset": "Palauta asetukset",
+  "settings.resetTitle": "Palautetaanko kaikki asetukset?",
+  "settings.resetMessage": "Kaikki tämän näkymän asetukset palautuvat alkutilaan. Tietosi, kieli ja päävaluutta säilyvät",
+  "settings.resetDone": "Asetukset palautettu",
+  "transfers.export": "Vie Exceliin"
 }

@@ -11,6 +11,9 @@ import { radius, spacing } from "@/theme/tokens";
 import { useBottomSpace } from "@/utils/useBottomSpace";
 import { addDays, formatLongDate, todayLocal } from "@/utils/dates";
 import { useMoney } from "@/utils/useMoney";
+import { fileDate } from "@/utils/files";
+import { useDeliverFile } from "@/utils/useDeliverFile";
+import { exportTransfers } from "@/data/userData";
 import { currentPeriod, inPeriod, type PeriodRange } from "@/utils/periods";
 import { HeaderSearchInput } from "@/components/HeaderSearchInput";
 import { IconButton } from "@/components/IconButton";
@@ -72,7 +75,8 @@ function TransferRow({ transfer, from, to, onPress }: { transfer: Transfer; from
 }
 
 // Screen 11 for transfers: the period's transfers, newest first, grouped by day; a tap opens the transfer (screen
-// 10). Search (accounts, comment, amount) looks through every period. Export comes with the data settings.
+// 10). Search (accounts, comment, amount) looks through every period. The download button saves what's shown to
+// Excel (Q10).
 export default function TransfersScreen() {
   const { colors } = useTheme();
   const bottomSpace = useBottomSpace();
@@ -107,6 +111,14 @@ export default function TransfersScreen() {
     return [...groups].map(([date, data]) => ({ date, data }));
   }, [transfers, range, needle, byId, toInput]);
 
+  // Q10: what's on the screen right now (the period, or the search results) goes to Excel.
+  const deliver = useDeliverFile();
+  const exportShown = () => {
+    const shown = sections.flatMap((section) => section.data);
+    const label = needle ? fileDate() : `${range.start}_${range.end}`;
+    deliver(exportTransfers(shown, t, label)).catch((error) => console.warn("transfer export failed:", error));
+  };
+
   const today = todayLocal();
   const dayTitle = (date: string) => {
     const relative = date === today ? t("dates.today") : date === addDays(today, -1) ? t("dates.yesterday") : null;
@@ -120,14 +132,19 @@ export default function TransfersScreen() {
         left="back"
         center={searching ? <HeaderSearchInput value={query} onChangeText={setQuery} placeholder={t("logs.search")} /> : undefined}
         right={
-          <IconButton
-            icon={searching ? "close" : "magnify"}
-            label={t(searching ? "common.close" : "logs.search")}
-            onPress={() => {
-              setSearching(!searching);
-              setQuery("");
-            }}
-          />
+          <View style={{ flexDirection: "row" }}>
+            {!searching && (
+              <IconButton icon="download" label={t("transfers.export")} onPress={exportShown} />
+            )}
+            <IconButton
+              icon={searching ? "close" : "magnify"}
+              label={t(searching ? "common.close" : "logs.search")}
+              onPress={() => {
+                setSearching(!searching);
+                setQuery("");
+              }}
+            />
+          </View>
         }
       />
       <SectionList

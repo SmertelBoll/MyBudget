@@ -1,11 +1,12 @@
 import { useMemo, useState } from "react";
-import { Pressable, ScrollView, View } from "react-native";
+import { Pressable, View } from "react-native";
+import { ScrollView } from "react-native-gesture-handler";
 import { router } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { sortAccounts } from "@/data/accounts";
 import { useBalances, useTotals } from "@/data/balances";
 import { useCollection } from "@/data/hooks";
-import { moveItem } from "@/data/ordering";
+import { applyOrder } from "@/data/ordering";
 import { reportWriteError } from "@/data/store";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTheme } from "@/theme/ThemeProvider";
@@ -17,7 +18,7 @@ import { AppText } from "@/components/AppText";
 import { Fab } from "@/components/Fab";
 import { IconButton } from "@/components/IconButton";
 import { ListRow } from "@/components/ListRow";
-import { MoveBanner } from "@/components/MoveBanner";
+import { Reorderable } from "@/components/Reorderable";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import type { IconName } from "@/constants/appearance";
 
@@ -59,25 +60,15 @@ export default function AccountsScreen() {
   const balances = useBalances();
   const totals = useTotals();
   const [details, setDetails] = useState(false);
-  const [picked, setPicked] = useState<string | null>(null);
+  const [dragging, setDragging] = useState(false);
 
   const active = useMemo(() => sortAccounts(accounts.filter((account) => account.isActive)), [accounts]);
-  const pickedAccount = active.find((account) => account.id === picked);
 
-  // Long press lifts an account; tapping another puts it in that place (spec 5.1).
-  const tap = (id: string) => {
-    if (!picked) {
-      router.push({ pathname: "/account/[id]", params: { id } });
-      return;
-    }
-    if (id !== picked) moveItem("accounts", active, picked, id).catch(reportWriteError);
-    setPicked(null);
-  };
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
       <ScreenHeader title={t("nav.accounts")} />
-      <ScrollView contentContainerStyle={{ padding: spacing.md, gap: spacing.md, paddingBottom: bottomSpace }}>
+      <ScrollView scrollEnabled={!dragging} contentContainerStyle={{ padding: spacing.md, gap: spacing.md, paddingBottom: bottomSpace }}>
         <View style={{ alignItems: "center", gap: 2 }}>
           <AppText variant="caption" secondary>
             {t("accounts.total")}
@@ -109,11 +100,15 @@ export default function AccountsScreen() {
             </AppText>
           </View>
         ) : (
-          <View style={{ gap: spacing.sm }}>
-            {pickedAccount && <MoveBanner name={pickedAccount.name} onCancel={() => setPicked(null)} />}
-            {active.map((account) => (
+          // Long press and drag to put an account elsewhere (spec 5.1).
+          <Reorderable
+            items={active}
+            keyOf={(account) => account.id}
+            style={{ gap: spacing.sm }}
+            onDragChange={setDragging}
+            onReorder={(keys) => applyOrder("accounts", active, keys).catch(reportWriteError)}
+            renderItem={(account) => (
               <ListRow
-                key={account.id}
                 icon={account.icon}
                 color={account.color}
                 title={account.name}
@@ -130,12 +125,10 @@ export default function AccountsScreen() {
                     />
                   ) : undefined
                 }
-                picked={account.id === picked}
-                onPress={() => tap(account.id)}
-                onLongPress={() => setPicked(account.id)}
+                onPress={() => router.push({ pathname: "/account/[id]", params: { id: account.id } })}
               />
-            ))}
-          </View>
+            )}
+          />
         )}
       </ScrollView>
 

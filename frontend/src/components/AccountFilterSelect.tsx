@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { Pressable, ScrollView, View } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useAuth } from "@/auth/AuthProvider";
 import { useBalances, useTotals } from "@/data/balances";
 import { useCollection } from "@/data/hooks";
 import { convert, useRates } from "@/data/rates";
@@ -102,6 +103,12 @@ export function AccountFilterSelect({
   const balance = useFilterBalance(value);
   const [open, setOpen] = useState(false);
   const [draft, setDraft] = useState<AccountFilter>(value);
+  // Settings -> "Hide balance on Home": dots until the eye is tapped (the sheet's balances too).
+  const { user } = useAuth();
+  const hidable = Boolean(showBalance && user?.settings.hideBalance);
+  const [revealed, setRevealed] = useState(false);
+  const masked = hidable && !revealed;
+  const amount = (minor: number, currency: string) => (masked ? "•••••" : money(minor, currency));
 
   const active = useMemo(() => [...accounts].filter((account) => account.isActive).sort((a, b) => a.sortOrder - b.sortOrder), [accounts]);
   // An account removed meanwhile drops out of the filter.
@@ -150,7 +157,21 @@ export function AccountFilterSelect({
           </AppText>
           <MaterialCommunityIcons name="menu-down" size={22} color={colors.text} />
         </View>
-        {showBalance && <AppText variant={compact ? "title" : "display"}>{money(balance, totals.currency)}</AppText>}
+        {showBalance && (
+          <View style={{ flexDirection: "row", alignItems: "center", gap: spacing.xs }}>
+            {/* Keeps the amount centered when the eye is shown on its right. */}
+            {hidable && <View style={{ width: 32 }} />}
+            <AppText variant={compact ? "title" : "display"}>{amount(balance, totals.currency)}</AppText>
+            {hidable && (
+              <IconButton
+                icon={revealed ? "eye-off-outline" : "eye-outline"}
+                label={t(revealed ? "home.hideBalance" : "home.showBalance")}
+                onPress={() => setRevealed(!revealed)}
+                size={32}
+              />
+            )}
+          </View>
+        )}
       </Pressable>
       )}
 
@@ -160,7 +181,7 @@ export function AccountFilterSelect({
             icon={TOTAL_ICON}
             color={colors.accent}
             title={t("home.total")}
-            subtitle={money(totals.included, totals.currency)}
+            subtitle={amount(totals.included, totals.currency)}
             selected={!draft}
             highlight
             onPress={() => setDraft(null)}
@@ -171,7 +192,7 @@ export function AccountFilterSelect({
               icon={account.icon}
               color={account.color}
               title={account.name}
-              subtitle={money(balances.get(account.id) ?? 0, account.currency)}
+              subtitle={amount(balances.get(account.id) ?? 0, account.currency)}
               selected={Boolean(draft?.includes(account.id))}
               onPress={() => toggle(account.id)}
             />

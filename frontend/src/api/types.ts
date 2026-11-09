@@ -14,6 +14,8 @@ export type UserSettings = {
   decimalSeparator: "." | ",";
   showCents: boolean;
   focus: EntryType;
+  // Missing on users saved before it existed: shown.
+  hideBalance?: boolean;
 };
 
 export type User = {

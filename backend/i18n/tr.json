@@ -665,5 +665,13 @@
   "data.share": "Paylaş…",
   "data.savedTo": "“{{folder}}” klasörüne kaydedildi",
   "data.restoring": "Yedek geri yükleniyor…",
-  "data.deleting": "Tüm veriler siliniyor…"
+  "data.deleting": "Tüm veriler siliniyor…",
+  "settings.hideBalance": "Ana sayfada bakiyeyi gizle",
+  "home.showBalance": "Bakiyeyi göster",
+  "home.hideBalance": "Bakiyeyi gizle",
+  "settings.reset": "Ayarları sıfırla",
+  "settings.resetTitle": "Tüm ayarlar sıfırlansın mı?",
+  "settings.resetMessage": "Bu ekrandaki tüm ayarlar başlangıç durumuna döner. Verileriniz, diliniz ve ana para biriminiz korunur",
+  "settings.resetDone": "Ayarlar sıfırlandı",
+  "transfers.export": "Excel’e aktar"
 }

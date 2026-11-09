@@ -11,6 +11,8 @@ import { spacing } from "@/theme/tokens";
 import { useCurrencyOptions, usePinnedCurrencies } from "@/utils/currency";
 import { useBottomSpace } from "@/utils/useBottomSpace";
 import { AppText } from "@/components/AppText";
+import { Button } from "@/components/Button";
+import { useDialog } from "@/components/AppDialog";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import { SegmentedSwitch } from "@/components/SegmentedSwitch";
 import { SelectField } from "@/components/SelectField";
@@ -22,6 +24,21 @@ import { SettingsCard, SettingsLink } from "@/components/settings/SettingsCard";
 
 const THEMES: ThemeMode[] = ["system", "light", "dark"];
 const PERIODS: Period[] = ["day", "week", "month", "year"];
+// "Reset settings": everything on this screen back to how a new account starts. The language and the main
+// currency stay (they were chosen at the first launch), and so does the data.
+const DEFAULT_SETTINGS: UserSettings = {
+  homeAccount: "total",
+  defaultPeriod: "week",
+  defaultAccountId: null,
+  showComment: true,
+  showPhotos: true,
+  firstDayOfWeek: 1,
+  decimalSeparator: ".",
+  showCents: false,
+  focus: "expense",
+  hideBalance: false,
+};
+
 // Monday first, as in the calendar.
 const WEEKDAYS = [1, 2, 3, 4, 5, 6, 0];
 
@@ -48,6 +65,7 @@ export default function SettingsScreen() {
   const { colors } = useTheme();
   const { t, lang } = useI18n();
   const toast = useToast();
+  const dialog = useDialog();
   const bottomSpace = useBottomSpace();
   const { user, updateMe } = useAuth();
   const currencyOptions = useCurrencyOptions();
@@ -61,6 +79,17 @@ export default function SettingsScreen() {
 
   const save = (patch: UserPatch) =>
     updateMe(patch).catch((error) => toast.show(t(error instanceof ApiError ? error.code : "common.serverError"), { kind: "error" }));
+  const resetAll = async () => {
+    const ok = await dialog.confirm({
+      title: t("settings.resetTitle"),
+      message: t("settings.resetMessage"),
+      confirmText: t("settings.reset"),
+      destructive: true,
+    });
+    if (!ok) return;
+    await save({ theme: "system", settings: DEFAULT_SETTINGS });
+    toast.show(t("settings.resetDone"));
+  };
   const setSetting = <K extends keyof UserSettings>(key: K, value: UserSettings[K]) => save({ settings: { [key]: value } });
 
 
@@ -75,6 +104,7 @@ export default function SettingsScreen() {
             empty="total"
             onChange={(id) => setSetting("homeAccount", id ?? "total")}
           />
+          <ToggleRow label={t("settings.hideBalance")} value={settings.hideBalance === true} onChange={(value) => setSetting("hideBalance", value)} />
           <Labeled label={t("settings.defaultPeriod")}>
             <SegmentedSwitch
               options={PERIODS.map((value) => ({ value, label: t(`periods.${value}`) }))}
@@ -150,6 +180,8 @@ export default function SettingsScreen() {
         <SettingsCard title={t("settings.security")} flush>
           <SettingsLink icon="cellphone-link" label={t("sessions.title")} hint={t("sessions.hint")} onPress={() => router.push("/sessions")} />
         </SettingsCard>
+
+        <Button title={t("settings.reset")} icon="restore" variant="secondary" onPress={resetAll} />
       </ScrollView>
     </View>
   );

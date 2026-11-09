@@ -655,5 +655,13 @@
   "data.share": "分享…",
   "data.savedTo": "已保存到“{{folder}}”",
   "data.restoring": "正在恢复备份…",
-  "data.deleting": "正在删除所有数据…"
+  "data.deleting": "正在删除所有数据…",
+  "settings.hideBalance": "在首页隐藏余额",
+  "home.showBalance": "显示余额",
+  "home.hideBalance": "隐藏余额",
+  "settings.reset": "重置设置",
+  "settings.resetTitle": "重置所有设置？",
+  "settings.resetMessage": "此页面上的所有设置将恢复为初始状态。你的数据、语言和主货币保持不变",
+  "settings.resetDone": "设置已重置",
+  "transfers.export": "导出到 Excel"
 }

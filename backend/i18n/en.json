@@ -700,5 +700,13 @@
   "data.share": "Share…",
   "data.savedTo": "Saved to “{{folder}}”",
   "data.restoring": "Restoring the backup…",
-  "data.deleting": "Deleting all data…"
+  "data.deleting": "Deleting all data…",
+  "settings.hideBalance": "Hide balance on Home",
+  "home.showBalance": "Show balance",
+  "home.hideBalance": "Hide balance",
+  "settings.reset": "Reset settings",
+  "settings.resetTitle": "Reset all settings?",
+  "settings.resetMessage": "Every setting on this screen goes back to how it was at the start. Your data, language and main currency stay",
+  "settings.resetDone": "Settings reset",
+  "transfers.export": "Export to Excel"
 }

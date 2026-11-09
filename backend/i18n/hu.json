@@ -665,5 +665,13 @@
   "data.share": "Megosztás…",
   "data.savedTo": "Mentve ide: „{{folder}}”",
   "data.restoring": "Mentés visszaállítása…",
-  "data.deleting": "Összes adat törlése…"
+  "data.deleting": "Összes adat törlése…",
+  "settings.hideBalance": "Egyenleg elrejtése a kezdőlapon",
+  "home.showBalance": "Egyenleg mutatása",
+  "home.hideBalance": "Egyenleg elrejtése",
+  "settings.reset": "Beállítások visszaállítása",
+  "settings.resetTitle": "Visszaállítod az összes beállítást?",
+  "settings.resetMessage": "A képernyő összes beállítása visszaáll a kezdeti állapotra. Az adataid, a nyelv és a fő pénznem megmarad",
+  "settings.resetDone": "Beállítások visszaállítva",
+  "transfers.export": "Exportálás Excelbe"
 }

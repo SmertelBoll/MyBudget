@@ -655,5 +655,13 @@
   "data.share": "공유…",
   "data.savedTo": "'{{folder}}'에 저장됨",
   "data.restoring": "백업 복원 중…",
-  "data.deleting": "모든 데이터 삭제 중…"
+  "data.deleting": "모든 데이터 삭제 중…",
+  "settings.hideBalance": "홈에서 잔액 숨기기",
+  "home.showBalance": "잔액 보기",
+  "home.hideBalance": "잔액 숨기기",
+  "settings.reset": "설정 초기화",
+  "settings.resetTitle": "모든 설정을 초기화할까요?",
+  "settings.resetMessage": "이 화면의 모든 설정이 처음 상태로 돌아갑니다. 데이터, 언어, 기본 통화는 그대로 유지됩니다",
+  "settings.resetDone": "설정이 초기화되었습니다",
+  "transfers.export": "Excel로 내보내기"
 }

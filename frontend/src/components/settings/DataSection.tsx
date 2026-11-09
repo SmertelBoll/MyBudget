@@ -2,12 +2,13 @@ import { useState } from "react";
 import { ActivityIndicator, View } from "react-native";
 import { ApiError } from "@/api/client";
 import { useAuth } from "@/auth/AuthProvider";
-import { BackupFileError, createBackup, deleteAllData, exportToExcel, readBackup, recalculateBalances, restoreBackup, type OutputFile } from "@/data/userData";
+import { BackupFileError, createBackup, deleteAllData, exportToExcel, readBackup, recalculateBalances, restoreBackup } from "@/data/userData";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTheme } from "@/theme/ThemeProvider";
 import { spacing } from "@/theme/tokens";
 import { formatLongDate, toLocalDate } from "@/utils/dates";
-import { canSaveToDevice, pickFile, saveFileToDevice, shareFile } from "@/utils/files";
+import { pickFile } from "@/utils/files";
+import { useDeliverFile } from "@/utils/useDeliverFile";
 import { AppText } from "../AppText";
 import { useDialog } from "../AppDialog";
 import { whileBlocking } from "../BlockingOverlay";
@@ -27,6 +28,7 @@ export function DataSection() {
   const toast = useToast();
   const { user, acceptUser } = useAuth();
   const [job, setJob] = useState<Job | null>(null);
+  const deliver = useDeliverFile();
 
   if (!user) return null;
 
@@ -52,31 +54,6 @@ export function DataSection() {
     } finally {
       setJob(null);
     }
-  };
-
-  // Android and the browser: save on the device or share; iOS: the share sheet (it has "Save to Files"). Returns
-  // whether the file was saved, so "saved" is never shown for a closed picker.
-  const deliver = async (file: OutputFile) => {
-    if (!canSaveToDevice) {
-      await shareFile(file.name, file.bytes, file.mimeType);
-      return false;
-    }
-    const how = await dialog.choose({
-      title: file.name,
-      options: [
-        { value: "save", label: t("data.saveToDevice") },
-        { value: "share", label: t("data.share") },
-      ],
-    });
-    if (how === "share") {
-      await shareFile(file.name, file.bytes, file.mimeType);
-      return false;
-    }
-    if (how !== "save") return false;
-    const folder = await saveFileToDevice(file.name, file.bytes, file.mimeType);
-    if (folder === null) return false;
-    toast.show(t("data.savedTo", { folder }));
-    return true;
   };
 
   const backup = () =>

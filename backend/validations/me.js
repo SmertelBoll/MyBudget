@@ -13,6 +13,7 @@ export const settingsSchema = z
     decimalSeparator: z.enum([".", ","]),
     showCents: z.boolean(),
     focus: z.enum(["expense", "income"]),
+    hideBalance: z.boolean(),
   })
   .partial();
 

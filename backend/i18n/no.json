@@ -665,5 +665,13 @@
   "data.share": "Del…",
   "data.savedTo": "Lagret i «{{folder}}»",
   "data.restoring": "Gjenoppretter sikkerhetskopien…",
-  "data.deleting": "Sletter alle data…"
+  "data.deleting": "Sletter alle data…",
+  "settings.hideBalance": "Skjul saldo på startsiden",
+  "home.showBalance": "Vis saldo",
+  "home.hideBalance": "Skjul saldo",
+  "settings.reset": "Tilbakestill innstillinger",
+  "settings.resetTitle": "Tilbakestille alle innstillinger?",
+  "settings.resetMessage": "Alle innstillingene på denne skjermen går tilbake til start. Dataene, språket og hovedvalutaen beholdes",
+  "settings.resetDone": "Innstillingene er tilbakestilt",
+  "transfers.export": "Eksporter til Excel"
 }

@@ -56,6 +56,13 @@ export const transferRows = (transfers: Transfer[], t: Translate): Cell[][] => {
 
 export const TRANSFER_WIDTHS = [12, 20, 14, 9, 20, 14, 9, 10, 30];
 
+// Q10: the transfers shown in the transfer history (its period or search), as one sheet.
+export const exportTransfers = (transfers: Transfer[], t: Translate, label: string): OutputFile => ({
+  name: `MyBudget-${t("export.transfers")}-${label}.xlsx`.replace(/[\/:*?"<>|]/g, "-"),
+  bytes: buildXlsx([{ name: t("export.transfers"), rows: transferRows(transfers, t), widths: TRANSFER_WIDTHS }]),
+  mimeType: XLSX_MIME,
+});
+
 // Three sheets: expenses, income, transfers; every field, both amounts and the rate (spec 13.4). Photos are listed
 // by id: a link to a private photo would stop working within the hour.
 // The file only; the screen decides where it goes (saved on the device or shared).

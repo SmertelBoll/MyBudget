@@ -665,5 +665,13 @@
   "data.share": "शेयर करें…",
   "data.savedTo": "\"{{folder}}\" में सहेजा गया",
   "data.restoring": "बैकअप बहाल हो रहा है…",
-  "data.deleting": "सारा डेटा हटाया जा रहा है…"
+  "data.deleting": "सारा डेटा हटाया जा रहा है…",
+  "settings.hideBalance": "होम पर बैलेंस छिपाएँ",
+  "home.showBalance": "बैलेंस दिखाएँ",
+  "home.hideBalance": "बैलेंस छिपाएँ",
+  "settings.reset": "सेटिंग्स रीसेट करें",
+  "settings.resetTitle": "सभी सेटिंग्स रीसेट करें?",
+  "settings.resetMessage": "इस स्क्रीन की सभी सेटिंग्स शुरुआती स्थिति में लौट आएँगी। आपका डेटा, भाषा और मुख्य मुद्रा बने रहेंगे",
+  "settings.resetDone": "सेटिंग्स रीसेट हो गईं",
+  "transfers.export": "Excel में निर्यात करें"
 }

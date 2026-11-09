@@ -665,5 +665,13 @@
   "data.share": "Delen…",
   "data.savedTo": "Opgeslagen in ‘{{folder}}’",
   "data.restoring": "Back-up herstellen…",
-  "data.deleting": "Alle gegevens verwijderen…"
+  "data.deleting": "Alle gegevens verwijderen…",
+  "settings.hideBalance": "Saldo verbergen op Home",
+  "home.showBalance": "Saldo tonen",
+  "home.hideBalance": "Saldo verbergen",
+  "settings.reset": "Instellingen herstellen",
+  "settings.resetTitle": "Alle instellingen herstellen?",
+  "settings.resetMessage": "Alle instellingen op dit scherm gaan terug naar de beginstand. Je gegevens, taal en hoofdvaluta blijven behouden",
+  "settings.resetDone": "Instellingen hersteld",
+  "transfers.export": "Exporteren naar Excel"
 }

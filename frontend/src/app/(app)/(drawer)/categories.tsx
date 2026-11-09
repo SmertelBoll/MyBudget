@@ -1,11 +1,12 @@
 import { useMemo, useState } from "react";
-import { ScrollView, View } from "react-native";
+import { View } from "react-native";
+import { ScrollView } from "react-native-gesture-handler";
 import { router } from "expo-router";
 import type { EntryType } from "@/api/types";
 import { useAuth } from "@/auth/AuthProvider";
 import { categoriesOfType, categoryName } from "@/data/categories";
 import { useCollection } from "@/data/hooks";
-import { moveItem } from "@/data/ordering";
+import { applyOrder } from "@/data/ordering";
 import { reportWriteError } from "@/data/store";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTheme } from "@/theme/ThemeProvider";
@@ -14,7 +15,7 @@ import { useBottomSpace } from "@/utils/useBottomSpace";
 import { BottomActionButton } from "@/components/BottomActionButton";
 import { CategoryCell } from "@/components/CategoryCell";
 import { IconButton } from "@/components/IconButton";
-import { MoveBanner } from "@/components/MoveBanner";
+import { Reorderable } from "@/components/Reorderable";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import { SegmentedSwitch } from "@/components/SegmentedSwitch";
 
@@ -27,19 +28,10 @@ export default function CategoriesScreen() {
   const categories = useCollection("categories");
   // Starts on the side chosen in Settings -> Advanced (focus); kept while the screen lives (spec 2.7).
   const [type, setType] = useState<EntryType>(user?.settings.focus ?? "expense");
-  const [picked, setPicked] = useState<string | null>(null);
+  const [dragging, setDragging] = useState(false);
 
   const list = useMemo(() => categoriesOfType(categories, type), [categories, type]);
-  const pickedCategory = list.find((category) => category.id === picked);
 
-  const tap = (id: string) => {
-    if (!picked) {
-      router.push({ pathname: "/category/[id]", params: { id } });
-      return;
-    }
-    if (id !== picked) moveItem("categories", list, picked, id).catch(reportWriteError);
-    setPicked(null);
-  };
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
@@ -54,29 +46,30 @@ export default function CategoriesScreen() {
               { value: "income", label: t("entries.income") },
             ]}
             value={type}
-            onChange={(next) => {
-              setType(next);
-              setPicked(null);
-            }}
+            onChange={setType}
           />
         </View>
       </ScreenHeader>
 
-      <ScrollView contentContainerStyle={{ padding: spacing.md, gap: spacing.md, paddingBottom: bottomSpace }}>
-        {pickedCategory && <MoveBanner name={categoryName(pickedCategory, t)} onCancel={() => setPicked(null)} />}
-        <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
-          {list.map((category) => (
+      <ScrollView scrollEnabled={!dragging} contentContainerStyle={{ padding: spacing.md, gap: spacing.md, paddingBottom: bottomSpace }}>
+        {/* Long press and drag to put a category elsewhere (spec 7.1). */}
+        <Reorderable
+          items={list}
+          keyOf={(category) => category.id}
+          style={{ flexDirection: "row", flexWrap: "wrap" }}
+          itemStyle={{ width: "25%" }}
+          onDragChange={setDragging}
+          onReorder={(keys) => applyOrder("categories", list, keys).catch(reportWriteError)}
+          renderItem={(category) => (
             <CategoryCell
-              key={category.id}
+              width="100%"
               icon={category.icon}
               color={category.color}
               label={categoryName(category, t)}
-              picked={category.id === picked}
-              onPress={() => tap(category.id)}
-              onLongPress={() => setPicked(category.id)}
+              onPress={() => router.push({ pathname: "/category/[id]", params: { id: category.id } })}
             />
-          ))}
-        </View>
+          )}
+        />
       </ScrollView>
 
       <BottomActionButton

@@ -655,5 +655,13 @@
   "data.share": "共有…",
   "data.savedTo": "「{{folder}}」に保存しました",
   "data.restoring": "バックアップを復元しています…",
-  "data.deleting": "すべてのデータを削除しています…"
+  "data.deleting": "すべてのデータを削除しています…",
+  "settings.hideBalance": "ホームで残高を隠す",
+  "home.showBalance": "残高を表示",
+  "home.hideBalance": "残高を隠す",
+  "settings.reset": "設定をリセット",
+  "settings.resetTitle": "すべての設定をリセットしますか？",
+  "settings.resetMessage": "この画面の設定はすべて初期状態に戻ります。データ、言語、基本通貨はそのまま残ります",
+  "settings.resetDone": "設定をリセットしました",
+  "transfers.export": "Excelに書き出す"
 }
