@@ -1,7 +1,8 @@
 import { secureStorage } from "@/storage/storage";
 import type { AuthPayload } from "./types";
 
-const BASE_URL = `${(process.env.EXPO_PUBLIC_API_URL || "http://localhost:4444").replace(/\/$/, "")}/api/v1`;
+const ORIGIN = (process.env.EXPO_PUBLIC_API_URL || "http://localhost:4444").replace(/\/$/, "");
+const BASE_URL = `${ORIGIN}/api/v1`;
 const TIMEOUT_MS = 20000;
 const REFRESH_TOKEN_KEY = "auth.refreshToken";
 
@@ -15,6 +16,12 @@ export class ApiError extends Error {
     super(code);
   }
 }
+
+// A free Render instance sleeps when idle and takes up to a minute to wake: one knock at launch, so it is up by the
+// time the user signs in or syncs. The answer doesn't matter.
+export const wakeServer = () => {
+  fetch(`${ORIGIN}/health`).catch(() => {});
+};
 
 export const isNetworkError = (error: unknown) => error instanceof ApiError && error.status === 0;
 

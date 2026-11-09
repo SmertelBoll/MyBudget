@@ -1,0 +1,51 @@
+# Render Blueprint: the backend as one web service (Dashboard -> New -> Blueprint -> this repository).
+# Values marked "sync: false" are asked for once, when the Blueprint is first applied; secrets never go into git.
+services:
+  - type: web
+    name: mybudget-api
+    runtime: node
+    plan: free
+    region: frankfurt
+    rootDir: backend
+    # No dev dependencies: the in-memory MongoDB used by the tests would download a large binary.
+    buildCommand: npm ci --omit=dev
+    startCommand: npm start
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: "22"
+      # Atlas connection string with the database name; Atlas must allow connections from anywhere (0.0.0.0/0),
+      # as free Render services have no fixed address.
+      - key: MONGODB_URI
+        sync: false
+      # Long random strings made by Render.
+      - key: JWT_ACCESS_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+      - key: CLOUDINARY_FOLDER
+        value: MyBudget
+      # Optional (may be left empty): Google sign-in, city in the sessions list, support messages by email.
+      - key: GOOGLE_CLIENT_IDS
+        sync: false
+      - key: IPINFO_TOKEN
+        sync: false
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASS
+        sync: false
+      - key: SMTP_FROM
+        sync: false
+      - key: SUPPORT_EMAIL
+        sync: false

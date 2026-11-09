@@ -7,6 +7,7 @@ import * as SplashScreen from "expo-splash-screen";
 import { useFonts } from "expo-font";
 import { Rubik_400Regular, Rubik_500Medium, Rubik_600SemiBold } from "@expo-google-fonts/rubik";
 import { Bungee_400Regular } from "@expo-google-fonts/bungee";
+import { wakeServer } from "@/api/client";
 import { AuthProvider, useAuth } from "@/auth/AuthProvider";
 import { I18nProvider, deviceLanguage } from "@/i18n/I18nProvider";
 import { ThemeProvider, useTheme } from "@/theme/ThemeProvider";
@@ -14,6 +15,7 @@ import { DialogProvider } from "@/components/AppDialog";
 import { ToastProvider } from "@/components/Toast";
 
 SplashScreen.preventAutoHideAsync();
+wakeServer();
 
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts({ Rubik_400Regular, Rubik_500Medium, Rubik_600SemiBold, Bungee_400Regular });
