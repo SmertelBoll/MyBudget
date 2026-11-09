@@ -16,7 +16,8 @@ export default function DrawerLayout() {
     >
       <Drawer.Screen name="index" />
       <Drawer.Screen name="accounts" />
-      <Drawer.Screen name="charts" />
+      {/* Swiping the bars towards older periods starts at the left edge too: there it scrolls, never opens the menu. */}
+      <Drawer.Screen name="charts" options={{ swipeEnabled: false }} />
       <Drawer.Screen name="categories" />
       <Drawer.Screen name="recurring" />
       <Drawer.Screen name="reminders" />

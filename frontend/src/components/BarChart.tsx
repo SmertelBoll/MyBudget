@@ -1,5 +1,5 @@
-import { memo, useEffect, useRef, useState, type ReactNode } from "react";
-import { FlatList, Text, View } from "react-native";
+import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { FlatList, Platform, Text, View } from "react-native";
 import { GestureDetector, useTapGesture } from "react-native-gesture-handler";
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming, type SharedValue } from "react-native-reanimated";
 import type { Period } from "@/api/types";
@@ -213,6 +213,56 @@ const BarItem = memo(function BarItem({
   );
 });
 
+// Under the chart: the years on screen; for days the months too ("October – November 2026"), as the bars only carry
+// day numbers.
+const spanText = (buckets: Bucket[], first: number, last: number, granularity: Period, lang: string) => {
+  const firstStart = buckets[first]?.range.start ?? "";
+  const lastStart = buckets[last]?.range.start ?? firstStart;
+  if (!firstStart) return "";
+  const [fromYear, toYear] = [firstStart.slice(0, 4), lastStart.slice(0, 4)];
+  if (granularity !== "day") return fromYear === toYear ? fromYear : `${fromYear} – ${toYear}`;
+  const month = (date: string) => format(date, lang, { month: "long" });
+  const monthYear = (date: string) => format(date, lang, { month: "long", year: "numeric" });
+  if (firstStart.slice(0, 7) === lastStart.slice(0, 7)) return monthYear(firstStart);
+  return fromYear === toYear ? `${month(firstStart)} – ${monthYear(lastStart)}` : `${monthYear(firstStart)} – ${monthYear(lastStart)}`;
+};
+
+// The span follows the list while it moves. It has its own state, fed from the scroll handler through `follow`, so
+// only this line is drawn again (and only when the periods on screen change), not the bars.
+function SpanLabel({
+  buckets,
+  granularity,
+  itemWidth,
+  viewport,
+  startX,
+  followRef,
+}: {
+  buckets: Bucket[];
+  granularity: Period;
+  itemWidth: number;
+  viewport: number;
+  startX: number;
+  followRef: { current: ((x: number) => void) | null };
+}) {
+  const { lang } = useI18n();
+  const range = (x: number) => [Math.max(0, Math.ceil(x / itemWidth - 0.5)), Math.min(buckets.length - 1, Math.floor((x + viewport) / itemWidth - 0.5))];
+  const [shown, setShown] = useState(() => range(startX));
+  useEffect(() => {
+    followRef.current = (x) => {
+      const [first, last] = range(x);
+      setShown((current) => (current[0] === first && current[1] === last ? current : [first, last]));
+    };
+    return () => {
+      followRef.current = null;
+    };
+  });
+  return (
+    <AppText secondary style={{ textAlign: "center", marginTop: spacing.xs, textTransform: "capitalize" }}>
+      {spanText(buckets, shown[0], shown[1], granularity, lang)}
+    </AppText>
+  );
+}
+
 type Props = {
   buckets: Bucket[];
   todayIndex: number;
@@ -232,14 +282,51 @@ export function BarChart(props: Props) {
   // Drawn once the real width is known, so it can open at today's period.
   return (
     <View onLayout={(event) => setViewport(event.nativeEvent.layout.width)}>
-      {viewport === null ? <View style={{ height: BAR_AREA + 1 + LABEL_HEIGHT }} /> : <Bars {...props} viewport={viewport} />}
+      {viewport === null ? <View style={{ height: BAR_AREA + 1 + LABEL_HEIGHT }} /> : <ChunkedBars {...props} viewport={viewport} />}
     </View>
   );
 }
 
-function Bars({ buckets, todayIndex, granularity, mode, colorOf, selection, onSelect, viewport }: Props & { viewport: number }) {
+// Days and weeks are handed to the list in chunks, newest first: the list only holds what's near, and the next older
+// chunk is added once the user has scrolled to the middle of what's loaded, well before reaching its edge.
+// Phone only: keeping the view in place when periods are added in front (maintainVisibleContentPosition) isn't there
+// in the browser, which gets the whole list at once.
+const CHUNK: Partial<Record<Period, number>> = Platform.OS === "web" ? {} : { day: 120, week: 52 };
+
+function ChunkedBars(props: Props & { viewport: number }) {
+  const { buckets, todayIndex, granularity, selection, onSelect } = props;
+  const chunk = CHUNK[granularity];
+  const [from, setFrom] = useState(() => (chunk ? Math.max(0, buckets.length - chunk) : 0));
+  const shown = useMemo(() => (from ? buckets.slice(from) : buckets), [buckets, from]);
+  const loadOlder = useCallback(() => {
+    if (chunk) setFrom((current) => Math.max(0, current - chunk));
+  }, [chunk]);
+  return (
+    <Bars
+      {...props}
+      buckets={shown}
+      todayIndex={todayIndex - from}
+      offsetItems={from}
+      selection={selection && selection.index >= from ? { ...selection, index: selection.index - from } : null}
+      onSelect={(next) => onSelect(next && { ...next, index: next.index + from })}
+      onReachMiddle={from > 0 ? loadOlder : undefined}
+    />
+  );
+}
+
+function Bars({
+  buckets,
+  todayIndex,
+  granularity,
+  mode,
+  colorOf,
+  selection,
+  onSelect,
+  viewport,
+  offsetItems,
+  onReachMiddle,
+}: Props & { viewport: number; offsetItems: number; onReachMiddle?: () => void }) {
   const { colors } = useTheme();
-  const { lang } = useI18n();
   const { money, baseCurrency } = useMoney();
   const itemWidth = ITEM_WIDTH[mode === "general" ? "general" : "stacked"];
   // Days fly by fastest when flung: many more of them are kept drawn on both sides.
@@ -255,7 +342,21 @@ function Bars({ buckets, todayIndex, granularity, mode, colorOf, selection, onSe
   const offset = () => Math.min(scrollX.current, Math.max(0, contentWidth.current - viewport));
   const settleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   // Where the list last came to rest; the scale and the years follow it (and new data), not the moving list.
-  const [restX, setRestX] = useState(startX);
+  // Where the list last came to rest, counted from the oldest period of the whole history (so adding older chunks in
+  // front doesn't move it); the scale and the years follow it (and new data), not the moving list.
+  const lead = offsetItems * itemWidth;
+  const [restAbs, setRestAbs] = useState(startX + lead);
+  const restX = restAbs - lead;
+  // Older periods were put in front: the list's own offset grew by that much. The phone keeps the view in place by
+  // itself (maintainVisibleContentPosition).
+  const lastLead = useRef(lead);
+  const askedAt = useRef(-1);
+  useLayoutEffect(() => {
+    const added = lead - lastLead.current;
+    lastLead.current = lead;
+    if (!added) return;
+    scrollX.current += added;
+  }, [lead]);
   // The plate stays with its bar only until the list moves. Only where the bar was is kept: its height and sum are
   // read from the current data, so they stay right when the bars change (categories <-> tags, a new scale).
   const [plate, setPlate] = useState<{ x: number; index: number; part: BarPart } | null>(null);
@@ -270,23 +371,11 @@ function Bars({ buckets, todayIndex, granularity, mode, colorOf, selection, onSe
   useEffect(() => {
     peakShared.set(withTiming(peak, { duration: GROW_MS, easing: Easing.out(Easing.cubic) }));
   }, [peak, peakShared]);
-  // Under the chart: the years on screen; for days the months too ("October – November 2026"), as the bars only
-  // carry day numbers.
-  const firstStart = buckets[first]?.range.start ?? "";
-  const lastStart = buckets[last]?.range.start ?? "";
-  const span = (() => {
-    if (!firstStart) return "";
-    const [fromYear, toYear] = [firstStart.slice(0, 4), lastStart.slice(0, 4)];
-    if (granularity !== "day") return fromYear === toYear ? fromYear : `${fromYear} – ${toYear}`;
-    const month = (date: string) => format(date, lang, { month: "long" });
-    const monthYear = (date: string) => format(date, lang, { month: "long", year: "numeric" });
-    if (firstStart.slice(0, 7) === lastStart.slice(0, 7)) return monthYear(firstStart);
-    return fromYear === toYear ? `${month(firstStart)} – ${monthYear(lastStart)}` : `${monthYear(firstStart)} – ${monthYear(lastStart)}`;
-  })();
+  const follow = useRef<((x: number) => void) | null>(null);
 
   const settle = () => {
     if (settleTimer.current) clearTimeout(settleTimer.current);
-    settleTimer.current = setTimeout(() => setRestX(scrollX.current), SETTLE_MS);
+    settleTimer.current = setTimeout(() => setRestAbs(scrollX.current + lead), SETTLE_MS);
   };
 
   // The chosen period, for dimming the others on the UI thread.
@@ -346,6 +435,7 @@ function Bars({ buckets, todayIndex, granularity, mode, colorOf, selection, onSe
       <View>
       <FlatList
         data={buckets}
+        maintainVisibleContentPosition={{ minIndexForVisible: 0 }}
         horizontal
         showsHorizontalScrollIndicator={false}
         keyExtractor={(bucket) => bucket.range.start}
@@ -362,12 +452,19 @@ function Bars({ buckets, todayIndex, granularity, mode, colorOf, selection, onSe
         extraData={selection}
         onContentSizeChange={(width) => {
           contentWidth.current = width;
-          setRestX((current) => Math.min(current, Math.max(0, width - viewport)));
+          setRestAbs((current) => Math.min(current, Math.max(0, width - viewport) + lead));
         }}
         onScrollBeginDrag={() => setPlate(null)}
         onScroll={(event) => {
           scrollX.current = event.nativeEvent.contentOffset.x;
+          follow.current?.(scrollX.current);
           settle();
+          // Past the middle of what's loaded: the next older chunk comes now, long before the edge.
+          // Once per chunk: the scroll events that follow before it arrives don't ask again.
+          if (onReachMiddle && askedAt.current !== offsetItems && scrollX.current / itemWidth < buckets.length / 2) {
+            askedAt.current = offsetItems;
+            onReachMiddle();
+          }
         }}
         scrollEventThrottle={32}
       />
@@ -385,9 +482,7 @@ function Bars({ buckets, todayIndex, granularity, mode, colorOf, selection, onSe
           </View>
         </View>
       )}
-      <AppText secondary style={{ textAlign: "center", marginTop: spacing.xs, textTransform: "capitalize" }}>
-        {span}
-      </AppText>
+      <SpanLabel buckets={buckets} granularity={granularity} itemWidth={itemWidth} viewport={viewport} startX={startX} followRef={follow} />
     </View>
   );
 }
