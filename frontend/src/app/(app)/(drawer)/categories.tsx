@@ -31,11 +31,9 @@ export default function CategoriesScreen() {
   const [type, setType] = useState<EntryType>(user?.settings.focus ?? "expense");
   const [dragging, setDragging] = useState(false);
 
-  const [showHidden, setShowHidden] = useState(false);
-
   const ofType = useMemo(() => categoriesOfType(categories, type), [categories, type]);
   const list = useMemo(() => ofType.filter((category) => !isHiddenCategory(category)), [ofType]);
-  // Hidden ones sit under a fold below the list and are not reordered.
+  // Hidden ones form their own block at the end and are not reordered.
   const hidden = useMemo(() => ofType.filter(isHiddenCategory), [ofType]);
 
 
@@ -78,20 +76,18 @@ export default function CategoriesScreen() {
         />
         {hidden.length > 0 && (
           <View>
-            <HiddenSectionHeader count={hidden.length} open={showHidden} onToggle={() => setShowHidden(!showHidden)} />
-            {showHidden && (
-              <View style={{ flexDirection: "row", flexWrap: "wrap", opacity: 0.6 }}>
-                {hidden.map((category) => (
-                  <CategoryCell
-                    key={category.id}
-                    icon={category.icon}
-                    color={category.color}
-                    label={categoryName(category, t)}
-                    onPress={() => router.push({ pathname: "/category/[id]", params: { id: category.id } })}
-                  />
-                ))}
-              </View>
-            )}
+            <HiddenSectionHeader count={hidden.length} />
+            <View style={{ flexDirection: "row", flexWrap: "wrap", opacity: 0.6 }}>
+              {hidden.map((category) => (
+                <CategoryCell
+                  key={category.id}
+                  icon={category.icon}
+                  color={category.color}
+                  label={categoryName(category, t)}
+                  onPress={() => router.push({ pathname: "/category/[id]", params: { id: category.id } })}
+                />
+              ))}
+            </View>
           </View>
         )}
       </ScrollView>

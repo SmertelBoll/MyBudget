@@ -3,7 +3,7 @@ import type { EntryType, Period } from "@/api/types";
 import { useAuth } from "@/auth/AuthProvider";
 import { addDays, todayLocal } from "@/utils/dates";
 import { periodContaining, type PeriodRange } from "@/utils/periods";
-import { useCollection } from "./hooks";
+import { useCollection, useEntries } from "./hooks";
 import { useRates } from "./rates";
 import { NO_TAG, inBaseCurrency, type AccountFilter } from "./stats";
 import { buildTagTree, rootsOf } from "./tags";
@@ -16,7 +16,7 @@ export type Bucket = { range: PeriodRange; income: number; expense: number; stac
 // bar is split by category or by tag, biggest part at the bottom. By tag an entry counts in full in each of its tags
 // (as on Home), so such a bar can be taller than the period's total; the screen says so.
 export const useChartBuckets = (filter: AccountFilter, granularity: Period, mode: ChartMode, by: "category" | "tag") => {
-  const transactions = useCollection("transactions");
+  const transactions = useEntries();
   const accounts = useCollection("accounts");
   const tags = useCollection("tags");
   const rates = useRates();

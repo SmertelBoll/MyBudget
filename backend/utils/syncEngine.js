@@ -47,6 +47,11 @@ const upsertGuards = {
       data.hidden = false;
     }
   },
+  // A correction only moves a balance: nothing else on it.
+  transactions: (data) => {
+    if (!data.isCorrection) return;
+    Object.assign(data, { categoryId: null, tagIds: [], comment: "", photos: [], recurringId: null });
+  },
   tags: async (data, existing, { userId, id }) => {
     data.nameLower = data.name.toLowerCase();
     const duplicate = await TagModel.exists({ userId, nameLower: data.nameLower, deletedAt: null, _id: { $ne: id } });

@@ -4,8 +4,8 @@ import { useCollection } from "./hooks";
 import { convert, useRates } from "./rates";
 import type { Account, Transaction, Transfer } from "./types";
 
-// Spec 5.4: balance = anchor amount + every income/expense/transfer of the account created on the device after
-// the anchor was set (by creation time, not by operation date, so entries added for past days still count).
+// Balance = every income, expense (balance corrections included) and transfer of the account, whatever its date. A
+// balance typed by hand is a correction entry for the difference (accounts.ts), not a new starting point.
 // The collections are new arrays whenever they change, so the last result can be reused while they stay the same:
 // every screen that shows balances (forms, pickers, Home) mounts without going through all entries again.
 let cached: { accounts: Account[]; transactions: Transaction[]; transfers: Transfer[]; result: Map<string, number> } | null = null;
@@ -25,21 +25,14 @@ export const computeBalances = (accounts: Account[], transactions: Transaction[]
 };
 
 const computeFresh = (accounts: Account[], transactions: Transaction[], transfers: Transfer[]) => {
-  const anchors = new Map(accounts.map((account) => [account.id, Date.parse(account.balanceAnchorAt)]));
-  const balances = new Map(accounts.map((account) => [account.id, account.balanceAnchor]));
-
-  const add = (accountId: string, createdAt: string, delta: number) => {
-    const anchor = anchors.get(accountId);
-    if (anchor === undefined || Date.parse(createdAt) <= anchor) return;
-    balances.set(accountId, (balances.get(accountId) ?? 0) + delta);
+  const balances = new Map(accounts.map((account) => [account.id, 0]));
+  const add = (accountId: string, delta: number) => {
+    if (balances.has(accountId)) balances.set(accountId, balances.get(accountId)! + delta);
   };
-
-  for (const tx of transactions) {
-    add(tx.accountId, tx.clientCreatedAt, tx.type === "income" ? tx.accountAmount : -tx.accountAmount);
-  }
+  for (const tx of transactions) add(tx.accountId, tx.type === "income" ? tx.accountAmount : -tx.accountAmount);
   for (const transfer of transfers) {
-    add(transfer.fromAccountId, transfer.clientCreatedAt, -transfer.amountFrom);
-    add(transfer.toAccountId, transfer.clientCreatedAt, transfer.amountTo);
+    add(transfer.fromAccountId, -transfer.amountFrom);
+    add(transfer.toAccountId, transfer.amountTo);
   }
   return balances;
 };

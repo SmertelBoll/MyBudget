@@ -17,6 +17,8 @@ export type Account = Base & {
   color: string;
   includeInTotal: boolean;
   note: string;
+  // No longer used: older versions counted the balance from here. Always 0 and the creation time now; balance
+  // corrections are entries (Transaction.isCorrection).
   balanceAnchor: number;
   balanceAnchorAt: string;
   sortOrder: number;
@@ -49,7 +51,11 @@ export type Tag = Base & {
 export type Transaction = Base & {
   type: EntryType;
   accountId: string;
-  categoryId: string;
+  // null only on a balance correction.
+  categoryId: string | null;
+  // A balance correction (the user typed a balance by hand, or an account's starting balance): it only moves the
+  // account's balance, has no category or tags and never shows in lists or statistics. Missing on older entries.
+  isCorrection?: boolean;
   tagIds: string[];
   amount: number;
   currency: string;
@@ -61,6 +67,9 @@ export type Transaction = Base & {
   recurringId: string | null;
   clientCreatedAt: string;
 };
+
+// An income or expense the user sees (everything but corrections): it always has a category.
+export type Entry = Transaction & { categoryId: string; isCorrection?: false };
 
 export type Transfer = Base & {
   fromAccountId: string;

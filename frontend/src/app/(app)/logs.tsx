@@ -5,11 +5,11 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import type { EntryType } from "@/api/types";
 import { useAuth } from "@/auth/AuthProvider";
 import { categoryName } from "@/data/categories";
-import { useCollection } from "@/data/hooks";
+import { useCollection, useEntries } from "@/data/hooks";
 import { useRates } from "@/data/rates";
 import { useTagTree } from "@/data/tags";
 import { NO_TAG, filterTransactions, inBaseCurrency, type AccountFilter } from "@/data/stats";
-import type { Transaction } from "@/data/types";
+import type { Entry } from "@/data/types";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTheme } from "@/theme/ThemeProvider";
 import { radius, spacing } from "@/theme/tokens";
@@ -57,7 +57,7 @@ export default function LogsScreen() {
   const { user } = useAuth();
   const bottomSpace = useBottomSpace();
   const params = useLocalSearchParams<Params>();
-  const transactions = useCollection("transactions");
+  const transactions = useEntries();
   const accounts = useCollection("accounts");
   const categories = useCollection("categories");
   const rates = useRates();
@@ -154,7 +154,7 @@ export default function LogsScreen() {
     return relative ? `${relative}, ${formatLongDate(date, lang)}` : formatLongDate(date, lang);
   };
 
-  const renderRow = ({ tx, value }: { tx: Transaction; value: number }) => {
+  const renderRow = ({ tx, value }: { tx: Entry; value: number }) => {
     const category = categoryById.get(tx.categoryId);
     const account = accountById.get(tx.accountId);
     return (

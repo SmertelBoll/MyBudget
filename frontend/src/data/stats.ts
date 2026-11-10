@@ -2,10 +2,10 @@ import { useMemo } from "react";
 import type { EntryType } from "@/api/types";
 import { useAuth } from "@/auth/AuthProvider";
 import { inPeriod, type PeriodRange } from "@/utils/periods";
-import { useCollection } from "./hooks";
+import { useCollection, useEntries } from "./hooks";
 import { convert, useRates, type Rates } from "./rates";
 import { rootsOf, type TagTree } from "./tags";
-import type { Account, Transaction } from "./types";
+import type { Account, Entry, Transaction } from "./types";
 
 // null = Total: every account, whether or not it counts in the Total balance (Q3).
 export type AccountFilter = string[] | null;
@@ -26,7 +26,7 @@ export const inBaseCurrency = (tx: Transaction, accounts: Map<string, Account>, 
 };
 
 export const filterTransactions = (
-  transactions: Transaction[],
+  transactions: Entry[],
   { type, accountIds, range }: { type: EntryType; accountIds: AccountFilter; range: PeriodRange }
 ) => {
   const allowed = accountIds ? new Set(accountIds) : null;
@@ -36,7 +36,7 @@ export const filterTransactions = (
 };
 
 // The top-level tags an entry counts in (a subtag counts in its parent), or "no tag".
-const rootTagsOf = (tx: Transaction, tree: TagTree) => {
+const rootTagsOf = (tx: Entry, tree: TagTree) => {
   const roots = rootsOf(tx.tagIds, tree);
   return roots.length ? roots : [NO_TAG];
 };
@@ -48,7 +48,7 @@ const sorted = (map: Map<string, number>) =>
 // no subtags). An entry with several tags counts in each of its tags; the total counts it once, so tag shares may
 // add up to more than 100 %.
 export const groupEntries = (
-  entries: { tx: Transaction; value: number }[],
+  entries: { tx: Entry; value: number }[],
   by: "category" | "tag",
   tree: TagTree
 ): { total: number; groups: Group[] } => {
@@ -92,7 +92,7 @@ export const groupEntries = (
 
 // Entries of the chosen accounts, type and period, each with its amount in the main currency.
 export const usePeriodEntries = (type: EntryType, accountIds: AccountFilter, range: PeriodRange) => {
-  const transactions = useCollection("transactions");
+  const transactions = useEntries();
   const accounts = useCollection("accounts");
   const rates = useRates();
   const { user } = useAuth();

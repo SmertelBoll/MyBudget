@@ -6,9 +6,10 @@ import { buildXlsx, XLSX_MIME, type Cell } from "@/utils/xlsx";
 import { resetBalanceCache } from "./balances";
 import { categoryName } from "./categories";
 import { deleteLocalPhotoFiles, photoBytes, storePhotoBytes } from "./photos";
+import { visibleEntries } from "./hooks";
 import { getSnapshot, loadAll, setMeta, wipeLocal } from "./store";
 import { requestSync } from "./sync";
-import { COLLECTIONS, type Collection, type EntityMap, type Transaction, type Transfer } from "./types";
+import { COLLECTIONS, type Collection, type EntityMap, type Entry, type Transaction, type Transfer } from "./types";
 
 // Settings -> Data and storage (spec 13.4).
 
@@ -71,7 +72,7 @@ export type OutputFile = { name: string; bytes: Uint8Array; mimeType: string };
 const TRANSACTION_WIDTHS = [12, 20, 20, 24, 14, 9, 14, 9, 10, 30, 20];
 
 // One row per entry with every field: both amounts and the rate (spec 13.4).
-const transactionRows = (transactions: Transaction[], t: Translate): Cell[][] => {
+const transactionRows = (transactions: Entry[], t: Translate): Cell[][] => {
   const { accounts, categories, tags } = lookups(t);
   const header = [
     t("export.date"),
@@ -111,14 +112,15 @@ const transactionRows = (transactions: Transaction[], t: Translate): Cell[][] =>
 const safeName = (name: string) => name.replace(/[\\/:*?"<>|]/g, "-");
 
 // The entries shown in the transaction log (its type, accounts, period, category or tag, search), as one sheet.
-export const exportTransactions = (transactions: Transaction[], t: Translate, sheet: string, label: string): OutputFile => ({
+export const exportTransactions = (transactions: Entry[], t: Translate, sheet: string, label: string): OutputFile => ({
   name: safeName(`MyBudget-${sheet}-${label}.xlsx`),
   bytes: buildXlsx([{ name: sheet, rows: transactionRows(transactions, t), widths: TRANSACTION_WIDTHS }]),
   mimeType: XLSX_MIME,
 });
 
 export const exportToExcel = (t: Translate): OutputFile => {
-  const transactions = getSnapshot("transactions");
+  // Balance corrections are not entries of the user's: the export leaves them out, the backup keeps them.
+  const transactions = visibleEntries(getSnapshot("transactions"));
   const rows = (type: Transaction["type"]) => transactionRows(transactions.filter((tx) => tx.type === type), t);
   const widths = TRANSACTION_WIDTHS;
   const bytes = buildXlsx([
@@ -242,7 +244,7 @@ export const deleteAllData = async () => {
   return user;
 };
 
-// Spec 5.4. Balances are never stored here: they're always worked out from each account's anchor and its entries.
+// Balances are never stored here: they're always worked out from each account's entries and transfers.
 // "Recalculate" reads everything from the device's database again and works the balances out from scratch, then
 // syncs, so the result also includes what other devices added.
 export const recalculateBalances = async () => {

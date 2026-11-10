@@ -1,33 +1,32 @@
-import { Pressable } from "react-native";
+import { View } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTheme } from "@/theme/ThemeProvider";
 import { spacing } from "@/theme/tokens";
 import { AppText } from "./AppText";
 
-// The fold under a list that holds its hidden categories or tags: closed by default, so they stay out of the way.
-export function HiddenSectionHeader({ count, open, onToggle }: { count: number; open: boolean; onToggle: () => void }) {
+// Title of the separate block at the very end of a list that holds its hidden categories or tags.
+export function HiddenSectionHeader({ count }: { count: number }) {
   const { colors } = useTheme();
   const { t } = useI18n();
   return (
-    <Pressable
-      onPress={onToggle}
-      accessibilityRole="button"
-      accessibilityState={{ expanded: open }}
-      style={({ pressed }) => ({
+    <View
+      accessibilityRole="header"
+      style={{
         flexDirection: "row",
         alignItems: "center",
         gap: spacing.sm,
-        minHeight: 48,
+        marginTop: spacing.lg,
+        paddingTop: spacing.md,
         paddingHorizontal: spacing.xs,
-        opacity: pressed ? 0.6 : 1,
-      })}
+        borderTopWidth: 1,
+        borderTopColor: colors.selected,
+      }}
     >
       <MaterialCommunityIcons name="eye-off-outline" size={20} color={colors.textSecondary} />
       <AppText variant="label" secondary style={{ flex: 1 }}>
         {t("hide.section", { count })}
       </AppText>
-      <MaterialCommunityIcons name={open ? "chevron-up" : "chevron-down"} size={22} color={colors.textSecondary} />
-    </Pressable>
+    </View>
   );
 }

@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { parseLocalDate, todayLocal } from "@/utils/dates";
-import { useCollection } from "./hooks";
+import { useEntries } from "./hooks";
 import type { Tag } from "./types";
 
 // Spec 4.6, tag order: most likely first. A "frecency" score (frequency and recency, as in Firefox's address bar):
@@ -13,7 +13,7 @@ const DAY_MS = 86_400_000;
 type Scores = { overall: Map<string, number>; byCategory: Map<string, Map<string, number>> };
 
 const useTagScores = (): Scores => {
-  const transactions = useCollection("transactions");
+  const transactions = useEntries();
   return useMemo(() => {
     const today = parseLocalDate(todayLocal()).getTime();
     const overall = new Map<string, number>();

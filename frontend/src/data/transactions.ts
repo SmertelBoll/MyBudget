@@ -1,14 +1,13 @@
 import { newId } from "./accounts";
 import { getMeta, removeEntity, saveEntity, setMeta } from "./store";
-import type { Recurring, Transaction } from "./types";
+import type { Entry, Recurring, Transaction } from "./types";
 
 export type TransactionFields = Pick<
-  Transaction,
+  Entry,
   "type" | "accountId" | "categoryId" | "tagIds" | "amount" | "currency" | "accountAmount" | "rate" | "date" | "comment" | "photos"
 >;
 
-// Screen 4. A new entry is stamped with the device time: the balance rule compares it with the account's anchor
-// (spec 5.4), so an entry for last week still changes today's balance.
+// Screen 4. A new entry is stamped with the device time (when it was made, apart from the date it is for).
 export const saveTransaction = async (fields: TransactionFields, existing?: Transaction) => {
   const transaction: Transaction = {
     ...existing,

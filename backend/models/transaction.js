@@ -6,7 +6,8 @@ import { syncedSchema } from "./syncedSchema.js";
 const TransactionSchema = syncedSchema({
   type: { type: String, enum: ["expense", "income"], required: true },
   accountId: { type: String, required: true },
-  categoryId: { type: String, required: true },
+  // null only on a balance correction.
+  categoryId: { type: String, default: null },
   tagIds: { type: [String], default: [] },
   amount: { type: Number, required: true },
   currency: { type: String, required: true },
@@ -17,10 +18,12 @@ const TransactionSchema = syncedSchema({
   comment: { type: String, default: "" },
   // Photo ids, up to 3.
   photos: { type: [String], default: [] },
+  // A balance correction: made when the user types an account balance by hand (or for an account's starting
+  // balance). It moves the balance only: no category or tags, and it never shows in lists or statistics.
+  isCorrection: { type: Boolean, default: false },
   // Set when generated from a regular payment.
   recurringId: { type: String, default: null },
-  // When the record was made on the device (UTC). The balance rule compares it with balanceAnchorAt; the server's
-  // createdAt would be the sync time instead.
+  // When the record was made on the device (UTC); the server's createdAt would be the sync time instead.
   clientCreatedAt: { type: Date, required: true },
 });
 

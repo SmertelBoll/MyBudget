@@ -9,8 +9,9 @@ const AccountSchema = syncedSchema({
   color: { type: String, required: true },
   includeInTotal: { type: Boolean, default: true },
   note: { type: String, default: "" },
-  // Balance = balanceAnchor + every transaction/transfer created after balanceAnchorAt (spec 5.4). Both are reset
-  // when the user types the balance in by hand.
+  // Balance = every transaction (balance corrections included) and transfer of the account. These two are what older
+  // app versions counted from; now always 0 and the creation time (scripts/migrate-balance-corrections.js turned the
+  // old ones into corrections).
   balanceAnchor: { type: Number, default: 0 },
   balanceAnchorAt: { type: Date, required: true },
   sortOrder: { type: Number, default: 0 },

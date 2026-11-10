@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import type { SelectOption } from "@/components/SelectField";
 import { useAuth } from "@/auth/AuthProvider";
-import { useCollection } from "@/data/hooks";
+import { useCollection, useEntries } from "@/data/hooks";
 import { useRates } from "@/data/rates";
 import { useI18n } from "@/i18n/I18nProvider";
 
@@ -79,7 +79,7 @@ export const usePinnedCurrencies = () => {
   const { user } = useAuth();
   const baseCurrency = user?.baseCurrency;
   const accounts = useCollection("accounts");
-  const transactions = useCollection("transactions");
+  const transactions = useEntries();
   return useMemo(() => {
     const lastUsed = new Map<string, string>();
     const touch = (code: string, at: string | undefined) => {

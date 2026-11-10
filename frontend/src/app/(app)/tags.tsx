@@ -29,9 +29,7 @@ export default function TagsScreen() {
   const tree = useTagTree();
   const remove = useDeleteTag();
   const [query, setQuery] = useState("");
-  const [showHidden, setShowHidden] = useState(false);
-
-  // Hidden tags (and subtags of hidden ones) go under a fold at the end; a search opens it.
+  // Hidden tags (and subtags of hidden ones) form their own block at the end.
   const rows = useMemo(() => {
     const needle = query.trim().toLowerCase();
     const matches = ({ tag }: { tag: Tag }) => !needle || tag.name.toLowerCase().includes(needle);
@@ -46,8 +44,8 @@ export default function TagsScreen() {
         return { kind: "tag", tag, depth: depth && parent && tree.isHidden(parent) ? 1 : 0, hidden: true };
       });
     if (!hidden.length) return shown;
-    return [...shown, { kind: "fold", count: hidden.length } as Row, ...(showHidden || needle ? hidden : [])];
-  }, [tree, query, showHidden]);
+    return [...shown, { kind: "fold", count: hidden.length } as Row, ...hidden];
+  }, [tree, query]);
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
@@ -72,7 +70,7 @@ export default function TagsScreen() {
         }
         renderItem={({ item }) => {
           if (item.kind === "fold")
-            return <HiddenSectionHeader count={item.count} open={showHidden || Boolean(query.trim())} onToggle={() => setShowHidden(!showHidden)} />;
+            return <HiddenSectionHeader count={item.count} />;
           const { tag, depth, hidden } = item;
           const subtags = tree.children.get(tag.id)?.length ?? 0;
           return (

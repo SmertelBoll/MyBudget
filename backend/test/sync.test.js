@@ -158,6 +158,19 @@ describe("business rules", () => {
     assert.equal(after.body.item.hidden, false);
   });
 
+  it("takes a balance correction without a category, and strips everything else off it", async () => {
+    const res = await push(anna, [
+      { collection: "transactions", id: "tx-fix", op: "upsert", data: transaction({ categoryId: null, isCorrection: true, tagIds: ["tag-x"], comment: "hi" }) },
+      { collection: "transactions", id: "tx-nocat", op: "upsert", data: transaction({ categoryId: null }) },
+    ]);
+    assert.deepEqual(res.body.results.map((r) => r.status), ["applied", "rejected"]);
+    const fix = (await http.get("/transactions/tx-fix", anna.accessToken)).body.item;
+    assert.equal(fix.isCorrection, true);
+    assert.equal(fix.categoryId, null);
+    assert.deepEqual(fix.tagIds, []);
+    assert.equal(fix.comment, "");
+  });
+
   it("keeps a hidden category and tag hidden, and old ones visible", async () => {
     await push(anna, [
       { collection: "categories", id: "cat-hidden", op: "upsert", data: { name: "Old", type: "expense", icon: "star", color: "#ffffff", hidden: true } },

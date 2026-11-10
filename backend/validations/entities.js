@@ -65,21 +65,25 @@ export const entitySchemas = {
     parentId: id.nullable().default(null),
     hidden: z.boolean().default(false),
   }),
-  transactions: z.object({
-    type,
-    accountId: id,
-    categoryId: id,
-    tagIds,
-    amount: positiveMinor,
-    currency,
-    accountAmount: positiveMinor,
-    rate: z.number().positive(),
-    date: localDate,
-    comment,
-    photos: z.array(id).max(3).default([]),
-    recurringId: id.nullable().default(null),
-    clientCreatedAt: isoDateTime,
-  }),
+  transactions: z
+    .object({
+      type,
+      accountId: id,
+      // null only on a balance correction (isCorrection).
+      categoryId: id.nullable().default(null),
+      isCorrection: z.boolean().default(false),
+      tagIds,
+      amount: positiveMinor,
+      currency,
+      accountAmount: positiveMinor,
+      rate: z.number().positive(),
+      date: localDate,
+      comment,
+      photos: z.array(id).max(3).default([]),
+      recurringId: id.nullable().default(null),
+      clientCreatedAt: isoDateTime,
+    })
+    .refine((t) => t.isCorrection || t.categoryId !== null, { message: "categoryId is required", path: ["categoryId"] }),
   transfers: z
     .object({
       fromAccountId: id,
