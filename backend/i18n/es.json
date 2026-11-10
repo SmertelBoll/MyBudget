@@ -732,5 +732,10 @@
   "receipt.fillComments": "Rellenar comentarios (artículo · tienda)",
   "common.timeout": "El servidor tardó demasiado en responder. Inténtalo de nuevo",
   "sync.slow": "El servidor responde despacio. Toca para reintentar",
-  "sessions.loading": "Cargando sesiones…"
+  "sessions.loading": "Cargando sesiones…",
+  "hide.category": "Ocultar categoría",
+  "hide.tag": "Ocultar etiqueta",
+  "hide.hint": "No se ofrecerá para nuevos registros. Los registros existentes, las estadísticas y los filtros la conservan.",
+  "hide.tagWithSubtagsHint": "Ni ella ni sus subetiquetas se ofrecerán para nuevos registros. Los registros existentes, las estadísticas y los filtros las conservan.",
+  "hide.section": "Ocultas ({{count}})"
 }

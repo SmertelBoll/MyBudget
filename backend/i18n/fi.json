@@ -722,5 +722,10 @@
   "receipt.fillComments": "Täytä kommentit (tuote · kauppa)",
   "common.timeout": "Palvelin vastasi liian hitaasti. Yritä uudelleen",
   "sync.slow": "Palvelin vastaa hitaasti. Yritä uudelleen napauttamalla",
-  "sessions.loading": "Ladataan istuntoja…"
+  "sessions.loading": "Ladataan istuntoja…",
+  "hide.category": "Piilota luokka",
+  "hide.tag": "Piilota tunniste",
+  "hide.hint": "Sitä ei tarjota uusiin merkintöihin. Nykyiset merkinnät, tilastot ja suodattimet säilyttävät sen.",
+  "hide.tagWithSubtagsHint": "Sitä ja sen alatunnisteita ei tarjota uusiin merkintöihin. Nykyiset merkinnät, tilastot ja suodattimet säilyttävät ne.",
+  "hide.section": "Piilotetut ({{count}})"
 }

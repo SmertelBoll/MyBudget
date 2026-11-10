@@ -712,5 +712,10 @@
   "receipt.fillComments": "메모 채우기 (항목 · 상점)",
   "common.timeout": "서버 응답이 너무 오래 걸렸습니다. 다시 시도하세요",
   "sync.slow": "서버 응답이 느립니다. 탭하여 다시 시도",
-  "sessions.loading": "세션 불러오는 중…"
+  "sessions.loading": "세션 불러오는 중…",
+  "hide.category": "카테고리 숨기기",
+  "hide.tag": "태그 숨기기",
+  "hide.hint": "새 기록에서는 제안되지 않습니다. 기존 기록, 통계, 필터에는 그대로 남습니다.",
+  "hide.tagWithSubtagsHint": "이 태그와 하위 태그는 새 기록에서 제안되지 않습니다. 기존 기록, 통계, 필터에는 그대로 남습니다.",
+  "hide.section": "숨김 ({{count}})"
 }

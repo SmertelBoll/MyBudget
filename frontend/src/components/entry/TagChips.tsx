@@ -86,9 +86,10 @@ export function TagChips({
   const visible = useMemo(() => {
     const needle = query.trim().toLowerCase();
     // Chosen tags first, so they're visible without scrolling.
-    const sorted = [...ranked].sort((a, b) => Number(value.includes(b.id)) - Number(value.includes(a.id)));
+    // Hidden tags (and subtags of hidden ones) aren't offered, except those this entry already has.
+    const sorted = ranked.filter((tag) => !tagTree.isHidden(tag.id) || value.includes(tag.id)).sort((a, b) => Number(value.includes(b.id)) - Number(value.includes(a.id)));
     return sorted.filter((tag) => !needle || tag.name.toLowerCase().includes(needle));
-  }, [ranked, query, value]);
+  }, [ranked, query, value, tagTree]);
 
   const toggle = (id: string) => onChange(value.includes(id) ? value.filter((tagId) => tagId !== id) : [...value, id]);
 

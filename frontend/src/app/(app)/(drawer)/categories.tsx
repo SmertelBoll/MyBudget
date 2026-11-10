@@ -4,7 +4,7 @@ import { ScrollView } from "react-native-gesture-handler";
 import { router } from "expo-router";
 import type { EntryType } from "@/api/types";
 import { useAuth } from "@/auth/AuthProvider";
-import { categoriesOfType, categoryName } from "@/data/categories";
+import { categoriesOfType, categoryName, isHiddenCategory } from "@/data/categories";
 import { useCollection } from "@/data/hooks";
 import { applyOrder } from "@/data/ordering";
 import { reportWriteError } from "@/data/store";
@@ -14,6 +14,7 @@ import { spacing } from "@/theme/tokens";
 import { useBottomSpace } from "@/utils/useBottomSpace";
 import { BottomActionButton } from "@/components/BottomActionButton";
 import { CategoryCell } from "@/components/CategoryCell";
+import { HiddenSectionHeader } from "@/components/HiddenSectionHeader";
 import { IconButton } from "@/components/IconButton";
 import { Reorderable } from "@/components/Reorderable";
 import { ScreenHeader } from "@/components/ScreenHeader";
@@ -30,7 +31,12 @@ export default function CategoriesScreen() {
   const [type, setType] = useState<EntryType>(user?.settings.focus ?? "expense");
   const [dragging, setDragging] = useState(false);
 
-  const list = useMemo(() => categoriesOfType(categories, type), [categories, type]);
+  const [showHidden, setShowHidden] = useState(false);
+
+  const ofType = useMemo(() => categoriesOfType(categories, type), [categories, type]);
+  const list = useMemo(() => ofType.filter((category) => !isHiddenCategory(category)), [ofType]);
+  // Hidden ones sit under a fold below the list and are not reordered.
+  const hidden = useMemo(() => ofType.filter(isHiddenCategory), [ofType]);
 
 
   return (
@@ -70,6 +76,24 @@ export default function CategoriesScreen() {
             />
           )}
         />
+        {hidden.length > 0 && (
+          <View>
+            <HiddenSectionHeader count={hidden.length} open={showHidden} onToggle={() => setShowHidden(!showHidden)} />
+            {showHidden && (
+              <View style={{ flexDirection: "row", flexWrap: "wrap", opacity: 0.6 }}>
+                {hidden.map((category) => (
+                  <CategoryCell
+                    key={category.id}
+                    icon={category.icon}
+                    color={category.color}
+                    label={categoryName(category, t)}
+                    onPress={() => router.push({ pathname: "/category/[id]", params: { id: category.id } })}
+                  />
+                ))}
+              </View>
+            )}
+          </View>
+        )}
       </ScrollView>
 
       <BottomActionButton

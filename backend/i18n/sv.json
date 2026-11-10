@@ -722,5 +722,10 @@
   "receipt.fillComments": "Fyll i kommentarer (vara · butik)",
   "common.timeout": "Servern tog för lång tid att svara. Försök igen",
   "sync.slow": "Servern svarar långsamt. Tryck för att försöka igen",
-  "sessions.loading": "Läser in sessioner…"
+  "sessions.loading": "Läser in sessioner…",
+  "hide.category": "Dölj kategori",
+  "hide.tag": "Dölj tagg",
+  "hide.hint": "Den föreslås inte för nya poster. Befintliga poster, statistik och filter behåller den.",
+  "hide.tagWithSubtagsHint": "Taggen och dess undertaggar föreslås inte för nya poster. Befintliga poster, statistik och filter behåller dem.",
+  "hide.section": "Dolda ({{count}})"
 }

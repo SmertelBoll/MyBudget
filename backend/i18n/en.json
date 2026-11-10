@@ -757,5 +757,10 @@
   "receipt.fillComments": "Fill comments (item · store)",
   "common.timeout": "The server took too long to answer. Please try again",
   "sync.slow": "The server is slow to answer. Tap to retry",
-  "sessions.loading": "Loading sessions…"
+  "sessions.loading": "Loading sessions…",
+  "hide.category": "Hide category",
+  "hide.tag": "Hide tag",
+  "hide.hint": "It won't be offered for new entries. Existing entries, statistics and filters keep it.",
+  "hide.tagWithSubtagsHint": "It and its subtags won't be offered for new entries. Existing entries, statistics and filters keep them.",
+  "hide.section": "Hidden ({{count}})"
 }

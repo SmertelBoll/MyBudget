@@ -26,6 +26,7 @@ import { IconPicker } from "@/components/IconPicker";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import { SegmentedSwitch } from "@/components/SegmentedSwitch";
 import { TextField } from "@/components/TextField";
+import { ToggleRow } from "@/components/ToggleRow";
 
 type FormValues = {
   name: string;
@@ -33,6 +34,7 @@ type FormValues = {
   limit: string;
   icon: string;
   color: string;
+  hidden: boolean;
 };
 
 // Screen 7.2: create ("new", ?type=expense|income from the list it was opened from) and edit share one form.
@@ -50,6 +52,7 @@ export default function CategoryFormScreen() {
       limit: existing?.plannedMonthly ? toInput(existing.plannedMonthly) : "",
       icon: existing?.icon ?? DEFAULT_CATEGORY_ICON[startType],
       color: existing?.color ?? DEFAULT_COLOR,
+      hidden: Boolean(existing?.hidden),
     };
   });
 
@@ -88,7 +91,7 @@ function CategoryForm({ initial, existingId }: { initial: FormValues; existingId
     setSaving(true);
     const translated = existing?.nameKey ? t(existing.nameKey) : null;
     saveCategory(
-      { name: values.name.trim(), type: values.type, icon: values.icon, color: values.color, plannedMonthly: limit },
+      { name: values.name.trim(), type: values.type, icon: values.icon, color: values.color, plannedMonthly: limit, hidden: values.hidden },
       translated,
       existing
     ).catch(reportWriteError);
@@ -209,6 +212,15 @@ function CategoryForm({ initial, existingId }: { initial: FormValues; existingId
           )}
 
           <ColorPicker label={t("accounts.color")} value={values.color} onChange={(color) => set("color", color)} />
+
+          {existing && !locked && (
+            <View style={{ gap: spacing.xs }}>
+              <ToggleRow label={t("hide.category")} value={values.hidden} onChange={(hidden) => set("hidden", hidden)} />
+              <AppText variant="caption" secondary>
+                {t("hide.hint")}
+              </AppText>
+            </View>
+          )}
         </KeyboardAwareScrollView>
 
       <BottomActionButton

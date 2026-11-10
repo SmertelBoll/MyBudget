@@ -712,5 +712,10 @@
   "receipt.fillComments": "填写备注（条目 · 商店）",
   "common.timeout": "服务器响应时间过长，请重试",
   "sync.slow": "服务器响应缓慢，点按重试",
-  "sessions.loading": "正在加载会话…"
+  "sessions.loading": "正在加载会话…",
+  "hide.category": "隐藏分类",
+  "hide.tag": "隐藏标签",
+  "hide.hint": "新记录中将不再推荐它。已有记录、统计和筛选仍会保留它。",
+  "hide.tagWithSubtagsHint": "该标签及其子标签在新记录中将不再推荐。已有记录、统计和筛选仍会保留它们。",
+  "hide.section": "已隐藏 ({{count}})"
 }

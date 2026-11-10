@@ -732,5 +732,10 @@
   "receipt.fillComments": "Compila i commenti (voce · negozio)",
   "common.timeout": "Il server ha impiegato troppo a rispondere. Riprova",
   "sync.slow": "Il server risponde lentamente. Tocca per riprovare",
-  "sessions.loading": "Caricamento sessioni…"
+  "sessions.loading": "Caricamento sessioni…",
+  "hide.category": "Nascondi categoria",
+  "hide.tag": "Nascondi etichetta",
+  "hide.hint": "Non verrà proposta per le nuove voci. Le voci esistenti, le statistiche e i filtri la mantengono.",
+  "hide.tagWithSubtagsHint": "L'etichetta e le sue sottoetichette non verranno proposte per le nuove voci. Le voci esistenti, le statistiche e i filtri le mantengono.",
+  "hide.section": "Nascoste ({{count}})"
 }

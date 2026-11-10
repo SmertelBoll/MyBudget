@@ -52,7 +52,8 @@ const parseCollections = (collections) => {
   for (const type of ["expense", "income"]) {
     const others = result.categories.filter(({ data }) => data.type === type && data.isSystemOther);
     others.slice(1).forEach(({ data }) => (data.isSystemOther = false));
-    if (!others.length) {
+    if (others.length) others[0].data.hidden = false;
+    else {
       result.categories.push({
         id: crypto.randomUUID(),
         data: { name: null, nameKey: "category.other", type, icon: "dots-horizontal", color: "#9e9e9e", plannedMonthly: null, sortOrder: 999, isSystemOther: true },

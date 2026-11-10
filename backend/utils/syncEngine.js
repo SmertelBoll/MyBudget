@@ -40,9 +40,11 @@ const upsertGuards = {
   categories: (data, existing) => {
     data.isSystemOther = existing?.isSystemOther ?? false;
     if (existing) data.type = existing.type;
-    // "Other" is the fallback for deleted categories: only its color and place in the list may change.
+    // "Other" is the fallback for deleted categories: only its color and place in the list may change, and it is
+    // never hidden.
     if (existing?.isSystemOther) {
       for (const field of ["name", "nameKey", "icon", "plannedMonthly"]) data[field] = existing[field];
+      data.hidden = false;
     }
   },
   tags: async (data, existing, { userId, id }) => {

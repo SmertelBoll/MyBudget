@@ -722,5 +722,10 @@
   "receipt.fillComments": "Megjegyzések kitöltése (tétel · üzlet)",
   "common.timeout": "A szerver túl sokáig nem válaszolt. Próbáld újra",
   "sync.slow": "A szerver lassan válaszol. Koppints az újrapróbáláshoz",
-  "sessions.loading": "Munkamenetek betöltése…"
+  "sessions.loading": "Munkamenetek betöltése…",
+  "hide.category": "Kategória elrejtése",
+  "hide.tag": "Címke elrejtése",
+  "hide.hint": "Új bejegyzéseknél nem lesz felajánlva. A meglévő bejegyzések, statisztikák és szűrők megtartják.",
+  "hide.tagWithSubtagsHint": "A címke és alcímkéi új bejegyzéseknél nem lesznek felajánlva. A meglévő bejegyzések, statisztikák és szűrők megtartják őket.",
+  "hide.section": "Rejtett ({{count}})"
 }

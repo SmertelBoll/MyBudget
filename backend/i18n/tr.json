@@ -722,5 +722,10 @@
   "receipt.fillComments": "Açıklamaları doldur (kalem · mağaza)",
   "common.timeout": "Sunucunun yanıt vermesi çok uzun sürdü. Tekrar deneyin",
   "sync.slow": "Sunucu yavaş yanıt veriyor. Tekrar denemek için dokunun",
-  "sessions.loading": "Oturumlar yükleniyor…"
+  "sessions.loading": "Oturumlar yükleniyor…",
+  "hide.category": "Kategoriyi gizle",
+  "hide.tag": "Etiketi gizle",
+  "hide.hint": "Yeni kayıtlar için önerilmez. Mevcut kayıtlar, istatistikler ve filtreler onu korur.",
+  "hide.tagWithSubtagsHint": "Etiket ve alt etiketleri yeni kayıtlar için önerilmez. Mevcut kayıtlar, istatistikler ve filtreler onları korur.",
+  "hide.section": "Gizli ({{count}})"
 }

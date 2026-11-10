@@ -4,7 +4,7 @@ import { router } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import type { EntryType } from "@/api/types";
-import { categoriesOfType, categoryName } from "@/data/categories";
+import { categoriesOfType, categoryName, isHiddenCategory } from "@/data/categories";
 import { useCollection } from "@/data/hooks";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTheme } from "@/theme/ThemeProvider";
@@ -35,7 +35,11 @@ export function CategoryChooser({
   const categories = useCollection("categories");
   const [open, setOpen] = useState(false);
 
-  const all = useMemo(() => categoriesOfType(categories, type), [categories, type]);
+  // Hidden categories aren't offered, except the one this entry already has.
+  const all = useMemo(
+    () => categoriesOfType(categories, type).filter((category) => !isHiddenCategory(category) || category.id === value),
+    [categories, type, value]
+  );
   const inline = all.slice(0, INLINE);
   const chosen = all.find((category) => category.id === value);
   if (chosen && !inline.includes(chosen)) inline[INLINE - 1] = chosen;

@@ -13,6 +13,8 @@ const CategorySchema = syncedSchema({
   sortOrder: { type: Number, default: 0 },
   // "Other": one per type, can't be deleted; deleted categories' transactions move here.
   isSystemOther: { type: Boolean, default: false },
+  // Hidden: left out of the pickers and the main list; its entries keep it in history and statistics.
+  hidden: { type: Boolean, default: false },
 });
 
 export default mongoose.model("Category", CategorySchema);

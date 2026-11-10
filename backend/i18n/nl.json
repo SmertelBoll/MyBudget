@@ -722,5 +722,10 @@
   "receipt.fillComments": "Opmerkingen invullen (artikel · winkel)",
   "common.timeout": "De server deed er te lang over om te antwoorden. Probeer het opnieuw",
   "sync.slow": "De server reageert traag. Tik om opnieuw te proberen",
-  "sessions.loading": "Sessies laden…"
+  "sessions.loading": "Sessies laden…",
+  "hide.category": "Categorie verbergen",
+  "hide.tag": "Tag verbergen",
+  "hide.hint": "Wordt niet meer aangeboden voor nieuwe items. Bestaande items, statistieken en filters behouden haar.",
+  "hide.tagWithSubtagsHint": "De tag en zijn subtags worden niet meer aangeboden voor nieuwe items. Bestaande items, statistieken en filters behouden ze.",
+  "hide.section": "Verborgen ({{count}})"
 }

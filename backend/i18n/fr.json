@@ -732,5 +732,10 @@
   "receipt.fillComments": "Remplir les commentaires (article · magasin)",
   "common.timeout": "Le serveur a mis trop de temps à répondre. Réessayez",
   "sync.slow": "Le serveur répond lentement. Touchez pour réessayer",
-  "sessions.loading": "Chargement des sessions…"
+  "sessions.loading": "Chargement des sessions…",
+  "hide.category": "Masquer la catégorie",
+  "hide.tag": "Masquer l'étiquette",
+  "hide.hint": "Elle ne sera plus proposée pour les nouvelles saisies. Les saisies existantes, les statistiques et les filtres la conservent.",
+  "hide.tagWithSubtagsHint": "Elle et ses sous-étiquettes ne seront plus proposées pour les nouvelles saisies. Les saisies existantes, les statistiques et les filtres les conservent.",
+  "hide.section": "Masquées ({{count}})"
 }

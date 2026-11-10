@@ -54,6 +54,7 @@ export const entitySchemas = {
       color,
       plannedMonthly: positiveMinor.nullable().default(null),
       sortOrder,
+      hidden: z.boolean().default(false),
     })
     .refine((c) => c.name || c.nameKey, { message: "name or nameKey is required" }),
   tags: z.object({
@@ -62,6 +63,7 @@ export const entitySchemas = {
     color: color.nullable().default(null),
     // One level: a subtag belongs to a top-level tag.
     parentId: id.nullable().default(null),
+    hidden: z.boolean().default(false),
   }),
   transactions: z.object({
     type,

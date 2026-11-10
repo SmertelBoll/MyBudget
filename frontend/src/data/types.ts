@@ -32,6 +32,8 @@ export type Category = Base & {
   plannedMonthly: number | null;
   sortOrder: number;
   isSystemOther?: boolean;
+  // Left out of the pickers and the main list; entries keep it. Missing on categories saved before it existed.
+  hidden?: boolean;
 };
 
 export type Tag = Base & {
@@ -40,6 +42,8 @@ export type Tag = Base & {
   color?: string | null;
   // A top-level tag this one is a subtag of (one level only).
   parentId?: string | null;
+  // Left out of the pickers and the main list, with its subtags (TagTree.isHidden); entries keep it.
+  hidden?: boolean;
 };
 
 export type Transaction = Base & {

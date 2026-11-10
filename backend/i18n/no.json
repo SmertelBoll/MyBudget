@@ -722,5 +722,10 @@
   "receipt.fillComments": "Fyll ut kommentarer (vare · butikk)",
   "common.timeout": "Serveren brukte for lang tid på å svare. Prøv igjen",
   "sync.slow": "Serveren svarer tregt. Trykk for å prøve igjen",
-  "sessions.loading": "Laster inn økter…"
+  "sessions.loading": "Laster inn økter…",
+  "hide.category": "Skjul kategori",
+  "hide.tag": "Skjul tagg",
+  "hide.hint": "Den foreslås ikke for nye oppføringer. Eksisterende oppføringer, statistikk og filtre beholder den.",
+  "hide.tagWithSubtagsHint": "Den og undertaggene foreslås ikke for nye oppføringer. Eksisterende oppføringer, statistikk og filtre beholder dem.",
+  "hide.section": "Skjulte ({{count}})"
 }

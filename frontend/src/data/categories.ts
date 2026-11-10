@@ -13,7 +13,12 @@ export const sortCategories = (categories: Category[]) =>
 export const categoriesOfType = (categories: Category[], type: EntryType) =>
   sortCategories(categories.filter((category) => category.type === type));
 
-export type CategoryFields = Pick<Category, "type" | "icon" | "color" | "plannedMonthly"> & { name: string };
+// "Other" is never hidden: deleted categories' entries go there.
+export const isHiddenCategory = (category: Category) => Boolean(category.hidden) && !category.isSystemOther;
+
+export const setCategoryHidden = (category: Category, hidden: boolean) => saveEntity("categories", { ...category, hidden });
+
+export type CategoryFields = Pick<Category, "type" | "icon" | "color" | "plannedMonthly"> & { name: string; hidden?: boolean };
 
 // Screen 7.2. Renaming a default category to its current translation keeps it translated in other languages.
 export const saveCategory = async (fields: CategoryFields, translatedName: string | null, existing?: Category) => {
@@ -51,6 +56,7 @@ export const saveCategory = async (fields: CategoryFields, translatedName: strin
     icon: fields.icon,
     color: fields.color,
     plannedMonthly: fields.plannedMonthly,
+    hidden: fields.hidden ?? existing.hidden ?? false,
   };
   await saveEntity("categories", category);
   return category;

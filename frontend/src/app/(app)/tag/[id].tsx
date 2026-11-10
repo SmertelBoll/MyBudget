@@ -21,8 +21,9 @@ import { IconCircle } from "@/components/IconCircle";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import { TextField } from "@/components/TextField";
 import { SelectField } from "@/components/SelectField";
+import { ToggleRow } from "@/components/ToggleRow";
 
-type FormValues = { name: string; parentId: string; color: string };
+type FormValues = { name: string; parentId: string; color: string; hidden: boolean };
 
 const NO_PARENT = "";
 
@@ -35,6 +36,7 @@ export default function TagFormScreen() {
     name: existing?.name ?? "",
     parentId: (existing && tree.parentOf(existing.id)) ?? NO_PARENT,
     color: existing ? tree.colorOf(existing.id) : nextTagColor(tree),
+    hidden: Boolean(existing?.hidden),
   }));
   if (id !== "new" && !existing) return null;
   return <TagForm initial={initial} existingId={existing?.id ?? null} />;
@@ -67,7 +69,7 @@ function TagForm({ initial, existingId }: { initial: FormValues; existingId: str
   const parentOptions = [
     { value: NO_PARENT, label: t("tags.noParent") },
     ...tree.ordered
-      .filter(({ tag, depth }) => depth === 0 && tag.id !== existingId)
+      .filter(({ tag, depth }) => depth === 0 && tag.id !== existingId && (!tag.hidden || tag.id === initial.parentId))
       .map(({ tag }) => ({ value: tag.id, label: tag.name })),
   ];
 
@@ -90,7 +92,7 @@ function TagForm({ initial, existingId }: { initial: FormValues; existingId: str
         : existing && values.color === initial.color
           ? (existing.color ?? null)
           : values.color;
-    (existing ? updateTag(existing, { name: values.name, color, parentId }) : createTag(values.name, { color, parentId })).catch(reportWriteError);
+    (existing ? updateTag(existing, { name: values.name, color, parentId, hidden: values.hidden }) : createTag(values.name, { color, parentId })).catch(reportWriteError);
     leave();
   };
 
@@ -153,6 +155,15 @@ function TagForm({ initial, existingId }: { initial: FormValues; existingId: str
             setValues((current) => ({ ...current, color }));
           }}
         />
+
+        {existing && (
+          <View style={{ gap: spacing.xs }}>
+            <ToggleRow label={t("hide.tag")} value={values.hidden} onChange={(hidden) => setValues((current) => ({ ...current, hidden }))} />
+            <AppText variant="caption" secondary>
+              {t(hasChildren ? "hide.tagWithSubtagsHint" : "hide.hint")}
+            </AppText>
+          </View>
+        )}
       </KeyboardAwareScrollView>
 
       <BottomActionButton title={t(existing ? "common.save" : "common.add")} onPress={save} loading={saving} muted={Boolean(nameError)} />

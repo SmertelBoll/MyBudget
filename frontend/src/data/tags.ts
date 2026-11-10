@@ -35,6 +35,8 @@ export type TagTree = {
   colorOf: (id: string) => string;
   // Top-level tags by name, each followed by its subtags: [tag, depth].
   ordered: { tag: Tag; depth: 0 | 1 }[];
+  // Hidden itself or under a hidden parent: not offered in pickers.
+  isHidden: (id: string) => boolean;
 };
 
 export const buildTagTree = (tags: Tag[], lang?: string): TagTree => {
@@ -67,7 +69,12 @@ export const buildTagTree = (tags: Tag[], lang?: string): TagTree => {
     ordered.push({ tag, depth: 0 });
     for (const child of children.get(tag.id) ?? []) ordered.push({ tag: child, depth: 1 });
   }
-  return { byId, parentOf, rootOf, children, colorOf, ordered };
+  const isHidden = (id: string): boolean => {
+    if (byId.get(id)?.hidden) return true;
+    const parent = parentOf(id);
+    return parent ? isHidden(parent) : false;
+  };
+  return { byId, parentOf, rootOf, children, colorOf, ordered, isHidden };
 };
 
 export const useTagTree = () => {
@@ -97,7 +104,7 @@ export const createTag = async (name: string, fields: { color?: string | null; p
   return tag;
 };
 
-export const updateTag = (tag: Tag, fields: { name: string; color: string | null; parentId: string | null }) =>
+export const updateTag = (tag: Tag, fields: { name: string; color: string | null; parentId: string | null; hidden: boolean }) =>
   saveEntity("tags", { ...tag, ...fields, name: fields.name.trim() });
 
 // Spec 7.4: deleting a tag takes it off every transaction and regular payment; its subtags become top-level tags.

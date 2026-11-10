@@ -7,6 +7,8 @@ const TagSchema = syncedSchema({
   nameLower: { type: String, required: true },
   color: { type: String, default: null },
   parentId: { type: String, default: null },
+  // Hidden: left out of the pickers and the main list (its subtags too); entries keep it.
+  hidden: { type: Boolean, default: false },
 });
 
 TagSchema.index({ userId: 1, nameLower: 1 });

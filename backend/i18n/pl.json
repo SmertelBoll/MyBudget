@@ -742,5 +742,10 @@
   "receipt.fillComments": "Wypełnij komentarze (pozycja · sklep)",
   "common.timeout": "Serwer zbyt długo nie odpowiadał. Spróbuj ponownie",
   "sync.slow": "Serwer odpowiada powoli. Dotknij, aby ponowić",
-  "sessions.loading": "Wczytywanie sesji…"
+  "sessions.loading": "Wczytywanie sesji…",
+  "hide.category": "Ukryj kategorię",
+  "hide.tag": "Ukryj tag",
+  "hide.hint": "Nie będzie proponowana dla nowych wpisów. Istniejące wpisy, statystyki i filtry ją zachowują.",
+  "hide.tagWithSubtagsHint": "Tag i jego podtagi nie będą proponowane dla nowych wpisów. Istniejące wpisy, statystyki i filtry je zachowują.",
+  "hide.section": "Ukryte ({{count}})"
 }

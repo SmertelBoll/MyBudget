@@ -15,6 +15,10 @@ import { IconButton } from "@/components/IconButton";
 import { IconCircle } from "@/components/IconCircle";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import { TextField } from "@/components/TextField";
+import { HiddenSectionHeader } from "@/components/HiddenSectionHeader";
+import type { Tag } from "@/data/types";
+
+type Row = { kind: "tag"; tag: Tag; depth: 0 | 1; hidden: boolean } | { kind: "fold"; count: number };
 
 // Spec 7.4: every tag with search, each top-level tag followed by its subtags; a tap opens the tag (name, parent,
 // color), the bin deletes it (taken off all transactions). Tags are shared by expenses and income.
@@ -25,18 +29,32 @@ export default function TagsScreen() {
   const tree = useTagTree();
   const remove = useDeleteTag();
   const [query, setQuery] = useState("");
+  const [showHidden, setShowHidden] = useState(false);
 
-  const visible = useMemo(() => {
+  // Hidden tags (and subtags of hidden ones) go under a fold at the end; a search opens it.
+  const rows = useMemo(() => {
     const needle = query.trim().toLowerCase();
-    return tree.ordered.filter(({ tag }) => !needle || tag.name.toLowerCase().includes(needle));
-  }, [tree, query]);
+    const matches = ({ tag }: { tag: Tag }) => !needle || tag.name.toLowerCase().includes(needle);
+    const shown: Row[] = tree.ordered
+      .filter((item) => !tree.isHidden(item.tag.id) && matches(item))
+      .map(({ tag, depth }) => ({ kind: "tag", tag, depth, hidden: false }));
+    const hidden: Row[] = tree.ordered
+      .filter((item) => tree.isHidden(item.tag.id) && matches(item))
+      // A hidden subtag of a shown tag stands on its own there.
+      .map(({ tag, depth }) => {
+        const parent = tree.parentOf(tag.id);
+        return { kind: "tag", tag, depth: depth && parent && tree.isHidden(parent) ? 1 : 0, hidden: true };
+      });
+    if (!hidden.length) return shown;
+    return [...shown, { kind: "fold", count: hidden.length } as Row, ...(showHidden || needle ? hidden : [])];
+  }, [tree, query, showHidden]);
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
       <ScreenHeader title={t("tags.title")} left="back" />
       <FlatList
-        data={visible}
-        keyExtractor={({ tag }) => tag.id}
+        data={rows}
+        keyExtractor={(row) => (row.kind === "fold" ? "--hidden--" : row.tag.id)}
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={{ padding: spacing.md, gap: spacing.sm, paddingBottom: bottomSpace }}
         ListHeaderComponent={
@@ -52,7 +70,10 @@ export default function TagsScreen() {
             </AppText>
           </View>
         }
-        renderItem={({ item: { tag, depth } }) => {
+        renderItem={({ item }) => {
+          if (item.kind === "fold")
+            return <HiddenSectionHeader count={item.count} open={showHidden || Boolean(query.trim())} onToggle={() => setShowHidden(!showHidden)} />;
+          const { tag, depth, hidden } = item;
           const subtags = tree.children.get(tag.id)?.length ?? 0;
           return (
             // The row and the delete button are siblings: a button inside a button isn't allowed (and confuses
@@ -65,6 +86,7 @@ export default function TagsScreen() {
                 borderRadius: radius.md,
                 backgroundColor: colors.surface,
                 overflow: "hidden",
+                opacity: hidden ? 0.6 : 1,
               }}
             >
               <Pressable

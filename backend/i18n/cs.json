@@ -742,5 +742,10 @@
   "receipt.fillComments": "Vyplnit komentáře (položka · obchod)",
   "common.timeout": "Server odpovídal příliš dlouho. Zkuste to znovu",
   "sync.slow": "Server odpovídá pomalu. Klepnutím to zkusíte znovu",
-  "sessions.loading": "Načítání relací…"
+  "sessions.loading": "Načítání relací…",
+  "hide.category": "Skrýt kategorii",
+  "hide.tag": "Skrýt štítek",
+  "hide.hint": "Nebude nabízena pro nové záznamy. Stávající záznamy, statistiky a filtry ji zachovají.",
+  "hide.tagWithSubtagsHint": "Štítek ani jeho podštítky nebudou nabízeny pro nové záznamy. Stávající záznamy, statistiky a filtry je zachovají.",
+  "hide.section": "Skryté ({{count}})"
 }

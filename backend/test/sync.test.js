@@ -144,7 +144,7 @@ describe("business rules", () => {
         collection: "categories",
         id: other.id,
         op: "upsert",
-        data: { name: "Renamed", type: other.type, icon: "star", color: "#123456", plannedMonthly: 500, sortOrder: 9 },
+        data: { name: "Renamed", type: other.type, icon: "star", color: "#123456", plannedMonthly: 500, sortOrder: 9, hidden: true },
       },
     ]);
     assert.equal(edit.body.results[0].status, "applied");
@@ -155,6 +155,18 @@ describe("business rules", () => {
     assert.equal(after.body.item.nameKey, "category.other");
     assert.equal(after.body.item.icon, other.icon);
     assert.equal(after.body.item.plannedMonthly, null);
+    assert.equal(after.body.item.hidden, false);
+  });
+
+  it("keeps a hidden category and tag hidden, and old ones visible", async () => {
+    await push(anna, [
+      { collection: "categories", id: "cat-hidden", op: "upsert", data: { name: "Old", type: "expense", icon: "star", color: "#ffffff", hidden: true } },
+      { collection: "tags", id: "tag-hidden", op: "upsert", data: { name: "Old trip", hidden: true } },
+      { collection: "tags", id: "tag-shown", op: "upsert", data: { name: "Shown" } },
+    ]);
+    assert.equal((await http.get("/categories/cat-hidden", anna.accessToken)).body.item.hidden, true);
+    assert.equal((await http.get("/tags/tag-hidden", anna.accessToken)).body.item.hidden, true);
+    assert.equal((await http.get("/tags/tag-shown", anna.accessToken)).body.item.hidden, false);
   });
 
   it("keeps tag names unique regardless of case", async () => {
