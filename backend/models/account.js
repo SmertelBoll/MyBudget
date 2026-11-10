@@ -10,8 +10,7 @@ const AccountSchema = syncedSchema({
   includeInTotal: { type: Boolean, default: true },
   note: { type: String, default: "" },
   // Balance = every transaction (balance corrections included) and transfer of the account. These two are what older
-  // app versions counted from; now always 0 and the creation time (scripts/migrate-balance-corrections.js turned the
-  // old ones into corrections).
+  // app versions counted from; now always 0 and the creation time.
   balanceAnchor: { type: Number, default: 0 },
   balanceAnchorAt: { type: Date, required: true },
   sortOrder: { type: Number, default: 0 },
