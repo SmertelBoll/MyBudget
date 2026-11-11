@@ -218,11 +218,11 @@ function HomeContent() {
               <PeriodChart segments={segments} label={money(total, baseCurrency, "home")} collapsed={collapsed} />
             </Pressable>
           </PeriodSwitcher>
-          {/* Categories / tags: one small button in the free corner, showing the other view; a tap switches. Next to
-              it a smaller one: what the rows open into. */}
+          {/* Categories / tags: a button in the free corner showing the current view; a tap switches to the other. Next
+              to it a smaller one, the same way: what the rows open into. */}
           <View style={{ position: "absolute", left: spacing.md, bottom: spacing.md, flexDirection: "row", alignItems: "center", gap: spacing.sm }}>
             <IconButton
-              icon={by === "category" ? TAG_ICON : "shape-outline"}
+              icon={by === "category" ? "shape-outline" : TAG_ICON}
               label={t(by === "category" ? "home.byTags" : "home.byCategories")}
               size={40}
               onPress={() => {

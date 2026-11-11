@@ -174,7 +174,7 @@ export default function ChartsScreen() {
             ) : (
               <View style={{ flexDirection: "row", alignItems: "center", gap: spacing.sm }}>
                 <IconButton
-                  icon={by === "category" ? TAG_ICON : "shape-outline"}
+                  icon={by === "category" ? "shape-outline" : TAG_ICON}
                   label={t(by === "category" ? "home.byTags" : "home.byCategories")}
                   size={40}
                   onPress={() => {
