@@ -16,6 +16,8 @@ export type UserSettings = {
   // centsInTotals until that is set.
   showCents: boolean;
   centsInEntries?: boolean | null;
+  centsInHome?: boolean | null;
+  centsInAccounts?: boolean | null;
   centsInTotals?: boolean | null;
   focus: EntryType;
   // Missing on users saved before it existed: shown.

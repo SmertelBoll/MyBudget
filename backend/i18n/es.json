@@ -584,7 +584,6 @@
   "settings.decimalSeparator": "Separador decimal",
   "settings.decimalDot": "Punto  1.50",
   "settings.decimalComma": "Coma  1,50",
-  "settings.showCents": "Mostrar céntimos",
   "settings.focus": "Mostrar primero",
   "settings.data": "Datos y almacenamiento",
   "settings.security": "Seguridad y sesiones",
@@ -738,6 +737,17 @@
   "hide.hint": "No se ofrecerá para nuevos registros. Los registros existentes, las estadísticas y los filtros la conservan.",
   "hide.tagWithSubtagsHint": "Ni ella ni sus subetiquetas se ofrecerán para nuevos registros. Los registros existentes, las estadísticas y los filtros las conservan.",
   "hide.section": "Ocultas ({{count}})",
-  "settings.centsInEntries": "Céntimos en los registros",
-  "settings.centsInTotals": "Céntimos en los totales"
+  "cents.title": "Céntimos",
+  "cents.linkHint": "Dónde los importes muestran céntimos",
+  "cents.where": "Mostrar céntimos",
+  "cents.entries": "Registros",
+  "cents.entriesHint": "Transacciones, transferencias, pagos periódicos",
+  "cents.home": "Inicio",
+  "cents.homeHint": "Saldo, total del periodo y categorías en Inicio",
+  "cents.accounts": "Cuentas",
+  "cents.accountsHint": "La página de cuentas y los saldos en las listas",
+  "cents.totals": "Gráficos y otros totales",
+  "cents.totalsHint": "Gráficos, totales del registro y próximos pagos",
+  "cents.always": "El detalle del saldo, los recibos y los campos de importe siempre muestran céntimos.",
+  "tags.noSubtag": "Sin subetiqueta"
 }

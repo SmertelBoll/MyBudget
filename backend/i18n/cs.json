@@ -593,7 +593,6 @@
   "settings.decimalSeparator": "Desetinný oddělovač",
   "settings.decimalDot": "Tečka  1.50",
   "settings.decimalComma": "Čárka  1,50",
-  "settings.showCents": "Zobrazit haléře",
   "settings.focus": "Zobrazit nejdřív",
   "settings.data": "Data a úložiště",
   "settings.security": "Zabezpečení a relace",
@@ -748,6 +747,17 @@
   "hide.hint": "Nebude nabízena pro nové záznamy. Stávající záznamy, statistiky a filtry ji zachovají.",
   "hide.tagWithSubtagsHint": "Štítek ani jeho podštítky nebudou nabízeny pro nové záznamy. Stávající záznamy, statistiky a filtry je zachovají.",
   "hide.section": "Skryté ({{count}})",
-  "settings.centsInEntries": "Haléře u záznamů",
-  "settings.centsInTotals": "Haléře v součtech"
+  "cents.title": "Haléře",
+  "cents.linkHint": "Kde částky ukazují haléře",
+  "cents.where": "Zobrazovat haléře",
+  "cents.entries": "Záznamy",
+  "cents.entriesHint": "Transakce, převody, pravidelné platby",
+  "cents.home": "Domů",
+  "cents.homeHint": "Zůstatek, součet za období a kategorie na domovské obrazovce",
+  "cents.accounts": "Účty",
+  "cents.accountsHint": "Stránka účtů a zůstatky účtů v seznamech",
+  "cents.totals": "Grafy a další součty",
+  "cents.totalsHint": "Grafy, součty v přehledu a nadcházející platby",
+  "cents.always": "Detail zůstatku, účtenky a pole částek vždy ukazují haléře.",
+  "tags.noSubtag": "Bez podštítku"
 }

@@ -575,7 +575,6 @@
   "settings.decimalSeparator": "Desimaltegn",
   "settings.decimalDot": "Punktum  1.50",
   "settings.decimalComma": "Komma  1,50",
-  "settings.showCents": "Vis øre",
   "settings.focus": "Vis først",
   "settings.data": "Data og lagring",
   "settings.security": "Sikkerhet og økter",
@@ -728,6 +727,17 @@
   "hide.hint": "Den foreslås ikke for nye oppføringer. Eksisterende oppføringer, statistikk og filtre beholder den.",
   "hide.tagWithSubtagsHint": "Den og undertaggene foreslås ikke for nye oppføringer. Eksisterende oppføringer, statistikk og filtre beholder dem.",
   "hide.section": "Skjulte ({{count}})",
-  "settings.centsInEntries": "Øre i oppføringer",
-  "settings.centsInTotals": "Øre i totaler"
+  "cents.title": "Øre",
+  "cents.linkHint": "Hvor beløp viser øre",
+  "cents.where": "Vis øre",
+  "cents.entries": "Oppføringer",
+  "cents.entriesHint": "Transaksjoner, overføringer, faste betalinger",
+  "cents.home": "Hjem",
+  "cents.homeHint": "Saldo, periodens sum og kategorier på Hjem",
+  "cents.accounts": "Kontoer",
+  "cents.accountsHint": "Kontosiden og kontosaldoer i lister",
+  "cents.totals": "Diagrammer og andre totaler",
+  "cents.totalsHint": "Diagrammer, summer i loggen og kommende betalinger",
+  "cents.always": "Saldodetaljer, kvitteringer og beløpsfelt viser alltid øre.",
+  "tags.noSubtag": "Uten undertagg"
 }

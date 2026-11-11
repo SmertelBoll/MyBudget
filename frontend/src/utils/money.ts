@@ -7,11 +7,16 @@ export type MoneyFormat = {
   // Settings -> Advanced, two switches: cents on single entries (transactions, transfers, payments) and on totals
   // (balances, sums for a period, a category or a chart).
   centsInEntries: boolean;
+  centsInHome: boolean;
+  centsInAccounts: boolean;
   centsInTotals: boolean;
 };
 
-// What an amount is: a total (the default), a single entry, or exact (always with cents: balance details, receipts).
-export type MoneyKind = "total" | "entry" | "exact";
+// Where an amount is shown, for the Cents settings: a single entry, Home, an account balance, any other total (the
+// default: charts, period sums), or exact (always with cents: balance details, receipts).
+export type MoneyKind = "entry" | "home" | "accounts" | "total" | "exact";
+
+const CENTS_SETTING = { entry: "centsInEntries", home: "centsInHome", accounts: "centsInAccounts", total: "centsInTotals" } as const;
 
 const NBSP = " ";
 
@@ -25,7 +30,7 @@ const SYMBOLS: Record<string, string> = {
 
 // "₴32,207" / "₴32 206,83", with or without cents by what the amount is and the user's settings.
 export const formatMoney = (minor: number, currency: string, format: MoneyFormat, kind: MoneyKind = "total") => {
-  const cents = kind === "exact" || (kind === "entry" ? format.centsInEntries : format.centsInTotals);
+  const cents = kind === "exact" || format[CENTS_SETTING[kind]];
   const digits = cents ? 2 : 0;
   let parts: Intl.NumberFormatPart[];
   try {

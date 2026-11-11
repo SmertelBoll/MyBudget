@@ -8,6 +8,7 @@ import { useTagTree } from "@/data/tags";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTheme } from "@/theme/ThemeProvider";
 import type { PeriodRange } from "@/utils/periods";
+import type { MoneyKind } from "@/utils/money";
 import { useMoney } from "@/utils/useMoney";
 import { StatsRow, type StatsChild } from "./StatsRow";
 
@@ -70,7 +71,7 @@ export const useGroupLook = (by: GroupBy) => {
   // a tag with no subtags.
   const childLook = (group: Group, id: string) => {
     if (group.childBy === "category") return categoryLook(id);
-    if (by === "tag" && id === group.id) return { ...tagLook(id), title: t("tags.ownOnly", { name: tagLook(id).title }) };
+    if (by === "tag" && id === group.id) return { ...tagLook(id), title: t("tags.noSubtag") };
     return tagLook(id);
   };
   return { look, childLook };
@@ -86,6 +87,7 @@ export function GroupRow({
   range,
   expanded,
   onToggle,
+  moneyKind = "total",
 }: {
   group: Group;
   by: GroupBy;
@@ -94,6 +96,8 @@ export function GroupRow({
   range: PeriodRange;
   expanded: boolean;
   onToggle: () => void;
+  // Which Cents switch its amounts follow: Home has its own.
+  moneyKind?: MoneyKind;
 }) {
   const { t } = useI18n();
   const { money, baseCurrency } = useMoney();
@@ -106,14 +110,14 @@ export function GroupRow({
     ? []
     : group.children.map((child) => {
         const inner = childLook(group, child.id);
-        return { id: child.id, icon: inner.icon, color: inner.color, title: inner.title, amount: money(child.amount, baseCurrency) };
+        return { id: child.id, icon: inner.icon, color: inner.color, title: inner.title, amount: money(child.amount, baseCurrency, moneyKind) };
       });
 
   const planned = by === "category" && range.kind === "month" ? (look(group.id) as { plannedMonthly?: number | null }).plannedMonthly : null;
   const limit = planned
     ? {
         used: group.amount / planned,
-        text: t("home.planned", { spent: money(group.amount, baseCurrency), planned: money(planned, baseCurrency) }),
+        text: t("home.planned", { spent: money(group.amount, baseCurrency, moneyKind), planned: money(planned, baseCurrency, moneyKind) }),
       }
     : undefined;
 
@@ -123,7 +127,7 @@ export function GroupRow({
       color={color}
       title={title}
       share={group.share}
-      amount={money(group.amount, baseCurrency)}
+      amount={money(group.amount, baseCurrency, moneyKind)}
       breakdown={breakdown}
       expanded={expanded}
       onToggle={onToggle}

@@ -566,7 +566,6 @@
   "settings.decimalSeparator": "소수점 기호",
   "settings.decimalDot": "마침표  1.50",
   "settings.decimalComma": "쉼표  1,50",
-  "settings.showCents": "소수점 이하 표시",
   "settings.focus": "먼저 표시",
   "settings.data": "데이터 및 저장 공간",
   "settings.security": "보안 및 세션",
@@ -718,6 +717,17 @@
   "hide.hint": "새 기록에서는 제안되지 않습니다. 기존 기록, 통계, 필터에는 그대로 남습니다.",
   "hide.tagWithSubtagsHint": "이 태그와 하위 태그는 새 기록에서 제안되지 않습니다. 기존 기록, 통계, 필터에는 그대로 남습니다.",
   "hide.section": "숨김 ({{count}})",
-  "settings.centsInEntries": "기록에 소수점 표시",
-  "settings.centsInTotals": "합계에 소수점 표시"
+  "cents.title": "소수점",
+  "cents.linkHint": "금액에 소수점을 표시할 곳",
+  "cents.where": "소수점 표시",
+  "cents.entries": "기록",
+  "cents.entriesHint": "거래, 이체, 정기 결제",
+  "cents.home": "홈",
+  "cents.homeHint": "홈의 잔액, 기간 합계, 카테고리",
+  "cents.accounts": "계좌",
+  "cents.accountsHint": "계좌 페이지와 목록의 계좌 잔액",
+  "cents.totals": "차트와 기타 합계",
+  "cents.totalsHint": "차트, 내역과 예정 결제의 합계",
+  "cents.always": "잔액 상세, 영수증, 금액 입력란은 항상 소수점을 표시합니다.",
+  "tags.noSubtag": "하위 태그 없음"
 }

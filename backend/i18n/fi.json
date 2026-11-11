@@ -575,7 +575,6 @@
   "settings.decimalSeparator": "Desimaalierotin",
   "settings.decimalDot": "Piste  1.50",
   "settings.decimalComma": "Pilkku  1,50",
-  "settings.showCents": "Näytä sentit",
   "settings.focus": "Näytä ensin",
   "settings.data": "Tiedot ja tallennustila",
   "settings.security": "Tietoturva ja istunnot",
@@ -728,6 +727,17 @@
   "hide.hint": "Sitä ei tarjota uusiin merkintöihin. Nykyiset merkinnät, tilastot ja suodattimet säilyttävät sen.",
   "hide.tagWithSubtagsHint": "Sitä ja sen alatunnisteita ei tarjota uusiin merkintöihin. Nykyiset merkinnät, tilastot ja suodattimet säilyttävät ne.",
   "hide.section": "Piilotetut ({{count}})",
-  "settings.centsInEntries": "Sentit merkinnöissä",
-  "settings.centsInTotals": "Sentit summissa"
+  "cents.title": "Sentit",
+  "cents.linkHint": "Missä summat näyttävät sentit",
+  "cents.where": "Näytä sentit",
+  "cents.entries": "Merkinnät",
+  "cents.entriesHint": "Tapahtumat, siirrot, toistuvat maksut",
+  "cents.home": "Koti",
+  "cents.homeHint": "Saldo, jakson summa ja luokat kotinäkymässä",
+  "cents.accounts": "Tilit",
+  "cents.accountsHint": "Tilisivu ja tilien saldot listoissa",
+  "cents.totals": "Kaaviot ja muut summat",
+  "cents.totalsHint": "Kaaviot, lokin summat ja tulevat maksut",
+  "cents.always": "Saldon tiedot, kuitit ja summakentät näyttävät aina sentit.",
+  "tags.noSubtag": "Ei alatunnistetta"
 }

@@ -584,7 +584,6 @@
   "settings.decimalSeparator": "Separatore decimale",
   "settings.decimalDot": "Punto  1.50",
   "settings.decimalComma": "Virgola  1,50",
-  "settings.showCents": "Mostra centesimi",
   "settings.focus": "Mostra prima",
   "settings.data": "Dati e archiviazione",
   "settings.security": "Sicurezza e sessioni",
@@ -738,6 +737,17 @@
   "hide.hint": "Non verrà proposta per le nuove voci. Le voci esistenti, le statistiche e i filtri la mantengono.",
   "hide.tagWithSubtagsHint": "L'etichetta e le sue sottoetichette non verranno proposte per le nuove voci. Le voci esistenti, le statistiche e i filtri le mantengono.",
   "hide.section": "Nascoste ({{count}})",
-  "settings.centsInEntries": "Centesimi nelle voci",
-  "settings.centsInTotals": "Centesimi nei totali"
+  "cents.title": "Centesimi",
+  "cents.linkHint": "Dove gli importi mostrano i centesimi",
+  "cents.where": "Mostra i centesimi",
+  "cents.entries": "Voci",
+  "cents.entriesHint": "Transazioni, trasferimenti, pagamenti periodici",
+  "cents.home": "Home",
+  "cents.homeHint": "Saldo, totale del periodo e categorie nella Home",
+  "cents.accounts": "Conti",
+  "cents.accountsHint": "La pagina dei conti e i saldi negli elenchi",
+  "cents.totals": "Grafici e altri totali",
+  "cents.totalsHint": "Grafici, totali del registro e pagamenti in arrivo",
+  "cents.always": "Dettaglio del saldo, scontrini e campi importo mostrano sempre i centesimi.",
+  "tags.noSubtag": "Senza sottoetichetta"
 }

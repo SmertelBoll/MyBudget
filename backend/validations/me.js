@@ -13,6 +13,8 @@ export const settingsSchema = z
     decimalSeparator: z.enum([".", ","]),
     showCents: z.boolean(),
     centsInEntries: z.boolean().nullable(),
+    centsInHome: z.boolean().nullable(),
+    centsInAccounts: z.boolean().nullable(),
     centsInTotals: z.boolean().nullable(),
     focus: z.enum(["expense", "income"]),
     hideBalance: z.boolean(),

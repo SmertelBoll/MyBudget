@@ -74,14 +74,14 @@ export default function AccountsScreen() {
             {t("accounts.total")}
           </AppText>
           <View style={{ flexDirection: "row", alignItems: "center", gap: spacing.sm }}>
-            <AppText variant="display">{money(totals.included, totals.currency)}</AppText>
+            <AppText variant="display">{money(totals.included, totals.currency, "accounts")}</AppText>
             <IconButton icon="clipboard-text-outline" label={t("accounts.balanceDetails")} size={36} onPress={() => setDetails(true)} />
           </View>
           {/* All money, including accounts kept out of Total (spec 5.1). */}
           <View style={{ flexDirection: "row", alignItems: "center", gap: spacing.xs }}>
             <MaterialCommunityIcons name="cash-multiple" size={18} color={colors.textSecondary} />
             <AppText secondary accessibilityLabel={t("accounts.allMoney")}>
-              {money(totals.all, totals.currency)}
+              {money(totals.all, totals.currency, "accounts")}
             </AppText>
           </View>
         </View>
@@ -113,7 +113,7 @@ export default function AccountsScreen() {
                 color={account.color}
                 title={account.name}
                 note={account.note}
-                value={money(balances.get(account.id) ?? 0, account.currency)}
+                value={money(balances.get(account.id) ?? 0, account.currency, "accounts")}
                 valueColor={(balances.get(account.id) ?? 0) < 0 ? colors.danger : undefined}
                 badges={
                   !account.includeInTotal ? (

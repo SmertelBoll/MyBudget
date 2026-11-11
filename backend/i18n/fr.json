@@ -584,7 +584,6 @@
   "settings.decimalSeparator": "Séparateur décimal",
   "settings.decimalDot": "Point  1.50",
   "settings.decimalComma": "Virgule  1,50",
-  "settings.showCents": "Afficher les centimes",
   "settings.focus": "Afficher d'abord",
   "settings.data": "Données et stockage",
   "settings.security": "Sécurité et sessions",
@@ -738,6 +737,17 @@
   "hide.hint": "Elle ne sera plus proposée pour les nouvelles saisies. Les saisies existantes, les statistiques et les filtres la conservent.",
   "hide.tagWithSubtagsHint": "Elle et ses sous-étiquettes ne seront plus proposées pour les nouvelles saisies. Les saisies existantes, les statistiques et les filtres les conservent.",
   "hide.section": "Masquées ({{count}})",
-  "settings.centsInEntries": "Centimes dans les saisies",
-  "settings.centsInTotals": "Centimes dans les totaux"
+  "cents.title": "Centimes",
+  "cents.linkHint": "Où les montants affichent les centimes",
+  "cents.where": "Afficher les centimes",
+  "cents.entries": "Saisies",
+  "cents.entriesHint": "Transactions, virements, paiements réguliers",
+  "cents.home": "Accueil",
+  "cents.homeHint": "Solde, total de la période et catégories sur l’accueil",
+  "cents.accounts": "Comptes",
+  "cents.accountsHint": "La page des comptes et les soldes dans les listes",
+  "cents.totals": "Graphiques et autres totaux",
+  "cents.totalsHint": "Graphiques, totaux du journal et paiements à venir",
+  "cents.always": "Le détail du solde, les tickets et les champs de montant affichent toujours les centimes.",
+  "tags.noSubtag": "Sans sous-étiquette"
 }

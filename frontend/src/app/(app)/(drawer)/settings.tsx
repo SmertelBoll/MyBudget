@@ -36,6 +36,8 @@ const DEFAULT_SETTINGS: UserSettings = {
   decimalSeparator: ".",
   showCents: false,
   centsInEntries: true,
+  centsInHome: false,
+  centsInAccounts: false,
   centsInTotals: false,
   focus: "expense",
   hideBalance: false,
@@ -170,16 +172,10 @@ export default function SettingsScreen() {
               onChange={(value) => setSetting("decimalSeparator", value)}
             />
           </Labeled>
-          <ToggleRow
-            label={t("settings.centsInEntries")}
-            value={settings.centsInEntries ?? true}
-            onChange={(value) => setSetting("centsInEntries", value)}
-          />
-          <ToggleRow
-            label={t("settings.centsInTotals")}
-            value={settings.centsInTotals ?? settings.showCents ?? false}
-            onChange={(value) => setSetting("centsInTotals", value)}
-          />
+          {/* Four switches, one per place, on their own screen. */}
+          <View style={{ marginHorizontal: -spacing.md }}>
+            <SettingsLink icon="decimal" label={t("cents.title")} hint={t("cents.linkHint")} onPress={() => router.push("/cents")} />
+          </View>
           <Labeled label={t("settings.focus")}>
             <SegmentedSwitch<EntryType>
               options={[

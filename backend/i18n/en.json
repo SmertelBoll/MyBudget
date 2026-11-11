@@ -6,7 +6,6 @@
   "common.payloadTooLarge": "The data is too large",
   "common.invalidJson": "Invalid request",
   "common.noInternet": "Internet connection required",
-
   "auth.required": "Please sign in",
   "auth.tokenExpired": "Your session needs to be refreshed",
   "auth.invalidToken": "Please sign in again",
@@ -19,22 +18,17 @@
   "auth.googleNotConfigured": "Google sign-in is not available yet",
   "auth.googleInvalidToken": "Google sign-in failed. Please try again",
   "auth.googleEmailNotVerified": "Your Google email is not verified",
-
   "session.invalid": "Please sign in again",
   "session.revoked": "Your session was ended on another device",
   "session.expired": "Your session has expired. Please sign in again",
   "session.notFound": "Session not found",
   "session.cannotRevokeCurrent": "Use Log out to end this device's session",
-
   "user.notFound": "Account not found",
-
   "sync.forbidden": "This record belongs to another account",
   "sync.deleted": "This record was deleted on another device",
   "sync.reset": "Your data was reset on another device",
-
   "tag.duplicate": "A tag with this name already exists",
   "category.otherNotDeletable": "The \"Other\" category can't be deleted",
-
   "photo.missing": "No photo in the request",
   "photo.tooLarge": "The photo is larger than 5 MB",
   "photo.invalidUpload": "Photo upload failed",
@@ -42,10 +36,8 @@
   "photo.storageNotConfigured": "Photo storage is not configured",
   "photo.notFound": "Photo not found",
   "photo.forbidden": "This photo belongs to another account",
-
   "rates.unavailable": "Exchange rates are not available right now",
   "i18n.unknownLanguage": "Unknown language",
-
   "category.food": "Food",
   "category.transport": "Transport",
   "category.housing": "Housing",
@@ -59,7 +51,6 @@
   "category.refunds": "Refunds",
   "category.cashback": "Cashback",
   "category.other": "Other",
-
   "common.cancel": "Cancel",
   "common.ok": "OK",
   "common.save": "Save",
@@ -73,9 +64,7 @@
   "common.seconds": "{{count}} s",
   "common.nothingFound": "Nothing found",
   "common.close": "Close",
-
   "app.tagline": "Your budget on every device",
-
   "auth.signIn": "Sign in",
   "auth.signUp": "Create account",
   "auth.email": "Email",
@@ -95,7 +84,6 @@
   "auth.passwordsDontMatch": "Passwords don't match",
   "auth.showPassword": "Show password",
   "auth.hidePassword": "Hide password",
-
   "onboarding.title": "Welcome!",
   "onboarding.subtitle": "Two quick choices and you're ready to go",
   "onboarding.currency": "Main currency",
@@ -104,7 +92,6 @@
   "onboarding.searchCurrency": "Search currency",
   "onboarding.start": "Get started",
   "onboarding.chooseCurrency": "Choose a currency",
-
   "nav.home": "Home",
   "nav.accounts": "Accounts",
   "nav.charts": "Charts",
@@ -115,7 +102,6 @@
   "nav.support": "Contact the support",
   "nav.profile": "Profile",
   "nav.openMenu": "Open menu",
-
   "sync.syncing": "Syncing…",
   "sync.pending_one": "{{count}} change waiting to be sent",
   "sync.pending_other": "{{count}} changes waiting to be sent",
@@ -124,7 +110,6 @@
   "sync.synced": "Synced {{time}}",
   "sync.never": "Not synced yet",
   "sync.retry": "Sync now",
-
   "profile.email": "Email",
   "profile.accountId": "Account ID: {{id}}",
   "profile.logout": "Log out",
@@ -136,10 +121,8 @@
   "profile.deleteFinalMessage": "Your account can't be restored",
   "profile.keep": "Don't delete",
   "profile.deleted": "Your account was deleted",
-
   "common.delete": "Delete",
   "common.add": "Add",
-
   "amount.invalid": "Enter a valid amount",
   "amount.mustBePositive": "Enter an amount above zero",
   "amount.convert": "Convert from the other amount",
@@ -148,13 +131,11 @@
   "calculator.invalid": "The expression can't be calculated",
   "calculator.mustBePositive": "The result must be above zero",
   "calculator.backspace": "Delete last character",
-
   "dates.today": "Today",
   "dates.yesterday": "Yesterday",
   "dates.pick": "Choose a date",
   "dates.previousMonth": "Previous month",
   "dates.nextMonth": "Next month",
-
   "icons.more": "All icons",
   "icons.money": "Money",
   "icons.currencies": "Currencies",
@@ -175,7 +156,6 @@
   "colors.hex": "Color code (#RRGGBB)",
   "colors.hexInvalid": "Use the #RRGGBB format",
   "colors.select": "Select",
-
   "accounts.total": "Total",
   "accounts.allMoney": "All money, including accounts not in Total",
   "accounts.balanceDetails": "Balance details",
@@ -213,18 +193,14 @@
   "accounts.deleteFinalHide": "The account can't be restored; its transactions stay",
   "accounts.keep": "Don't delete",
   "accounts.deleted": "Account deleted",
-
   "common.required": "This field is required",
   "order.moveHint": "Tap where to put \"{{name}}\"",
-
   "entries.expenses": "Expenses",
   "entries.income": "Income",
   "entries.expense": "Expense",
   "entries.incomeOne": "Income",
-
   "amount.changeCurrency": "Change currency",
   "dates.twoDaysAgo": "2 days ago",
-
   "entry.addTitle": "Add entry",
   "entry.editTitle": "Edit entry",
   "entry.account": "Account",
@@ -250,9 +226,7 @@
   "entry.paymentCreated": "One-time payment created",
   "entry.deleteTitle": "Delete the entry?",
   "entry.deleteMessage": "The account balance will change back",
-
   "tags.search": "Search and create tags",
-
   "photos.title": "Photos",
   "photos.add": "Add photo",
   "photos.camera": "Take a photo",
@@ -260,7 +234,6 @@
   "photos.remove": "Remove photo",
   "photos.permissionDenied": "No access. Allow it in the phone's settings",
   "photos.failed": "The photo couldn't be added",
-
   "categories.new": "New category",
   "categories.name": "Category name",
   "categories.nameRequired": "Enter a category name",
@@ -272,7 +245,6 @@
   "categories.deleteTitle": "Delete the category?",
   "categories.deleteMessage_one": "Its {{count}} entry will move to \"Other\"",
   "categories.deleteMessage_other": "Its {{count}} entries will move to \"Other\"",
-
   "tags.title": "Tags",
   "tags.add": "Add tag",
   "tags.rename": "Rename tag",
@@ -283,7 +255,6 @@
   "tags.deleteTitle": "Delete \"{{name}}\"?",
   "tags.deleteMessage_one": "It will be removed from {{count}} entry",
   "tags.deleteMessage_other": "It will be removed from {{count}} entries",
-
   "transfers.new": "New transfer",
   "transfers.edit": "Transfer",
   "transfers.from": "From account",
@@ -297,14 +268,12 @@
   "transfers.deleteTitle": "Delete the transfer?",
   "transfers.deleteMessage": "Both account balances will change back",
   "transfers.empty": "No transfers yet",
-
   "settings.appearance": "Appearance",
   "settings.language": "Language",
   "settings.theme": "Theme",
   "settings.theme.system": "System",
   "settings.theme.light": "Light",
-  "settings.theme.dark": "Dark",
-
+  "settings.theme.dark": "Dark",
   "periods.day": "Day",
   "periods.week": "Week",
   "periods.month": "Month",
@@ -335,7 +304,6 @@
   "logs.sort": "Sort",
   "logs.sortDate": "Date",
   "logs.sortAmount": "Amount",
-
   "charts.general": "General",
   "charts.byYear": "by year",
   "charts.byMonth": "by month",
@@ -348,7 +316,6 @@
   "charts.empty": "No entries yet",
   "charts.hint": "Tap a bar to see that period",
   "charts.tagsDuplicated": "An entry with several tags counts in each of them",
-
   "common.edit": "Edit",
   "common.yes": "Yes",
   "common.no": "No",
@@ -428,7 +395,6 @@
   "reminders.empty": "No reminders yet",
   "reminders.search": "Search reminders",
   "reminders.deleteTitle": "Delete this reminder?",
-
   "currency.AED": "United Arab Emirates Dirham",
   "currency.AFN": "Afghan Afghani",
   "currency.ALL": "Albanian Lek",
@@ -595,7 +561,6 @@
   "currency.ZMW": "Zambian Kwacha",
   "currency.ZWG": "Zimbabwean Gold",
   "currency.ZWL": "Zimbabwean Dollar (2009–2024)",
-
   "settings.personalisation": "Personalisation",
   "settings.homeAccount": "Account shown on Home",
   "settings.defaultPeriod": "Default period",
@@ -610,7 +575,6 @@
   "settings.decimalSeparator": "Decimal separator",
   "settings.decimalDot": "Dot  1.50",
   "settings.decimalComma": "Comma  1,50",
-  "settings.showCents": "Show cents",
   "settings.focus": "Show first",
   "settings.data": "Data and storage",
   "settings.security": "Security and sessions",
@@ -763,6 +727,17 @@
   "hide.hint": "It won't be offered for new entries. Existing entries, statistics and filters keep it.",
   "hide.tagWithSubtagsHint": "It and its subtags won't be offered for new entries. Existing entries, statistics and filters keep them.",
   "hide.section": "Hidden ({{count}})",
-  "settings.centsInEntries": "Cents in entries",
-  "settings.centsInTotals": "Cents in totals"
+  "cents.title": "Cents",
+  "cents.linkHint": "Where amounts show cents",
+  "cents.where": "Show cents",
+  "cents.entries": "Entries",
+  "cents.entriesHint": "Transactions, transfers, regular payments",
+  "cents.home": "Home",
+  "cents.homeHint": "Balance, period sum and categories on Home",
+  "cents.accounts": "Accounts",
+  "cents.accountsHint": "The Accounts page and account balances in lists",
+  "cents.totals": "Charts and other totals",
+  "cents.totalsHint": "Charts, sums in the log and upcoming payments",
+  "cents.always": "Balance details, receipts and amount fields always show cents.",
+  "tags.noSubtag": "No subtag"
 }

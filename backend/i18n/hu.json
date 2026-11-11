@@ -575,7 +575,6 @@
   "settings.decimalSeparator": "Tizedesjel",
   "settings.decimalDot": "Pont  1.50",
   "settings.decimalComma": "Vessző  1,50",
-  "settings.showCents": "Fillérek mutatása",
   "settings.focus": "Elsőként mutatott",
   "settings.data": "Adatok és tárhely",
   "settings.security": "Biztonság és munkamenetek",
@@ -728,6 +727,17 @@
   "hide.hint": "Új bejegyzéseknél nem lesz felajánlva. A meglévő bejegyzések, statisztikák és szűrők megtartják.",
   "hide.tagWithSubtagsHint": "A címke és alcímkéi új bejegyzéseknél nem lesznek felajánlva. A meglévő bejegyzések, statisztikák és szűrők megtartják őket.",
   "hide.section": "Rejtett ({{count}})",
-  "settings.centsInEntries": "Fillérek a tételeknél",
-  "settings.centsInTotals": "Fillérek az összesítésekben"
+  "cents.title": "Fillérek",
+  "cents.linkHint": "Hol mutassanak az összegek fillért",
+  "cents.where": "Fillérek mutatása",
+  "cents.entries": "Tételek",
+  "cents.entriesHint": "Tranzakciók, átutalások, rendszeres fizetések",
+  "cents.home": "Kezdőlap",
+  "cents.homeHint": "Egyenleg, időszaki összeg és kategóriák a kezdőlapon",
+  "cents.accounts": "Számlák",
+  "cents.accountsHint": "A számlák oldala és az egyenlegek a listákban",
+  "cents.totals": "Grafikonok és más összesítések",
+  "cents.totalsHint": "Grafikonok, a napló és a közelgő fizetések összegei",
+  "cents.always": "Az egyenleg részletei, a nyugták és az összegmezők mindig fillérrel jelennek meg.",
+  "tags.noSubtag": "Alcímke nélkül"
 }

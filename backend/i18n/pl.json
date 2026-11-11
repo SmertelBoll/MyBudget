@@ -593,7 +593,6 @@
   "settings.decimalSeparator": "Separator dziesiętny",
   "settings.decimalDot": "Kropka  1.50",
   "settings.decimalComma": "Przecinek  1,50",
-  "settings.showCents": "Pokazuj grosze",
   "settings.focus": "Pokazuj najpierw",
   "settings.data": "Dane i pamięć",
   "settings.security": "Bezpieczeństwo i sesje",
@@ -748,6 +747,17 @@
   "hide.hint": "Nie będzie proponowana dla nowych wpisów. Istniejące wpisy, statystyki i filtry ją zachowują.",
   "hide.tagWithSubtagsHint": "Tag i jego podtagi nie będą proponowane dla nowych wpisów. Istniejące wpisy, statystyki i filtry je zachowują.",
   "hide.section": "Ukryte ({{count}})",
-  "settings.centsInEntries": "Grosze we wpisach",
-  "settings.centsInTotals": "Grosze w sumach"
+  "cents.title": "Grosze",
+  "cents.linkHint": "Gdzie kwoty pokazują grosze",
+  "cents.where": "Pokazuj grosze",
+  "cents.entries": "Wpisy",
+  "cents.entriesHint": "Transakcje, przelewy, płatności cykliczne",
+  "cents.home": "Start",
+  "cents.homeHint": "Saldo, suma za okres i kategorie na ekranie głównym",
+  "cents.accounts": "Konta",
+  "cents.accountsHint": "Strona kont i salda kont na listach",
+  "cents.totals": "Wykresy i inne sumy",
+  "cents.totalsHint": "Wykresy, sumy w historii i nadchodzące płatności",
+  "cents.always": "Szczegóły salda, paragony i pola kwot zawsze pokazują grosze.",
+  "tags.noSubtag": "Bez podtagu"
 }

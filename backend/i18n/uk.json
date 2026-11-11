@@ -38,7 +38,6 @@
   "photo.forbidden": "Це фото належить іншому акаунту",
   "rates.unavailable": "Курси валют зараз недоступні",
   "i18n.unknownLanguage": "Невідома мова",
-
   "category.food": "Їжа",
   "category.transport": "Транспорт",
   "category.housing": "Житло",
@@ -52,7 +51,6 @@
   "category.refunds": "Повернення",
   "category.cashback": "Кешбек",
   "category.other": "Інше",
-
   "common.cancel": "Скасувати",
   "common.ok": "OK",
   "common.save": "Зберегти",
@@ -96,7 +94,6 @@
   "onboarding.searchCurrency": "Пошук валюти",
   "onboarding.start": "Почати",
   "onboarding.chooseCurrency": "Оберіть валюту",
-
   "nav.home": "Головна",
   "nav.accounts": "Рахунки",
   "nav.charts": "Графіки",
@@ -202,7 +199,6 @@
   "accounts.deleted": "Рахунок видалено",
   "common.required": "Обов’язкове поле",
   "order.moveHint": "Натисніть, куди поставити «{{name}}»",
-
   "entries.expenses": "Витрати",
   "entries.income": "Надходження",
   "entries.expense": "Витрата",
@@ -417,7 +413,6 @@
   "reminders.empty": "Нагадувань ще немає",
   "reminders.search": "Пошук нагадувань",
   "reminders.deleteTitle": "Видалити це нагадування?",
-
   "currency.AED": "Дирхам ОАЕ",
   "currency.AFN": "Афганський афгані",
   "currency.ALL": "Албанський лек",
@@ -584,7 +579,6 @@
   "currency.ZMW": "Замбійська квача",
   "currency.ZWG": "Зімбабвійське золото",
   "currency.ZWL": "Зімбабвійський долар (2009–2024)",
-
   "settings.personalisation": "Персоналізація",
   "settings.homeAccount": "Рахунок на Головній",
   "settings.defaultPeriod": "Період за замовчуванням",
@@ -599,7 +593,6 @@
   "settings.decimalSeparator": "Роздільник десяткових",
   "settings.decimalDot": "Крапка  1.50",
   "settings.decimalComma": "Кома  1,50",
-  "settings.showCents": "Показувати копійки",
   "settings.focus": "Показувати першими",
   "settings.data": "Дані й сховище",
   "settings.security": "Безпека й сеанси",
@@ -754,6 +747,17 @@
   "hide.hint": "Її не пропонуватиме для нових записів. Наявні записи, статистика й фільтри її зберігають.",
   "hide.tagWithSubtagsHint": "Його й підтеги не пропонуватиме для нових записів. Наявні записи, статистика й фільтри їх зберігають.",
   "hide.section": "Приховані ({{count}})",
-  "settings.centsInEntries": "Копійки в записах",
-  "settings.centsInTotals": "Копійки в підсумках"
+  "cents.title": "Копійки",
+  "cents.linkHint": "Де суми показуються з копійками",
+  "cents.where": "Показувати копійки",
+  "cents.entries": "Записи",
+  "cents.entriesHint": "Транзакції, перекази, регулярні платежі",
+  "cents.home": "Головна",
+  "cents.homeHint": "Баланс, сума за період і категорії на головній",
+  "cents.accounts": "Рахунки",
+  "cents.accountsHint": "Сторінка рахунків і баланси рахунків у списках",
+  "cents.totals": "Графіки та інші підсумки",
+  "cents.totalsHint": "Графіки, суми в журналі й майбутніх платежах",
+  "cents.always": "Деталі балансу, чеки й поля для суми завжди з копійками.",
+  "tags.noSubtag": "Без підтегу"
 }

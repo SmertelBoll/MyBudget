@@ -611,7 +611,6 @@
   "settings.decimalSeparator": "الفاصل العشري",
   "settings.decimalDot": "نقطة  1.50",
   "settings.decimalComma": "فاصلة  1,50",
-  "settings.showCents": "إظهار الكسور",
   "settings.focus": "العرض أولًا",
   "settings.data": "البيانات والتخزين",
   "settings.security": "الأمان والجلسات",
@@ -768,6 +767,17 @@
   "hide.hint": "لن تُقترح للإدخالات الجديدة. تحتفظ بها الإدخالات الحالية والإحصاءات والفلاتر.",
   "hide.tagWithSubtagsHint": "لن يُقترح هو ووسومه الفرعية للإدخالات الجديدة. تحتفظ بها الإدخالات الحالية والإحصاءات والفلاتر.",
   "hide.section": "المخفية ({{count}})",
-  "settings.centsInEntries": "الكسور في الإدخالات",
-  "settings.centsInTotals": "الكسور في المجاميع"
+  "cents.title": "الكسور",
+  "cents.linkHint": "أين تظهر المبالغ بالكسور",
+  "cents.where": "إظهار الكسور",
+  "cents.entries": "الإدخالات",
+  "cents.entriesHint": "المعاملات والتحويلات والمدفوعات المتكررة",
+  "cents.home": "الرئيسية",
+  "cents.homeHint": "الرصيد ومجموع الفترة والفئات في الرئيسية",
+  "cents.accounts": "الحسابات",
+  "cents.accountsHint": "صفحة الحسابات وأرصدة الحسابات في القوائم",
+  "cents.totals": "الرسوم البيانية والمجاميع الأخرى",
+  "cents.totalsHint": "الرسوم البيانية والمجاميع في السجل والمدفوعات القادمة",
+  "cents.always": "تفاصيل الرصيد والإيصالات وحقول المبالغ تظهر الكسور دائمًا.",
+  "tags.noSubtag": "بدون وسم فرعي"
 }

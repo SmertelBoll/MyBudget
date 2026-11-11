@@ -9,6 +9,7 @@ import type { AccountFilter } from "@/data/stats";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTheme } from "@/theme/ThemeProvider";
 import { radius, spacing } from "@/theme/tokens";
+import type { MoneyKind } from "@/utils/money";
 import { useMoney } from "@/utils/useMoney";
 import { AppSheet } from "./AppSheet";
 import { AppText } from "./AppText";
@@ -110,7 +111,7 @@ export function AccountFilterSelect({
   const hidable = Boolean(showBalance && user?.settings.hideBalance);
   const [revealed, setRevealed] = useState(false);
   const masked = hidable && !revealed;
-  const amount = (minor: number, currency: string) => (masked ? "•••••" : money(minor, currency));
+  const amount = (minor: number, currency: string, kind: MoneyKind = "accounts") => (masked ? "•••••" : money(minor, currency, kind));
 
   const active = useMemo(() => [...accounts].filter((account) => account.isActive).sort((a, b) => a.sortOrder - b.sortOrder), [accounts]);
   // An account removed meanwhile drops out of the filter.
@@ -163,7 +164,7 @@ export function AccountFilterSelect({
           <View style={{ flexDirection: "row", alignItems: "center", gap: spacing.xs }}>
             {/* Keeps the amount centered when the eye is shown on its right. */}
             {hidable && <View style={{ width: 32 }} />}
-            <AppText variant={compact ? "title" : "display"}>{amount(balance, totals.currency)}</AppText>
+            <AppText variant={compact ? "title" : "display"}>{amount(balance, totals.currency, "home")}</AppText>
             {hidable && (
               <IconButton
                 icon={revealed ? "eye-off-outline" : "eye-outline"}

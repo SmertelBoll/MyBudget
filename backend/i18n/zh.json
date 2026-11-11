@@ -566,7 +566,6 @@
   "settings.decimalSeparator": "小数分隔符",
   "settings.decimalDot": "句点  1.50",
   "settings.decimalComma": "逗号  1,50",
-  "settings.showCents": "显示分",
   "settings.focus": "优先显示",
   "settings.data": "数据与存储",
   "settings.security": "安全与会话",
@@ -718,6 +717,17 @@
   "hide.hint": "新记录中将不再推荐它。已有记录、统计和筛选仍会保留它。",
   "hide.tagWithSubtagsHint": "该标签及其子标签在新记录中将不再推荐。已有记录、统计和筛选仍会保留它们。",
   "hide.section": "已隐藏 ({{count}})",
-  "settings.centsInEntries": "记录显示小数",
-  "settings.centsInTotals": "合计显示小数"
+  "cents.title": "小数",
+  "cents.linkHint": "金额在哪里显示小数",
+  "cents.where": "显示小数",
+  "cents.entries": "记录",
+  "cents.entriesHint": "交易、转账、定期付款",
+  "cents.home": "首页",
+  "cents.homeHint": "首页的余额、期间合计和分类",
+  "cents.accounts": "账户",
+  "cents.accountsHint": "账户页面和列表中的账户余额",
+  "cents.totals": "图表和其他合计",
+  "cents.totalsHint": "图表、记录和即将付款的合计",
+  "cents.always": "余额明细、收据和金额输入框始终显示小数。",
+  "tags.noSubtag": "无子标签"
 }

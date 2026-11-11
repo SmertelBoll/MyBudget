@@ -575,7 +575,6 @@
   "settings.decimalSeparator": "दशमलव विभाजक",
   "settings.decimalDot": "बिंदु  1.50",
   "settings.decimalComma": "अल्पविराम  1,50",
-  "settings.showCents": "पैसे दिखाएँ",
   "settings.focus": "पहले दिखाएँ",
   "settings.data": "डेटा और स्टोरेज",
   "settings.security": "सुरक्षा और सत्र",
@@ -728,6 +727,17 @@
   "hide.hint": "इसे नई प्रविष्टियों के लिए नहीं सुझाया जाएगा। मौजूदा प्रविष्टियाँ, आँकड़े और फ़िल्टर इसे बनाए रखते हैं।",
   "hide.tagWithSubtagsHint": "यह और इसके उप-टैग नई प्रविष्टियों के लिए नहीं सुझाए जाएँगे। मौजूदा प्रविष्टियाँ, आँकड़े और फ़िल्टर इन्हें बनाए रखते हैं।",
   "hide.section": "छिपे हुए ({{count}})",
-  "settings.centsInEntries": "प्रविष्टियों में पैसे",
-  "settings.centsInTotals": "कुल में पैसे"
+  "cents.title": "पैसे",
+  "cents.linkHint": "राशियाँ कहाँ पैसों के साथ दिखें",
+  "cents.where": "पैसे दिखाएँ",
+  "cents.entries": "प्रविष्टियाँ",
+  "cents.entriesHint": "लेन-देन, ट्रांसफ़र, नियमित भुगतान",
+  "cents.home": "होम",
+  "cents.homeHint": "होम पर शेष, अवधि का योग और श्रेणियाँ",
+  "cents.accounts": "खाते",
+  "cents.accountsHint": "खातों का पेज और सूचियों में खातों के शेष",
+  "cents.totals": "चार्ट और अन्य योग",
+  "cents.totalsHint": "चार्ट, लॉग और आगामी भुगतानों के योग",
+  "cents.always": "शेष का विवरण, रसीदें और राशि वाले फ़ील्ड हमेशा पैसे दिखाते हैं।",
+  "tags.noSubtag": "बिना उप-टैग"
 }

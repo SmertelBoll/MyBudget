@@ -97,7 +97,7 @@ export function AccountSettingField({
   const chosen = active.find((account) => account.id === value) ?? null;
   const emptyRow =
     empty === "total"
-      ? { icon: TOTAL_ICON, color: colors.accent, title: t("home.total"), subtitle: money(totals.included, totals.currency) }
+      ? { icon: TOTAL_ICON, color: colors.accent, title: t("home.total"), subtitle: money(totals.included, totals.currency, "accounts") }
       : { icon: NONE_ICON, color: colors.tonal, title: t("settings.noAccount"), subtitle: t("settings.noAccountHint") };
 
   const pick = (id: string | null) => {
@@ -123,7 +123,7 @@ export function AccountSettingField({
               icon={account.icon}
               color={account.color}
               title={account.name}
-              subtitle={money(balances.get(account.id) ?? 0, account.currency)}
+              subtitle={money(balances.get(account.id) ?? 0, account.currency, "accounts")}
               selected={account.id === chosen?.id}
               onPress={() => pick(account.id)}
             />

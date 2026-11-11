@@ -566,7 +566,6 @@
   "settings.decimalSeparator": "小数点記号",
   "settings.decimalDot": "ピリオド  1.50",
   "settings.decimalComma": "カンマ  1,50",
-  "settings.showCents": "小数点以下を表示",
   "settings.focus": "最初に表示",
   "settings.data": "データとストレージ",
   "settings.security": "セキュリティとセッション",
@@ -718,6 +717,17 @@
   "hide.hint": "新しい記録では候補に表示されません。既存の記録・統計・フィルターには残ります。",
   "hide.tagWithSubtagsHint": "このタグとサブタグは新しい記録では候補に表示されません。既存の記録・統計・フィルターには残ります。",
   "hide.section": "非表示 ({{count}})",
-  "settings.centsInEntries": "記録の小数点以下",
-  "settings.centsInTotals": "合計の小数点以下"
+  "cents.title": "小数点以下",
+  "cents.linkHint": "小数点以下を表示する場所",
+  "cents.where": "小数点以下を表示",
+  "cents.entries": "記録",
+  "cents.entriesHint": "取引、振替、定期支払い",
+  "cents.home": "ホーム",
+  "cents.homeHint": "ホームの残高、期間の合計、カテゴリ",
+  "cents.accounts": "口座",
+  "cents.accountsHint": "口座ページと一覧の口座残高",
+  "cents.totals": "グラフとその他の合計",
+  "cents.totalsHint": "グラフ、履歴と今後の支払いの合計",
+  "cents.always": "残高の内訳、レシート、金額入力欄は常に小数点以下を表示します。",
+  "tags.noSubtag": "サブタグなし"
 }

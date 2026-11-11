@@ -67,7 +67,7 @@ export function AccountPicker({
             <View style={{ flex: 1 }}>
               <AppText numberOfLines={1}>{selected.name}</AppText>
               <AppText variant="caption" secondary>
-                {money(balances.get(selected.id) ?? 0, selected.currency)}
+                {money(balances.get(selected.id) ?? 0, selected.currency, "accounts")}
               </AppText>
             </View>
             {!selected.isActive && <MaterialCommunityIcons name="trash-can-outline" size={18} color={colors.textSecondary} />}
@@ -101,7 +101,7 @@ export function AccountPicker({
               color={item.color}
               title={item.name}
               note={item.note}
-              value={money(balances.get(item.id) ?? 0, item.currency)}
+              value={money(balances.get(item.id) ?? 0, item.currency, "accounts")}
               onPress={() => {
                 onChange(item.id);
                 setOpen(false);

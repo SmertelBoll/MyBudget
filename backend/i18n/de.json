@@ -575,7 +575,6 @@
   "settings.decimalSeparator": "Dezimaltrennzeichen",
   "settings.decimalDot": "Punkt  1.50",
   "settings.decimalComma": "Komma  1,50",
-  "settings.showCents": "Cent anzeigen",
   "settings.focus": "Zuerst anzeigen",
   "settings.data": "Daten und Speicher",
   "settings.security": "Sicherheit und Sitzungen",
@@ -728,6 +727,17 @@
   "hide.hint": "Sie wird für neue Einträge nicht mehr angeboten. Bestehende Einträge, Statistiken und Filter behalten sie.",
   "hide.tagWithSubtagsHint": "Der Tag und seine Untertags werden für neue Einträge nicht mehr angeboten. Bestehende Einträge, Statistiken und Filter behalten sie.",
   "hide.section": "Ausgeblendet ({{count}})",
-  "settings.centsInEntries": "Cent bei Einträgen",
-  "settings.centsInTotals": "Cent bei Summen"
+  "cents.title": "Cent",
+  "cents.linkHint": "Wo Beträge Cent zeigen",
+  "cents.where": "Cent anzeigen",
+  "cents.entries": "Einträge",
+  "cents.entriesHint": "Transaktionen, Überweisungen, regelmäßige Zahlungen",
+  "cents.home": "Start",
+  "cents.homeHint": "Saldo, Periodensumme und Kategorien auf der Startseite",
+  "cents.accounts": "Konten",
+  "cents.accountsHint": "Kontenseite und Kontostände in Listen",
+  "cents.totals": "Diagramme und andere Summen",
+  "cents.totalsHint": "Diagramme, Summen im Verlauf und anstehende Zahlungen",
+  "cents.always": "Saldodetails, Belege und Betragsfelder zeigen immer Cent.",
+  "tags.noSubtag": "Ohne Untertag"
 }

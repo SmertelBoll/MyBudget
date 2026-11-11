@@ -211,7 +211,7 @@ function HomeContent() {
               toTop();
             }} onSwipeVertical={(direction) => setCollapsed(direction === "up")}>
             <Pressable onPress={() => setCollapsed(false)} disabled={!collapsed} accessibilityRole={collapsed ? "button" : undefined}>
-              <PeriodChart segments={segments} label={money(total, baseCurrency)} collapsed={collapsed} />
+              <PeriodChart segments={segments} label={money(total, baseCurrency, "home")} collapsed={collapsed} />
             </Pressable>
           </PeriodSwitcher>
           {/* Categories / tags: one small button in the free corner, showing the other view; a tap switches. */}
@@ -266,6 +266,7 @@ function HomeContent() {
             range={range}
             expanded={expanded.has(item.id)}
             onToggle={() => toggle(item.id)}
+            moneyKind="home"
           />
         )}
       />

@@ -575,7 +575,6 @@
   "settings.decimalSeparator": "Decimaalteken",
   "settings.decimalDot": "Punt  1.50",
   "settings.decimalComma": "Komma  1,50",
-  "settings.showCents": "Centen tonen",
   "settings.focus": "Eerst tonen",
   "settings.data": "Gegevens en opslag",
   "settings.security": "Beveiliging en sessies",
@@ -728,6 +727,17 @@
   "hide.hint": "Wordt niet meer aangeboden voor nieuwe items. Bestaande items, statistieken en filters behouden haar.",
   "hide.tagWithSubtagsHint": "De tag en zijn subtags worden niet meer aangeboden voor nieuwe items. Bestaande items, statistieken en filters behouden ze.",
   "hide.section": "Verborgen ({{count}})",
-  "settings.centsInEntries": "Centen bij items",
-  "settings.centsInTotals": "Centen bij totalen"
+  "cents.title": "Centen",
+  "cents.linkHint": "Waar bedragen centen tonen",
+  "cents.where": "Centen tonen",
+  "cents.entries": "Items",
+  "cents.entriesHint": "Transacties, overboekingen, vaste betalingen",
+  "cents.home": "Start",
+  "cents.homeHint": "Saldo, periodetotaal en categorieën op Start",
+  "cents.accounts": "Rekeningen",
+  "cents.accountsHint": "De rekeningenpagina en saldi in lijsten",
+  "cents.totals": "Grafieken en andere totalen",
+  "cents.totalsHint": "Grafieken, totalen in het logboek en komende betalingen",
+  "cents.always": "Saldodetails, bonnen en bedragvelden tonen altijd centen.",
+  "tags.noSubtag": "Zonder subtag"
 }

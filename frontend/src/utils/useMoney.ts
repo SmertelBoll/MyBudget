@@ -1,7 +1,20 @@
 import { useCallback, useMemo } from "react";
 import { useAuth } from "@/auth/AuthProvider";
 import { useI18n } from "@/i18n/I18nProvider";
+import type { UserSettings } from "@/api/types";
 import { amountToInput, formatMoney, type MoneyFormat, type MoneyKind } from "./money";
+
+// The four Cents switches as they stand. Unset ones: entries keep cents (rows always had them); the others follow the
+// one switch there used to be (showCents, for totals).
+export const centsSettings = (settings?: Partial<UserSettings>) => {
+  const totals = settings?.centsInTotals ?? settings?.showCents ?? false;
+  return {
+    centsInEntries: settings?.centsInEntries ?? true,
+    centsInHome: settings?.centsInHome ?? totals,
+    centsInAccounts: settings?.centsInAccounts ?? totals,
+    centsInTotals: totals,
+  };
+};
 
 // Formatting with the user's settings (decimal separator, cents) and language.
 export const useMoney = () => {
@@ -11,12 +24,9 @@ export const useMoney = () => {
     () => ({
       lang,
       decimalSeparator: user?.settings.decimalSeparator ?? ".",
-      // Before there were two switches there was one (showCents) for totals; entries always had cents. Unset, the
-      // new switches keep that.
-      centsInEntries: user?.settings.centsInEntries ?? true,
-      centsInTotals: user?.settings.centsInTotals ?? user?.settings.showCents ?? false,
+      ...centsSettings(user?.settings),
     }),
-    [lang, user?.settings.decimalSeparator, user?.settings.centsInEntries, user?.settings.centsInTotals, user?.settings.showCents]
+    [lang, user?.settings]
   );
 
   // kind: "total" (default), "entry", or "exact" / true for always with cents.
