@@ -12,7 +12,11 @@ export type UserSettings = {
   showPhotos: boolean;
   firstDayOfWeek: number;
   decimalSeparator: "." | ",";
+  // The single switch before cents were split (it was for totals; entries always had cents): stands in for
+  // centsInTotals until that is set.
   showCents: boolean;
+  centsInEntries?: boolean | null;
+  centsInTotals?: boolean | null;
   focus: EntryType;
   // Missing on users saved before it existed: shown.
   hideBalance?: boolean;

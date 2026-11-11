@@ -737,5 +737,7 @@
   "hide.tag": "Nascondi etichetta",
   "hide.hint": "Non verrà proposta per le nuove voci. Le voci esistenti, le statistiche e i filtri la mantengono.",
   "hide.tagWithSubtagsHint": "L'etichetta e le sue sottoetichette non verranno proposte per le nuove voci. Le voci esistenti, le statistiche e i filtri le mantengono.",
-  "hide.section": "Nascoste ({{count}})"
+  "hide.section": "Nascoste ({{count}})",
+  "settings.centsInEntries": "Centesimi nelle voci",
+  "settings.centsInTotals": "Centesimi nei totali"
 }

@@ -737,5 +737,7 @@
   "hide.tag": "Ocultar etiqueta",
   "hide.hint": "Não será sugerida para novos registros. Os registros existentes, as estatísticas e os filtros a mantêm.",
   "hide.tagWithSubtagsHint": "A etiqueta e as subetiquetas não serão sugeridas para novos registros. Os registros existentes, as estatísticas e os filtros as mantêm.",
-  "hide.section": "Ocultas ({{count}})"
+  "hide.section": "Ocultas ({{count}})",
+  "settings.centsInEntries": "Centavos nos registros",
+  "settings.centsInTotals": "Centavos nos totais"
 }

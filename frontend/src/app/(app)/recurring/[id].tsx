@@ -93,7 +93,7 @@ export default function RecurringDetailsScreen() {
               <AppText variant="heading">{category ? categoryName(category, t) : "?"}</AppText>
             </View>
           </Field>
-          <Field label={t("transfers.amount")}>{money(payment.amount, payment.currency, true)}</Field>
+          <Field label={t("transfers.amount")}>{money(payment.amount, payment.currency, "entry")}</Field>
           {tagNames.length > 0 && (
             <Field label={t("tags.title")}>
               <View style={{ flexDirection: "row", flexWrap: "wrap", gap: spacing.xs }}>

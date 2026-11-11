@@ -4,9 +4,14 @@
 export type MoneyFormat = {
   lang: string;
   decimalSeparator: "." | ",";
-  // Settings -> Advanced: cents are hidden by default when displaying amounts.
-  showCents: boolean;
+  // Settings -> Advanced, two switches: cents on single entries (transactions, transfers, payments) and on totals
+  // (balances, sums for a period, a category or a chart).
+  centsInEntries: boolean;
+  centsInTotals: boolean;
 };
+
+// What an amount is: a total (the default), a single entry, or exact (always with cents: balance details, receipts).
+export type MoneyKind = "total" | "entry" | "exact";
 
 const NBSP = " ";
 
@@ -18,9 +23,10 @@ const SYMBOLS: Record<string, string> = {
   DKK: "kr", CAD: "C$", AUD: "A$", NZD: "NZ$", BRL: "R$", MXN: "Mex$", THB: "฿", VND: "₫", PHP: "₱", NGN: "₦",
 };
 
-// "₴32,207" / "₴32 206,83". `exact` always shows cents (balance details, edit fields).
-export const formatMoney = (minor: number, currency: string, format: MoneyFormat, exact = false) => {
-  const digits = format.showCents || exact ? 2 : 0;
+// "₴32,207" / "₴32 206,83", with or without cents by what the amount is and the user's settings.
+export const formatMoney = (minor: number, currency: string, format: MoneyFormat, kind: MoneyKind = "total") => {
+  const cents = kind === "exact" || (kind === "entry" ? format.centsInEntries : format.centsInTotals);
+  const digits = cents ? 2 : 0;
   let parts: Intl.NumberFormatPart[];
   try {
     parts = new Intl.NumberFormat(format.lang, {

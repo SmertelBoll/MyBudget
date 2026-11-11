@@ -35,6 +35,8 @@ const DEFAULT_SETTINGS: UserSettings = {
   firstDayOfWeek: 1,
   decimalSeparator: ".",
   showCents: false,
+  centsInEntries: true,
+  centsInTotals: false,
   focus: "expense",
   hideBalance: false,
   receiptComments: false,
@@ -168,7 +170,16 @@ export default function SettingsScreen() {
               onChange={(value) => setSetting("decimalSeparator", value)}
             />
           </Labeled>
-          <ToggleRow label={t("settings.showCents")} value={settings.showCents} onChange={(value) => setSetting("showCents", value)} />
+          <ToggleRow
+            label={t("settings.centsInEntries")}
+            value={settings.centsInEntries ?? true}
+            onChange={(value) => setSetting("centsInEntries", value)}
+          />
+          <ToggleRow
+            label={t("settings.centsInTotals")}
+            value={settings.centsInTotals ?? settings.showCents ?? false}
+            onChange={(value) => setSetting("centsInTotals", value)}
+          />
           <Labeled label={t("settings.focus")}>
             <SegmentedSwitch<EntryType>
               options={[

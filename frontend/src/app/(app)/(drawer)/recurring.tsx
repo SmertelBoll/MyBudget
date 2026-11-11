@@ -54,7 +54,7 @@ function PaymentRow({ payment, next, onToggleActive }: { payment: Recurring; nex
         <ToggleRow label={t("recurring.active")} value={active} onChange={onToggleActive} hideLabel />
       </View>
       <AppText variant="title" color={payment.type === "income" ? colors.text : colors.textSecondary}>
-        {signed(payment, money(payment.amount, payment.currency))}
+        {signed(payment, money(payment.amount, payment.currency, "entry"))}
       </AppText>
       <View style={{ flexDirection: "row", alignItems: "center", gap: spacing.xs }}>
         <MaterialCommunityIcons name="calendar-clock" size={16} color={colors.textSecondary} />
@@ -83,7 +83,7 @@ function PendingRow({ item, onSettle }: { item: PendingPayment; onSettle: (confi
         <AppText variant="heading" numberOfLines={1} style={{ flex: 1 }}>
           {payment.name}
         </AppText>
-        <AppText variant="heading">{signed(payment, money(payment.amount, payment.currency))}</AppText>
+        <AppText variant="heading">{signed(payment, money(payment.amount, payment.currency, "entry"))}</AppText>
       </View>
       <AppText variant="caption" secondary style={{ textTransform: "capitalize" }}>
         {formatLongDate(occurrence.date, lang)}, {occurrence.time}

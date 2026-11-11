@@ -727,5 +727,7 @@
   "hide.tag": "Skjul tagg",
   "hide.hint": "Den foreslås ikke for nye oppføringer. Eksisterende oppføringer, statistikk og filtre beholder den.",
   "hide.tagWithSubtagsHint": "Den og undertaggene foreslås ikke for nye oppføringer. Eksisterende oppføringer, statistikk og filtre beholder dem.",
-  "hide.section": "Skjulte ({{count}})"
+  "hide.section": "Skjulte ({{count}})",
+  "settings.centsInEntries": "Øre i oppføringer",
+  "settings.centsInTotals": "Øre i totaler"
 }

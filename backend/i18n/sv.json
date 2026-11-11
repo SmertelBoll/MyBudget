@@ -727,5 +727,7 @@
   "hide.tag": "Dölj tagg",
   "hide.hint": "Den föreslås inte för nya poster. Befintliga poster, statistik och filter behåller den.",
   "hide.tagWithSubtagsHint": "Taggen och dess undertaggar föreslås inte för nya poster. Befintliga poster, statistik och filter behåller dem.",
-  "hide.section": "Dolda ({{count}})"
+  "hide.section": "Dolda ({{count}})",
+  "settings.centsInEntries": "Ören i poster",
+  "settings.centsInTotals": "Ören i summor"
 }

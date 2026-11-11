@@ -717,5 +717,7 @@
   "hide.tag": "隐藏标签",
   "hide.hint": "新记录中将不再推荐它。已有记录、统计和筛选仍会保留它。",
   "hide.tagWithSubtagsHint": "该标签及其子标签在新记录中将不再推荐。已有记录、统计和筛选仍会保留它们。",
-  "hide.section": "已隐藏 ({{count}})"
+  "hide.section": "已隐藏 ({{count}})",
+  "settings.centsInEntries": "记录显示小数",
+  "settings.centsInTotals": "合计显示小数"
 }

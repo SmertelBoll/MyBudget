@@ -737,5 +737,7 @@
   "hide.tag": "Masquer l'étiquette",
   "hide.hint": "Elle ne sera plus proposée pour les nouvelles saisies. Les saisies existantes, les statistiques et les filtres la conservent.",
   "hide.tagWithSubtagsHint": "Elle et ses sous-étiquettes ne seront plus proposées pour les nouvelles saisies. Les saisies existantes, les statistiques et les filtres les conservent.",
-  "hide.section": "Masquées ({{count}})"
+  "hide.section": "Masquées ({{count}})",
+  "settings.centsInEntries": "Centimes dans les saisies",
+  "settings.centsInTotals": "Centimes dans les totaux"
 }

@@ -727,5 +727,7 @@
   "hide.tag": "Címke elrejtése",
   "hide.hint": "Új bejegyzéseknél nem lesz felajánlva. A meglévő bejegyzések, statisztikák és szűrők megtartják.",
   "hide.tagWithSubtagsHint": "A címke és alcímkéi új bejegyzéseknél nem lesznek felajánlva. A meglévő bejegyzések, statisztikák és szűrők megtartják őket.",
-  "hide.section": "Rejtett ({{count}})"
+  "hide.section": "Rejtett ({{count}})",
+  "settings.centsInEntries": "Fillérek a tételeknél",
+  "settings.centsInTotals": "Fillérek az összesítésekben"
 }

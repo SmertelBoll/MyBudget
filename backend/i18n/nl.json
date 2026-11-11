@@ -727,5 +727,7 @@
   "hide.tag": "Tag verbergen",
   "hide.hint": "Wordt niet meer aangeboden voor nieuwe items. Bestaande items, statistieken en filters behouden haar.",
   "hide.tagWithSubtagsHint": "De tag en zijn subtags worden niet meer aangeboden voor nieuwe items. Bestaande items, statistieken en filters behouden ze.",
-  "hide.section": "Verborgen ({{count}})"
+  "hide.section": "Verborgen ({{count}})",
+  "settings.centsInEntries": "Centen bij items",
+  "settings.centsInTotals": "Centen bij totalen"
 }

@@ -163,8 +163,8 @@ export default function LogsScreen() {
         color={category?.color ?? colors.iconIdle}
         title={category ? categoryName(category, t) : "?"}
         account={byAmount ? `${account?.name ?? "?"} · ${formatShortDate(tx.date, lang)}` : (account?.name ?? "?")}
-        amount={money(value, baseCurrency, true)}
-        original={tx.currency !== baseCurrency ? money(tx.amount, tx.currency, true) : undefined}
+        amount={money(value, baseCurrency, "entry")}
+        original={tx.currency !== baseCurrency ? money(tx.amount, tx.currency, "entry") : undefined}
         tags={tx.tagIds.filter((id) => tagById.has(id)).map((id) => ({ name: tagById.get(id)!.name, color: tagTree.colorOf(id) }))}
         comment={user?.settings.showComment === false ? undefined : tx.comment}
         hasPhotos={tx.photos.length > 0}
@@ -255,7 +255,7 @@ export default function LogsScreen() {
                 </View>
               ) : (
                 <AppText variant="heading" style={{ flex: 1 }}>
-                  {t("logs.total", { amount: money(total, baseCurrency, true) })}
+                  {t("logs.total", { amount: money(total, baseCurrency) })}
                 </AppText>
               )}
               <LogFilter kind="categories" type={type} value={narrow} onChange={setNarrow} />

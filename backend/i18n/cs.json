@@ -747,5 +747,7 @@
   "hide.tag": "Skrýt štítek",
   "hide.hint": "Nebude nabízena pro nové záznamy. Stávající záznamy, statistiky a filtry ji zachovají.",
   "hide.tagWithSubtagsHint": "Štítek ani jeho podštítky nebudou nabízeny pro nové záznamy. Stávající záznamy, statistiky a filtry je zachovají.",
-  "hide.section": "Skryté ({{count}})"
+  "hide.section": "Skryté ({{count}})",
+  "settings.centsInEntries": "Haléře u záznamů",
+  "settings.centsInTotals": "Haléře v součtech"
 }

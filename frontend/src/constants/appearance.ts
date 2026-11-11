@@ -1,9 +1,12 @@
 import type { MaterialCommunityIcons } from "@expo/vector-icons";
+import type { CustomIconName } from "@/components/AppIcon";
 
 // Spec 5.2: the allowed icons and colors for accounts and categories live in one place.
 
 export type IconName = keyof typeof MaterialCommunityIcons.glyphMap;
-export type IconSection = { title: string; icons: IconName[] };
+// What accounts, categories and avatars can pick: a Material icon or one of ours (components/AppIcon.tsx).
+export type IconChoice = IconName | CustomIconName;
+export type IconSection = { title: string; icons: IconChoice[] };
 
 // Section titles are dictionary keys. The first 7 icons are the ones shown inline (spec 5.2).
 // The ruble sign is deliberately not offered.
@@ -47,7 +50,7 @@ export const AVATAR_ICON_SECTIONS: IconSection[] = [
   },
   {
     title: "icons.animals",
-    icons: ["cat", "dog", "panda", "owl", "rabbit", "penguin", "fish", "koala", "duck", "bee", "butterfly", "turtle", "unicorn"],
+    icons: ["cat", "dog", "panda", "owl", "rabbit", "penguin", "fish", "koala", "giraffe", "duck", "bee", "butterfly", "turtle", "unicorn"],
   },
   {
     title: "icons.symbols",

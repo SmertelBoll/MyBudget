@@ -1,7 +1,6 @@
 import { View } from "react-native";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import type { IconName } from "@/constants/appearance";
 import { CONTRAST_DARK, CONTRAST_LIGHT } from "@/theme/palette";
+import { AppIcon, isKnownIcon } from "./AppIcon";
 
 // Readable icon color on any background: dark on light colors, light on dark ones.
 export const contrastOn = (hex: string) => {
@@ -22,7 +21,7 @@ export function IconCircle({
   size?: number;
   dimmed?: boolean;
 }) {
-  const name = (icon in MaterialCommunityIcons.glyphMap ? icon : "help") as IconName;
+  const name = isKnownIcon(icon) ? icon : "help";
   return (
     <View
       style={{
@@ -35,7 +34,7 @@ export function IconCircle({
         opacity: dimmed ? 0.45 : 1,
       }}
     >
-      <MaterialCommunityIcons name={name} size={size * 0.55} color={contrastOn(color)} />
+      <AppIcon name={name} size={size * 0.55} color={contrastOn(color)} background={color} />
     </View>
   );
 }

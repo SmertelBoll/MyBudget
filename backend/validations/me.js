@@ -12,6 +12,8 @@ export const settingsSchema = z
     firstDayOfWeek: z.number().int().min(0).max(6),
     decimalSeparator: z.enum([".", ","]),
     showCents: z.boolean(),
+    centsInEntries: z.boolean().nullable(),
+    centsInTotals: z.boolean().nullable(),
     focus: z.enum(["expense", "income"]),
     hideBalance: z.boolean(),
     receiptComments: z.boolean(),

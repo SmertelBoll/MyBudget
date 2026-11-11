@@ -284,7 +284,7 @@ export default function BarCanvas({
         >
           <View style={{ paddingHorizontal: spacing.sm, paddingVertical: 4, borderRadius: radius.md, backgroundColor: colors.text }}>
             <AppText variant="label" color={colors.background} numberOfLines={1}>
-              {money(plateValue, baseCurrency, true)}
+              {money(plateValue, baseCurrency)}
             </AppText>
           </View>
         </View>

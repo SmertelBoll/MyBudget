@@ -762,5 +762,7 @@
   "hide.tag": "Hide tag",
   "hide.hint": "It won't be offered for new entries. Existing entries, statistics and filters keep it.",
   "hide.tagWithSubtagsHint": "It and its subtags won't be offered for new entries. Existing entries, statistics and filters keep them.",
-  "hide.section": "Hidden ({{count}})"
+  "hide.section": "Hidden ({{count}})",
+  "settings.centsInEntries": "Cents in entries",
+  "settings.centsInTotals": "Cents in totals"
 }

@@ -747,5 +747,7 @@
   "hide.tag": "Ukryj tag",
   "hide.hint": "Nie będzie proponowana dla nowych wpisów. Istniejące wpisy, statystyki i filtry ją zachowują.",
   "hide.tagWithSubtagsHint": "Tag i jego podtagi nie będą proponowane dla nowych wpisów. Istniejące wpisy, statystyki i filtry je zachowują.",
-  "hide.section": "Ukryte ({{count}})"
+  "hide.section": "Ukryte ({{count}})",
+  "settings.centsInEntries": "Grosze we wpisach",
+  "settings.centsInTotals": "Grosze w sumach"
 }

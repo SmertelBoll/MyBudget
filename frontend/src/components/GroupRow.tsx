@@ -106,7 +106,7 @@ export function GroupRow({
     ? []
     : group.children.map((child) => {
         const inner = childLook(group, child.id);
-        return { id: child.id, icon: inner.icon, color: inner.color, title: inner.title, amount: money(child.amount, baseCurrency, true) };
+        return { id: child.id, icon: inner.icon, color: inner.color, title: inner.title, amount: money(child.amount, baseCurrency) };
       });
 
   const planned = by === "category" && range.kind === "month" ? (look(group.id) as { plannedMonthly?: number | null }).plannedMonthly : null;

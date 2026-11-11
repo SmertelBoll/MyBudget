@@ -727,5 +727,7 @@
   "hide.tag": "Tag ausblenden",
   "hide.hint": "Sie wird für neue Einträge nicht mehr angeboten. Bestehende Einträge, Statistiken und Filter behalten sie.",
   "hide.tagWithSubtagsHint": "Der Tag und seine Untertags werden für neue Einträge nicht mehr angeboten. Bestehende Einträge, Statistiken und Filter behalten sie.",
-  "hide.section": "Ausgeblendet ({{count}})"
+  "hide.section": "Ausgeblendet ({{count}})",
+  "settings.centsInEntries": "Cent bei Einträgen",
+  "settings.centsInTotals": "Cent bei Summen"
 }

@@ -66,9 +66,9 @@ function TransferRow({ transfer, from, to, onPress }: { transfer: Transfer; from
       </View>
       <View style={{ alignItems: "flex-end", gap: 2 }}>
         <AppText variant="label" color={colors.textSecondary}>
-          −{money(transfer.amountFrom, fromCurrency)}
+          −{money(transfer.amountFrom, fromCurrency, "entry")}
         </AppText>
-        <AppText variant="label">+{money(transfer.amountTo, toCurrency)}</AppText>
+        <AppText variant="label">+{money(transfer.amountTo, toCurrency, "entry")}</AppText>
       </View>
     </Pressable>
   );

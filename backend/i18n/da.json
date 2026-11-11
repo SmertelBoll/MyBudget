@@ -727,5 +727,7 @@
   "hide.tag": "Skjul tag",
   "hide.hint": "Den foreslås ikke til nye poster. Eksisterende poster, statistik og filtre beholder den.",
   "hide.tagWithSubtagsHint": "Det og dets undertags foreslås ikke til nye poster. Eksisterende poster, statistik og filtre beholder dem.",
-  "hide.section": "Skjulte ({{count}})"
+  "hide.section": "Skjulte ({{count}})",
+  "settings.centsInEntries": "Øre i poster",
+  "settings.centsInTotals": "Øre i totaler"
 }

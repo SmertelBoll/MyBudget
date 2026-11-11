@@ -717,5 +717,7 @@
   "hide.tag": "タグを非表示",
   "hide.hint": "新しい記録では候補に表示されません。既存の記録・統計・フィルターには残ります。",
   "hide.tagWithSubtagsHint": "このタグとサブタグは新しい記録では候補に表示されません。既存の記録・統計・フィルターには残ります。",
-  "hide.section": "非表示 ({{count}})"
+  "hide.section": "非表示 ({{count}})",
+  "settings.centsInEntries": "記録の小数点以下",
+  "settings.centsInTotals": "合計の小数点以下"
 }

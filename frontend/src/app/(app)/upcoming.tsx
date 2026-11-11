@@ -107,7 +107,7 @@ export default function UpcomingScreen() {
             <View style={{ backgroundColor: colors.surface, borderRadius: radius.md, padding: spacing.sm }}>
               <PeriodSwitcher value={range} onChange={setRange} allowFuture />
             </View>
-            <AppText variant="heading">{t("logs.total", { amount: money(type === "expense" ? totals.expense : totals.income, baseCurrency, true) })}</AppText>
+            <AppText variant="heading">{t("logs.total", { amount: money(type === "expense" ? totals.expense : totals.income, baseCurrency) })}</AppText>
           </View>
         }
         ListEmptyComponent={
@@ -148,7 +148,7 @@ export default function UpcomingScreen() {
                     {accountName(item.payment.accountId)}
                   </AppText>
                 </View>
-                <AppText variant="heading">{money(item.value, baseCurrency, true)}</AppText>
+                <AppText variant="heading">{money(item.value, baseCurrency, "entry")}</AppText>
               </View>
             </Pressable>
           );
@@ -167,7 +167,7 @@ export default function UpcomingScreen() {
           ].map((row) => (
             <View key={row.label} style={{ flexDirection: "row", justifyContent: "space-between" }}>
               <AppText>{row.label}</AppText>
-              <AppText variant="heading">{money(row.value, baseCurrency, true)}</AppText>
+              <AppText variant="heading">{money(row.value, baseCurrency, "entry")}</AppText>
             </View>
           ))}
           <AppText variant="caption" secondary>

@@ -717,5 +717,7 @@
   "hide.tag": "태그 숨기기",
   "hide.hint": "새 기록에서는 제안되지 않습니다. 기존 기록, 통계, 필터에는 그대로 남습니다.",
   "hide.tagWithSubtagsHint": "이 태그와 하위 태그는 새 기록에서 제안되지 않습니다. 기존 기록, 통계, 필터에는 그대로 남습니다.",
-  "hide.section": "숨김 ({{count}})"
+  "hide.section": "숨김 ({{count}})",
+  "settings.centsInEntries": "기록에 소수점 표시",
+  "settings.centsInTotals": "합계에 소수점 표시"
 }

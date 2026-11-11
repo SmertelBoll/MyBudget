@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Pressable, ScrollView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import type { IconName, IconSection } from "@/constants/appearance";
+import type { IconChoice, IconSection } from "@/constants/appearance";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTheme } from "@/theme/ThemeProvider";
 import { spacing } from "@/theme/tokens";
@@ -59,7 +59,7 @@ export function IconPicker({
   sections: IconSection[];
   value: string;
   color: string;
-  onChange: (icon: IconName) => void;
+  onChange: (icon: IconChoice) => void;
 }) {
   const { colors } = useTheme();
   const { t } = useI18n();
@@ -69,8 +69,8 @@ export function IconPicker({
   // An icon may sit in two sections (e.g. the hryvnia in Money and Currencies); inline it appears once.
   const all = [...new Set(sections.flatMap((section) => section.icons))];
   const inline = all.slice(0, INLINE);
-  if (!inline.includes(value as IconName) && all.includes(value as IconName)) {
-    inline[INLINE - 1] = value as IconName;
+  if (!inline.includes(value as IconChoice) && all.includes(value as IconChoice)) {
+    inline[INLINE - 1] = value as IconChoice;
   }
 
   return (

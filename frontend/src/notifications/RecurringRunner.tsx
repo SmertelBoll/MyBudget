@@ -72,7 +72,7 @@ export function RecurringRunner() {
       payment: (payment) => ({
         title: payment.name,
         body: t(payment.autoAdd ? "recurring.notifyAdded" : "recurring.notifyConfirm", {
-          amount: `${payment.type === "expense" ? "−" : "+"}${money(payment.amount, payment.currency)}`,
+          amount: `${payment.type === "expense" ? "−" : "+"}${money(payment.amount, payment.currency, "entry")}`,
         }),
       }),
       reminder: (reminder) => ({ title: reminder.title, body: reminder.comment || formatLongDate(reminder.startDate, lang) }),

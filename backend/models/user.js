@@ -27,7 +27,11 @@ const UserSchema = new mongoose.Schema(
       // 0 = Sunday ... 6 = Saturday
       firstDayOfWeek: { type: Number, default: 1 },
       decimalSeparator: { type: String, enum: [".", ","], default: "." },
+      // The one switch before cents were split (for totals; entries always had cents). Unset (null), the two below
+      // fall back to it and to "with cents".
       showCents: { type: Boolean, default: false },
+      centsInEntries: { type: Boolean, default: null },
+      centsInTotals: { type: Boolean, default: null },
       focus: { type: String, enum: ["expense", "income"], default: "expense" },
       // Home shows dots instead of the balance until the eye next to it is tapped.
       hideBalance: { type: Boolean, default: false },
