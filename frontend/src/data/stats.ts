@@ -44,13 +44,29 @@ const rootTagsOf = (tx: Entry, tree: TagTree) => {
 const sorted = (map: Map<string, number>) =>
   [...map].map(([id, amount]) => ({ id, amount })).sort((a, b) => b.amount - a.amount);
 
-// Spec 2.3: rows by category (opened: by tag) or by top-level tag (opened: by subtag, or by category for a tag with
-// no subtags). An entry with several tags counts in each of its tags; the total counts it once, so tag shares may
-// add up to more than 100 %.
+// What a row opens into. By category: its top-level tags, or each entry's most detailed tag (a subtag, else the
+// tag itself). By tag: its subtags (the tag's own id = entries with none of them), or categories.
+export type Inner = "tag" | "subtag" | "category";
+export const DEFAULT_INNER: Record<"category" | "tag", Inner> = { category: "tag", tag: "subtag" };
+export const INNER_CHOICES: Record<"category" | "tag", [Inner, Inner]> = { category: ["tag", "subtag"], tag: ["subtag", "category"] };
+
+// The most detailed tags an entry has: each top-level tag is replaced by its subtags on the entry, if any.
+const detailTagsOf = (tx: Entry, tree: TagTree) => {
+  const roots = rootsOf(tx.tagIds, tree);
+  if (!roots.length) return [NO_TAG];
+  return roots.flatMap((root) => {
+    const subtags = tx.tagIds.filter((id) => id !== root && tree.rootOf(id) === root);
+    return subtags.length ? [...new Set(subtags)] : [root];
+  });
+};
+
+// Spec 2.3: rows by category or by top-level tag, each opening into what `inner` says. An entry with several tags
+// counts in each of its tags; the total counts it once, so tag shares may add up to more than 100 %.
 export const groupEntries = (
   entries: { tx: Entry; value: number }[],
   by: "category" | "tag",
-  tree: TagTree
+  tree: TagTree,
+  inner: Inner = DEFAULT_INNER[by]
 ): { total: number; groups: Group[] } => {
   const total = entries.reduce((sum, entry) => sum + entry.value, 0);
   const groups = new Map<string, { amount: number; children: Map<string, number> }>();
@@ -61,17 +77,16 @@ export const groupEntries = (
   };
   const addChild = (target: Map<string, number>, id: string, value: number) => target.set(id, (target.get(id) ?? 0) + value);
   for (const { tx, value } of entries) {
-    const roots = rootTagsOf(tx, tree);
     if (by === "category") {
-      // Once in its category; inside it, once in each of its top-level tags.
+      // Once in its category; inside it, once in each of its tags (top-level or most detailed).
       const target = group(tx.categoryId);
       target.amount += value;
-      for (const tagId of roots) addChild(target.children, tagId, value);
+      for (const tagId of inner === "subtag" ? detailTagsOf(tx, tree) : rootTagsOf(tx, tree)) addChild(target.children, tagId, value);
     } else {
-      for (const root of roots) {
+      for (const root of rootTagsOf(tx, tree)) {
         const target = group(root);
         target.amount += value;
-        if (!tree.children.get(root)?.length) {
+        if (inner === "category") {
           addChild(target.children, tx.categoryId, value);
           continue;
         }
@@ -84,8 +99,9 @@ export const groupEntries = (
     id,
     amount,
     share: total ? amount / total : 0,
-    children: sorted(children),
-    childBy: (by === "category" || tree.children.get(id)?.length ? "tag" : "category") as Group["childBy"],
+    // A tag without subtags, opened to subtags, has nothing to show.
+    children: by === "tag" && inner === "subtag" && !tree.children.get(id)?.length ? [] : sorted(children),
+    childBy: (by === "tag" && inner === "category" ? "category" : "tag") as Group["childBy"],
   }));
   return { total, groups: result.sort((a, b) => b.amount - a.amount) };
 };

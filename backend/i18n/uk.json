@@ -759,5 +759,9 @@
   "cents.totals": "Графіки та інші підсумки",
   "cents.totalsHint": "Графіки, суми в журналі й майбутніх платежах",
   "cents.always": "Деталі балансу, чеки й поля для суми завжди з копійками.",
-  "tags.noSubtag": "Без підтегу"
+  "tags.noSubtag": "Без підтегу",
+  "home.innerSwitch": "Рядки розкриваються на {{now}}. Натисніть, щоб показати {{next}}",
+  "home.inner.tag": "теги",
+  "home.inner.subtag": "підтеги",
+  "home.inner.category": "категорії"
 }

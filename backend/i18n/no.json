@@ -739,5 +739,9 @@
   "cents.totals": "Diagrammer og andre totaler",
   "cents.totalsHint": "Diagrammer, summer i loggen og kommende betalinger",
   "cents.always": "Saldodetaljer, kvitteringer og beløpsfelt viser alltid øre.",
-  "tags.noSubtag": "Uten undertagg"
+  "tags.noSubtag": "Uten undertagg",
+  "home.innerSwitch": "Rader åpnes i {{now}}. Trykk for {{next}}",
+  "home.inner.tag": "tagger",
+  "home.inner.subtag": "undertagger",
+  "home.inner.category": "kategorier"
 }

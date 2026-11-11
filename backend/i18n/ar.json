@@ -779,5 +779,9 @@
   "cents.totals": "الرسوم البيانية والمجاميع الأخرى",
   "cents.totalsHint": "الرسوم البيانية والمجاميع في السجل والمدفوعات القادمة",
   "cents.always": "تفاصيل الرصيد والإيصالات وحقول المبالغ تظهر الكسور دائمًا.",
-  "tags.noSubtag": "بدون وسم فرعي"
+  "tags.noSubtag": "بدون وسم فرعي",
+  "home.innerSwitch": "تُفتح الصفوف إلى {{now}}. اضغط لعرض {{next}}",
+  "home.inner.tag": "الوسوم",
+  "home.inner.subtag": "الوسوم الفرعية",
+  "home.inner.category": "الفئات"
 }

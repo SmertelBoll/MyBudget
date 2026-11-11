@@ -739,5 +739,9 @@
   "cents.totals": "चार्ट और अन्य योग",
   "cents.totalsHint": "चार्ट, लॉग और आगामी भुगतानों के योग",
   "cents.always": "शेष का विवरण, रसीदें और राशि वाले फ़ील्ड हमेशा पैसे दिखाते हैं।",
-  "tags.noSubtag": "बिना उप-टैग"
+  "tags.noSubtag": "बिना उप-टैग",
+  "home.innerSwitch": "पंक्तियाँ {{now}} में खुलती हैं। {{next}} के लिए टैप करें",
+  "home.inner.tag": "टैग",
+  "home.inner.subtag": "उप-टैग",
+  "home.inner.category": "श्रेणियाँ"
 }

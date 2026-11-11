@@ -3,7 +3,7 @@ import { Pressable, ScrollView, View } from "react-native";
 import type { EntryType, Period } from "@/api/types";
 import { useChartBuckets, type ChartMode } from "@/data/chartBuckets";
 import { useTagTree } from "@/data/tags";
-import { groupEntries, usePeriodEntries, type AccountFilter } from "@/data/stats";
+import { DEFAULT_INNER, groupEntries, usePeriodEntries, type AccountFilter } from "@/data/stats";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTheme } from "@/theme/ThemeProvider";
 import { radius, spacing } from "@/theme/tokens";
@@ -14,6 +14,7 @@ import { AppText } from "@/components/AppText";
 import { BarChart, CHART_COLORS, type BarSelection } from "@/components/BarChart";
 import { GroupRow, TAG_ICON, useGroupLook, type GroupBy } from "@/components/GroupRow";
 import { IconButton } from "@/components/IconButton";
+import { InnerSwitch } from "@/components/InnerSwitch";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import { SegmentedSwitch } from "@/components/SegmentedSwitch";
 
@@ -78,10 +79,13 @@ export default function ChartsScreen() {
   const listType: EntryType | null =
     !selected || !selection ? null : mode === "general" ? (selection.part === "diff" ? null : selection.part) : mode;
   const listBy: GroupBy = mode === "general" ? "category" : by;
+  // What rows open into, kept for each of the two views.
+  const [innerFor, setInnerFor] = useState(DEFAULT_INNER);
+  const inner = innerFor[listBy];
   const range = selected?.range ?? NO_RANGE;
   const entries = usePeriodEntries(listType ?? "expense", filter, range);
   const tagTree = useTagTree();
-  const { groups } = useMemo(() => groupEntries(listType ? entries : [], listBy, tagTree), [entries, listType, listBy, tagTree]);
+  const { groups } = useMemo(() => groupEntries(listType ? entries : [], listBy, tagTree, inner), [entries, listType, listBy, tagTree, inner]);
 
   const toggle = (id: string) =>
     setExpanded((current) => {
@@ -179,6 +183,7 @@ export default function ChartsScreen() {
                     setExpanded(new Set());
                   }}
                 />
+                <InnerSwitch by={by} value={innerFor[by]} onChange={(next) => setInnerFor((current) => ({ ...current, [by]: next }))} />
                 {by === "tag" && (
                   // Android's balanced line breaking splits it into even lines in any language.
                   <AppText variant="caption" secondary textBreakStrategy="balanced" style={{ flex: 1, textAlign: "right" }}>
@@ -205,6 +210,7 @@ export default function ChartsScreen() {
                   key={group.id}
                   group={group}
                   by={listBy}
+                  inner={inner}
                   type={listType}
                   filter={filter}
                   range={selected.range}

@@ -739,5 +739,9 @@
   "cents.totals": "Kaaviot ja muut summat",
   "cents.totalsHint": "Kaaviot, lokin summat ja tulevat maksut",
   "cents.always": "Saldon tiedot, kuitit ja summakentät näyttävät aina sentit.",
-  "tags.noSubtag": "Ei alatunnistetta"
+  "tags.noSubtag": "Ei alatunnistetta",
+  "home.innerSwitch": "Rivit avautuvat: {{now}}. Napauta: {{next}}",
+  "home.inner.tag": "tunnisteet",
+  "home.inner.subtag": "alatunnisteet",
+  "home.inner.category": "luokat"
 }

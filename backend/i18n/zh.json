@@ -729,5 +729,9 @@
   "cents.totals": "图表和其他合计",
   "cents.totalsHint": "图表、记录和即将付款的合计",
   "cents.always": "余额明细、收据和金额输入框始终显示小数。",
-  "tags.noSubtag": "无子标签"
+  "tags.noSubtag": "无子标签",
+  "home.innerSwitch": "行展开为{{now}}。点按显示{{next}}",
+  "home.inner.tag": "标签",
+  "home.inner.subtag": "子标签",
+  "home.inner.category": "分类"
 }

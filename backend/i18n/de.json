@@ -739,5 +739,9 @@
   "cents.totals": "Diagramme und andere Summen",
   "cents.totalsHint": "Diagramme, Summen im Verlauf und anstehende Zahlungen",
   "cents.always": "Saldodetails, Belege und Betragsfelder zeigen immer Cent.",
-  "tags.noSubtag": "Ohne Untertag"
+  "tags.noSubtag": "Ohne Untertag",
+  "home.innerSwitch": "Zeilen klappen zu {{now}} auf. Tippen für {{next}}",
+  "home.inner.tag": "Tags",
+  "home.inner.subtag": "Untertags",
+  "home.inner.category": "Kategorien"
 }

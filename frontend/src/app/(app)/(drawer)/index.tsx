@@ -6,7 +6,7 @@ import type { EntryType } from "@/api/types";
 import { useAuth } from "@/auth/AuthProvider";
 import { useCollection } from "@/data/hooks";
 import { useTagTree } from "@/data/tags";
-import { groupEntries, usePeriodEntries, type AccountFilter, type Group } from "@/data/stats";
+import { DEFAULT_INNER, groupEntries, usePeriodEntries, type AccountFilter, type Group } from "@/data/stats";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTheme } from "@/theme/ThemeProvider";
 import { radius, spacing } from "@/theme/tokens";
@@ -18,6 +18,7 @@ import { AccountFilterSelect } from "@/components/AccountFilterSelect";
 import { AppText } from "@/components/AppText";
 import { Fab } from "@/components/Fab";
 import { IconButton } from "@/components/IconButton";
+import { InnerSwitch } from "@/components/InnerSwitch";
 import { PeriodChart } from "@/components/PeriodChart";
 import { PeriodSwitcher } from "@/components/PeriodSwitcher";
 import { ScreenHeader } from "@/components/ScreenHeader";
@@ -58,6 +59,9 @@ function HomeContent() {
   });
   const [range, setRange] = useState<PeriodRange>(() => currentPeriod(settings?.defaultPeriod ?? "week", settings?.firstDayOfWeek ?? 1));
   const [by, setBy] = useState<"category" | "tag">("category");
+  // What rows open into, kept for each of the two views.
+  const [innerFor, setInnerFor] = useState(DEFAULT_INNER);
+  const inner = innerFor[by];
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [collapsed, setCollapsedState] = useState(false);
   // The gesture's callbacks can outlive the render they were made in, so they read the latest value from here.
@@ -103,7 +107,7 @@ function HomeContent() {
 
   const entries = usePeriodEntries(type, filter, range);
   const tagTree = useTagTree();
-  const { total, groups } = useMemo(() => groupEntries(entries, by, tagTree), [entries, by, tagTree]);
+  const { total, groups } = useMemo(() => groupEntries(entries, by, tagTree, inner), [entries, by, tagTree, inner]);
 
   const { look } = useGroupLook(by);
   const segments = groups.map((group) => ({ id: group.id, value: group.amount, color: look(group.id).color }));
@@ -214,8 +218,9 @@ function HomeContent() {
               <PeriodChart segments={segments} label={money(total, baseCurrency, "home")} collapsed={collapsed} />
             </Pressable>
           </PeriodSwitcher>
-          {/* Categories / tags: one small button in the free corner, showing the other view; a tap switches. */}
-          <View style={{ position: "absolute", left: spacing.md, bottom: spacing.md }}>
+          {/* Categories / tags: one small button in the free corner, showing the other view; a tap switches. Next to
+              it a smaller one: what the rows open into. */}
+          <View style={{ position: "absolute", left: spacing.md, bottom: spacing.md, flexDirection: "row", alignItems: "center", gap: spacing.sm }}>
             <IconButton
               icon={by === "category" ? TAG_ICON : "shape-outline"}
               label={t(by === "category" ? "home.byTags" : "home.byCategories")}
@@ -226,6 +231,7 @@ function HomeContent() {
                 toTop();
               }}
             />
+            <InnerSwitch by={by} value={inner} onChange={(next) => setInnerFor((current) => ({ ...current, [by]: next }))} />
           </View>
           <Fab placement="corner" label={t("entry.addTitle")} onPress={() => openNewTransaction(type)} size={52} />
         </View>
@@ -267,6 +273,7 @@ function HomeContent() {
             expanded={expanded.has(item.id)}
             onToggle={() => toggle(item.id)}
             moneyKind="home"
+            inner={inner}
           />
         )}
       />

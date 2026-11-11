@@ -739,5 +739,9 @@
   "cents.totals": "Charts and other totals",
   "cents.totalsHint": "Charts, sums in the log and upcoming payments",
   "cents.always": "Balance details, receipts and amount fields always show cents.",
-  "tags.noSubtag": "No subtag"
+  "tags.noSubtag": "No subtag",
+  "home.innerSwitch": "Rows open into {{now}}. Tap for {{next}}",
+  "home.inner.tag": "tags",
+  "home.inner.subtag": "subtags",
+  "home.inner.category": "categories"
 }

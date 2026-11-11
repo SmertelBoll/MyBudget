@@ -739,5 +739,9 @@
   "cents.totals": "Grafieken en andere totalen",
   "cents.totalsHint": "Grafieken, totalen in het logboek en komende betalingen",
   "cents.always": "Saldodetails, bonnen en bedragvelden tonen altijd centen.",
-  "tags.noSubtag": "Zonder subtag"
+  "tags.noSubtag": "Zonder subtag",
+  "home.innerSwitch": "Rijen openen in {{now}}. Tik voor {{next}}",
+  "home.inner.tag": "tags",
+  "home.inner.subtag": "subtags",
+  "home.inner.category": "categorieën"
 }

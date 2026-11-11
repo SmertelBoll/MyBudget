@@ -749,5 +749,9 @@
   "cents.totals": "Graphiques et autres totaux",
   "cents.totalsHint": "Graphiques, totaux du journal et paiements à venir",
   "cents.always": "Le détail du solde, les tickets et les champs de montant affichent toujours les centimes.",
-  "tags.noSubtag": "Sans sous-étiquette"
+  "tags.noSubtag": "Sans sous-étiquette",
+  "home.innerSwitch": "Les lignes s’ouvrent sur {{now}}. Touchez pour {{next}}",
+  "home.inner.tag": "étiquettes",
+  "home.inner.subtag": "sous-étiquettes",
+  "home.inner.category": "catégories"
 }

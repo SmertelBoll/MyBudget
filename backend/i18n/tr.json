@@ -739,5 +739,9 @@
   "cents.totals": "Grafikler ve diğer toplamlar",
   "cents.totalsHint": "Grafikler, kayıt ve yaklaşan ödeme toplamları",
   "cents.always": "Bakiye ayrıntıları, fişler ve tutar alanları her zaman kuruş gösterir.",
-  "tags.noSubtag": "Alt etiket yok"
+  "tags.noSubtag": "Alt etiket yok",
+  "home.innerSwitch": "Satırlar {{now}} olarak açılır. {{next}} için dokunun",
+  "home.inner.tag": "etiketler",
+  "home.inner.subtag": "alt etiketler",
+  "home.inner.category": "kategoriler"
 }

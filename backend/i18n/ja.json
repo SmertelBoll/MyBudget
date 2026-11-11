@@ -729,5 +729,9 @@
   "cents.totals": "グラフとその他の合計",
   "cents.totalsHint": "グラフ、履歴と今後の支払いの合計",
   "cents.always": "残高の内訳、レシート、金額入力欄は常に小数点以下を表示します。",
-  "tags.noSubtag": "サブタグなし"
+  "tags.noSubtag": "サブタグなし",
+  "home.innerSwitch": "行は{{now}}に展開されます。タップで{{next}}",
+  "home.inner.tag": "タグ",
+  "home.inner.subtag": "サブタグ",
+  "home.inner.category": "カテゴリ"
 }

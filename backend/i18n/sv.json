@@ -739,5 +739,9 @@
   "cents.totals": "Diagram och andra summor",
   "cents.totalsHint": "Diagram, summor i loggen och kommande betalningar",
   "cents.always": "Saldodetaljer, kvitton och beloppsfält visar alltid ören.",
-  "tags.noSubtag": "Utan undertagg"
+  "tags.noSubtag": "Utan undertagg",
+  "home.innerSwitch": "Rader öppnas i {{now}}. Tryck för {{next}}",
+  "home.inner.tag": "taggar",
+  "home.inner.subtag": "undertaggar",
+  "home.inner.category": "kategorier"
 }

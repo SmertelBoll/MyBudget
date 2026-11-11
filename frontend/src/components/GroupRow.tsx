@@ -3,7 +3,7 @@ import { router } from "expo-router";
 import type { EntryType } from "@/api/types";
 import { categoryName } from "@/data/categories";
 import { useCollection } from "@/data/hooks";
-import { NO_TAG, type AccountFilter, type Group } from "@/data/stats";
+import { DEFAULT_INNER, NO_TAG, type AccountFilter, type Group, type Inner } from "@/data/stats";
 import { useTagTree } from "@/data/tags";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTheme } from "@/theme/ThemeProvider";
@@ -67,11 +67,16 @@ export const useGroupLook = (by: GroupBy) => {
     };
   };
   const look = (id: string) => (by === "tag" ? tagLook(id) : categoryLook(id));
-  // Inside a row: tags of a category, subtags of a tag (its own id: the tag without any of them), or categories of
-  // a tag with no subtags.
-  const childLook = (group: Group, id: string) => {
+  // Inside a row: categories of a tag; subtags of a tag (its own id: entries with none of them); or tags of a
+  // category, top-level or most detailed (a subtag reads "Parent › Subtag", a tag that has subtags "Tag without
+  // subtags").
+  const childLook = (group: Group, id: string, inner: Inner) => {
     if (group.childBy === "category") return categoryLook(id);
-    if (by === "tag" && id === group.id) return { ...tagLook(id), title: t("tags.noSubtag") };
+    if (by === "tag") return id === group.id ? { ...tagLook(id), title: t("tags.noSubtag") } : tagLook(id);
+    if (inner !== "subtag") return tagLook(id);
+    const parent = tree.parentOf(id);
+    if (parent) return { ...tagLook(id), title: `${tagLook(parent).title} › ${tagLook(id).title}` };
+    if (tree.children.get(id)?.length) return { ...tagLook(id), title: t("tags.ownOnly", { name: tagLook(id).title }) };
     return tagLook(id);
   };
   return { look, childLook };
@@ -88,6 +93,7 @@ export function GroupRow({
   expanded,
   onToggle,
   moneyKind = "total",
+  inner = DEFAULT_INNER[by],
 }: {
   group: Group;
   by: GroupBy;
@@ -98,10 +104,13 @@ export function GroupRow({
   onToggle: () => void;
   // Which Cents switch its amounts follow: Home has its own.
   moneyKind?: MoneyKind;
+  // What the row opens into (the grouping's `inner`).
+  inner?: Inner;
 }) {
   const { t } = useI18n();
   const { money, baseCurrency } = useMoney();
   const { look, childLook } = useGroupLook(by);
+  const tree = useTagTree();
   const { icon, color, title } = look(group.id);
 
   // A category whose entries have no tags has nothing to open.
@@ -109,8 +118,8 @@ export function GroupRow({
   const breakdown: StatsChild[] = onlyNoTag
     ? []
     : group.children.map((child) => {
-        const inner = childLook(group, child.id);
-        return { id: child.id, icon: inner.icon, color: inner.color, title: inner.title, amount: money(child.amount, baseCurrency, moneyKind) };
+        const childLooks = childLook(group, child.id, inner);
+        return { id: child.id, icon: childLooks.icon, color: childLooks.color, title: childLooks.title, amount: money(child.amount, baseCurrency, moneyKind) };
       });
 
   const planned = by === "category" && range.kind === "month" ? (look(group.id) as { plannedMonthly?: number | null }).plannedMonthly : null;
@@ -138,7 +147,8 @@ export function GroupRow({
           filter,
           range,
           by === "category"
-            ? { category: group.id, tag: childId }
+            ? // A tag that has subtags, as its own line among subtags: only entries with none of them.
+              { category: group.id, tag: childId, exactTag: inner === "subtag" && Boolean(tree.children.get(childId)?.length) }
             : group.childBy === "tag"
               ? { tag: childId, exactTag: childId === group.id }
               : { tag: group.id, category: childId }

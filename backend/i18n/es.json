@@ -749,5 +749,9 @@
   "cents.totals": "Gráficos y otros totales",
   "cents.totalsHint": "Gráficos, totales del registro y próximos pagos",
   "cents.always": "El detalle del saldo, los recibos y los campos de importe siempre muestran céntimos.",
-  "tags.noSubtag": "Sin subetiqueta"
+  "tags.noSubtag": "Sin subetiqueta",
+  "home.innerSwitch": "Las filas se abren en {{now}}. Toca para ver {{next}}",
+  "home.inner.tag": "etiquetas",
+  "home.inner.subtag": "subetiquetas",
+  "home.inner.category": "categorías"
 }

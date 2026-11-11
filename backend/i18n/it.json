@@ -749,5 +749,9 @@
   "cents.totals": "Grafici e altri totali",
   "cents.totalsHint": "Grafici, totali del registro e pagamenti in arrivo",
   "cents.always": "Dettaglio del saldo, scontrini e campi importo mostrano sempre i centesimi.",
-  "tags.noSubtag": "Senza sottoetichetta"
+  "tags.noSubtag": "Senza sottoetichetta",
+  "home.innerSwitch": "Le righe si aprono in {{now}}. Tocca per {{next}}",
+  "home.inner.tag": "etichette",
+  "home.inner.subtag": "sottoetichette",
+  "home.inner.category": "categorie"
 }

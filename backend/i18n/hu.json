@@ -739,5 +739,9 @@
   "cents.totals": "Grafikonok és más összesítések",
   "cents.totalsHint": "Grafikonok, a napló és a közelgő fizetések összegei",
   "cents.always": "Az egyenleg részletei, a nyugták és az összegmezők mindig fillérrel jelennek meg.",
-  "tags.noSubtag": "Alcímke nélkül"
+  "tags.noSubtag": "Alcímke nélkül",
+  "home.innerSwitch": "A sorok ezekre nyílnak: {{now}}. Koppints: {{next}}",
+  "home.inner.tag": "címkék",
+  "home.inner.subtag": "alcímkék",
+  "home.inner.category": "kategóriák"
 }

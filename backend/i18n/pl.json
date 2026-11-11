@@ -759,5 +759,9 @@
   "cents.totals": "Wykresy i inne sumy",
   "cents.totalsHint": "Wykresy, sumy w historii i nadchodzące płatności",
   "cents.always": "Szczegóły salda, paragony i pola kwot zawsze pokazują grosze.",
-  "tags.noSubtag": "Bez podtagu"
+  "tags.noSubtag": "Bez podtagu",
+  "home.innerSwitch": "Wiersze rozwijają się na {{now}}. Dotknij, aby pokazać {{next}}",
+  "home.inner.tag": "tagi",
+  "home.inner.subtag": "podtagi",
+  "home.inner.category": "kategorie"
 }

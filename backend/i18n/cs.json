@@ -759,5 +759,9 @@
   "cents.totals": "Grafy a další součty",
   "cents.totalsHint": "Grafy, součty v přehledu a nadcházející platby",
   "cents.always": "Detail zůstatku, účtenky a pole částek vždy ukazují haléře.",
-  "tags.noSubtag": "Bez podštítku"
+  "tags.noSubtag": "Bez podštítku",
+  "home.innerSwitch": "Řádky se rozbalí na {{now}}. Klepnutím zobrazíte {{next}}",
+  "home.inner.tag": "štítky",
+  "home.inner.subtag": "podštítky",
+  "home.inner.category": "kategorie"
 }

@@ -729,5 +729,9 @@
   "cents.totals": "차트와 기타 합계",
   "cents.totalsHint": "차트, 내역과 예정 결제의 합계",
   "cents.always": "잔액 상세, 영수증, 금액 입력란은 항상 소수점을 표시합니다.",
-  "tags.noSubtag": "하위 태그 없음"
+  "tags.noSubtag": "하위 태그 없음",
+  "home.innerSwitch": "행이 {{now}}(으)로 펼쳐집니다. 탭하면 {{next}}",
+  "home.inner.tag": "태그",
+  "home.inner.subtag": "하위 태그",
+  "home.inner.category": "카테고리"
 }
