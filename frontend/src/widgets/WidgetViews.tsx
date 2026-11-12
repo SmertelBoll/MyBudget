@@ -88,7 +88,7 @@ export function SummaryWidget({ scope, snapshot }: { scope: WidgetScope; snapsho
   );
 }
 
-// 4×2: balance and spending on the left, the month's three biggest categories with their share on the right.
+// 4×2: balance and spending on the left, the month's five biggest categories with their share on the right.
 export function OverviewWidget({ scope, snapshot, width }: { scope: WidgetScope; snapshot: WidgetSnapshot; width: number }) {
   const barMax = Math.max(40, width / 2 - 40);
   return (
@@ -102,14 +102,14 @@ export function OverviewWidget({ scope, snapshot, width }: { scope: WidgetScope;
         </FlexWidget>
         <FlexWidget style={{ flex: 1, flexDirection: "column", justifyContent: "center", height: "match_parent", marginLeft: 12 }}>
           {scope.top.map((item) => (
-            <FlexWidget key={item.name} style={{ flexDirection: "column", width: "match_parent", marginVertical: 3 }}>
+            <FlexWidget key={item.name} style={{ flexDirection: "column", width: "match_parent", marginVertical: 2 }}>
               <FlexWidget style={{ flexDirection: "row", width: "match_parent" }}>
                 <FlexWidget style={{ flex: 1 }}>
                   <TextWidget text={item.name} maxLines={1} truncate="END" style={{ color: TEXT, fontSize: 12 }} />
                 </FlexWidget>
                 <TextWidget text={item.amount} maxLines={1} style={{ color: MUTED, fontSize: 12 }} />
               </FlexWidget>
-              <FlexWidget style={{ height: 5, width: Math.max(4, Math.round(barMax * item.share)), borderRadius: 3, backgroundColor: hex(item.color), marginTop: 2 }} />
+              <FlexWidget style={{ height: 4, width: Math.max(4, Math.round(barMax * item.share)), borderRadius: 2, backgroundColor: hex(item.color), marginTop: 2 }} />
             </FlexWidget>
           ))}
         </FlexWidget>
@@ -118,21 +118,25 @@ export function OverviewWidget({ scope, snapshot, width }: { scope: WidgetScope;
   );
 }
 
-// 1×1: one big "+" for a new entry.
-export function QuickAddWidget() {
+// 1×1: one big "+" for a new entry, on a square as big as the cell's shorter side (cells are rarely square), centred
+// on a clear background.
+export function QuickAddWidget({ width, height }: { width: number; height: number }) {
+  const side = Math.max(32, Math.floor(Math.min(width, height)));
   return (
-    <FlexWidget
-      {...open()}
-      style={{ height: "match_parent", width: "match_parent", backgroundColor: ACCENT, borderRadius: RADIUS, justifyContent: "center", alignItems: "center" }}
-    >
-      <TextWidget text="+" style={{ color: ON_ACCENT, fontSize: 36, fontWeight: "bold" }} />
+    <FlexWidget style={{ height: "match_parent", width: "match_parent", justifyContent: "center", alignItems: "center" }}>
+      <FlexWidget
+        {...open()}
+        style={{ width: side, height: side, backgroundColor: ACCENT, borderRadius: Math.round(side * 0.28), justifyContent: "center", alignItems: "center" }}
+      >
+        <TextWidget text="+" style={{ color: ON_ACCENT, fontSize: Math.round(side * 0.5), fontWeight: "bold" }} />
+      </FlexWidget>
     </FlexWidget>
   );
 }
 
 // Any widget by name, for its chosen scope and current size.
 export function WidgetFor({ name, snapshot, selection, width, height }: { name: string; snapshot: WidgetSnapshot | null; selection: string; width: number; height: number }) {
-  if (name === WIDGET_NAMES.quickAdd) return <QuickAddWidget />;
+  if (name === WIDGET_NAMES.quickAdd) return <QuickAddWidget width={width} height={height} />;
   const scope = scopeOf(snapshot, selection);
   if (scope === "empty" || !snapshot) return <Message text="Open MyBudget to set up the widget" />;
   if (scope === "gone") return <Message text={label(snapshot, "widget.accountGone", "This account is gone. Hold the widget to choose another")} />;

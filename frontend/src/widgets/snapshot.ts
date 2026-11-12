@@ -50,7 +50,8 @@ export const removeSelection = (widgetId: number) => storage.remove(SELECTION_KE
 export const LABEL_KEYS = ["home.total", "widget.spentMonth", "widget.accountGone", "widget.empty", "widget.chooseTitle", "widget.chooseHint", "common.cancel"];
 
 const TOTAL_COLOR = "#F9F919";
-const TOP_COUNT = 3;
+// The 4×2 widget lists this many categories.
+const TOP_COUNT = 5;
 
 type Inputs = {
   user: User;
@@ -138,5 +139,5 @@ export const buildSnapshot = ({ user, lang, t, accounts, categories, transaction
   };
 };
 
-// The form a tap opens: the user's usual type, or the one asked for.
-export const newEntryUri = (type?: EntryType) => `mybudget://transaction/new${type ? `?type=${type}` : ""}`;
+// A tap opens a new entry (the user's usual type, or the one asked for) over Home: see app/(app)/from-widget.tsx.
+export const newEntryUri = (type?: EntryType) => `mybudget://from-widget${type ? `?type=${type}` : ""}`;

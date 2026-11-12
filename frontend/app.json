@@ -65,8 +65,19 @@
         {
           "widgets": [
             {
+              "name": "QuickAdd",
+              "label": "1×1 · New entry",
+              "description": "One tap to add an expense or income",
+              "minWidth": "40dp",
+              "minHeight": "40dp",
+              "targetCellWidth": 1,
+              "targetCellHeight": 1,
+              "resizeMode": "none",
+              "previewImage": "./assets/widget-preview/quick-add.png"
+            },
+            {
               "name": "Balance",
-              "label": "Balance",
+              "label": "2×1 · Balance",
               "description": "An account or Total. Stretch it for − and + buttons",
               "minWidth": "110dp",
               "minHeight": "40dp",
@@ -74,39 +85,32 @@
               "targetCellHeight": 1,
               "maxResizeWidth": "400dp",
               "resizeMode": "horizontal",
-              "widgetFeatures": "reconfigurable"
+              "widgetFeatures": "reconfigurable",
+              "previewImage": "./assets/widget-preview/balance.png"
             },
             {
               "name": "Summary",
-              "label": "Balance and month",
+              "label": "2×2 · Balance and month",
               "description": "Balance and this month's spending",
               "minWidth": "110dp",
               "minHeight": "110dp",
               "targetCellWidth": 2,
               "targetCellHeight": 2,
               "resizeMode": "horizontal|vertical",
-              "widgetFeatures": "reconfigurable"
+              "widgetFeatures": "reconfigurable",
+              "previewImage": "./assets/widget-preview/summary.png"
             },
             {
               "name": "Overview",
-              "label": "Month overview",
+              "label": "4×2 · Month overview",
               "description": "Balance, spending and the top categories of the month",
               "minWidth": "250dp",
               "minHeight": "110dp",
               "targetCellWidth": 4,
               "targetCellHeight": 2,
               "resizeMode": "horizontal|vertical",
-              "widgetFeatures": "reconfigurable"
-            },
-            {
-              "name": "QuickAdd",
-              "label": "New entry",
-              "description": "One tap to add an expense or income",
-              "minWidth": "40dp",
-              "minHeight": "40dp",
-              "targetCellWidth": 1,
-              "targetCellHeight": 1,
-              "resizeMode": "none"
+              "widgetFeatures": "reconfigurable",
+              "previewImage": "./assets/widget-preview/overview.png"
             }
           ]
         }
