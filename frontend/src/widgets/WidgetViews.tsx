@@ -2,7 +2,7 @@
 // Widgets are drawn by react-native-android-widget from these primitives only: no hooks, nothing async (the
 // library's rules). Everything they show comes ready-made in the snapshot.
 import { FlexWidget, TextWidget } from "react-native-android-widget";
-import { newEntryUri, type Selection, type WidgetScope, type WidgetSnapshot } from "./snapshot";
+import { allScopes, newEntryUri, type Selection, type WidgetScope, type WidgetSnapshot } from "./snapshot";
 
 export const WIDGET_NAMES = { balance: "Balance", summary: "Summary", overview: "Overview", quickAdd: "QuickAdd" } as const;
 
@@ -43,8 +43,7 @@ const label = (snapshot: WidgetSnapshot, key: string, fallback: string) => snaps
 // The scope a widget shows, or why it can't: no data yet, or its account is gone.
 export const scopeOf = (snapshot: WidgetSnapshot | null, key: string): WidgetScope | "empty" | "gone" => {
   if (!snapshot) return "empty";
-  if (key === snapshot.total.key) return snapshot.total;
-  return snapshot.accounts.find((scope) => scope.key === key) ?? "gone";
+  return allScopes(snapshot).find((scope) => scope.key === key) ?? "gone";
 };
 
 function Square({ text, type }: { text: string; type: "expense" | "income" }) {

@@ -3,7 +3,7 @@ import { Pressable, StatusBar, Text, View } from "react-native";
 import { GestureHandlerRootView, ScrollView } from "react-native-gesture-handler";
 import { Reorderable } from "@/components/Reorderable";
 import type { WidgetConfigurationScreenProps } from "react-native-android-widget";
-import { readSnapshot, readSelection, TOTAL, writeSelection, type Selection, type WidgetScope, type WidgetSnapshot } from "./snapshot";
+import { allScopes, readSnapshot, readSelection, TOTAL, writeSelection, type Selection, type WidgetScope, type WidgetSnapshot } from "./snapshot";
 import { WIDGET_NAMES, WidgetFor } from "./WidgetViews";
 
 const BG = "#171717";
@@ -31,7 +31,7 @@ export function WidgetConfigScreen({ widgetInfo, renderWidget, setResult }: Widg
   }, [widgetInfo.widgetId]);
 
   const word = (key: string, fallback: string) => snapshot?.i18n[key] ?? fallback;
-  const scopes = snapshot ? [snapshot.total, ...snapshot.accounts] : [];
+  const scopes = snapshot ? allScopes(snapshot) : [];
   const byKey = new Map(scopes.map((scope) => [scope.key, scope]));
   // Accounts removed since the widget was set up drop out of the list.
   const picked = chosen.filter((key) => byKey.has(key));

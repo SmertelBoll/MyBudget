@@ -29,7 +29,10 @@ export type WidgetScope = {
 export type WidgetSnapshot = {
   version: 1;
   updatedAt: string;
-  total: WidgetScope;
+  // All accounts, the ones in Total (as on Home), the ones left out of it: the same three as Balance details.
+  totals: WidgetScope[];
+  // Snapshots from before there were three totals had just this one (the Total of Home).
+  total?: WidgetScope;
   accounts: WidgetScope[];
   // "Spent this month" or "Received this month", already in the user's language.
   monthLabel: string;
@@ -38,11 +41,17 @@ export type WidgetSnapshot = {
   i18n: Record<string, string>;
 };
 
+// Keys of the three totals; "total" is the Total of Home (accounts counted in it), as it always was.
 export const TOTAL = "total";
+export const TOTAL_ALL = "total:all";
+export const TOTAL_EXCLUDED = "total:excluded";
 const SNAPSHOT_KEY = "widgets.snapshot";
 const SELECTION_KEY = (widgetId: number) => `widgets.selection.${widgetId}`;
 
 export const readSnapshot = () => readJson<WidgetSnapshot>(SNAPSHOT_KEY);
+
+// Everything a widget can show, in list order: the three totals, then the accounts.
+export const allScopes = (snapshot: WidgetSnapshot) => [...(snapshot.totals ?? (snapshot.total ? [snapshot.total] : [])), ...snapshot.accounts];
 export const writeSnapshot = (snapshot: WidgetSnapshot) => writeJson(SNAPSHOT_KEY, snapshot);
 
 // What each widget on the home screen shows: Total and / or accounts, in the user's order. The first is shown big,
@@ -60,6 +69,8 @@ export const removeSelection = (widgetId: number) => storage.remove(SELECTION_KE
 
 export const LABEL_KEYS = [
   "home.total",
+  "accounts.summary",
+  "accounts.excluded",
   "widget.accountGone",
   "widget.empty",
   "widget.chooseTitle",
@@ -73,7 +84,7 @@ export const LABEL_KEYS = [
   "common.cancel",
 ];
 
-const TOTAL_COLOR = "#F9F919";
+const TOTAL_COLORS = { [TOTAL_ALL]: "#F9F919", [TOTAL]: "#FFD54F", [TOTAL_EXCLUDED]: "#9E9E9E" };
 // The most categories a stretched 4×2 widget can list (it shows as many as fit, five at two cells tall).
 const TOP_COUNT = 12;
 
@@ -123,23 +134,31 @@ export const buildSnapshot = ({ user, lang, t, accounts, categories, transaction
     return { month: money(total, currency), top };
   };
 
-  // Total as on Home: active accounts counted in Total, in the main currency at today's rate. Its spending, like
-  // Home's with Total chosen, covers every account.
-  let totalBalance = 0;
-  for (const account of accounts) {
-    if (!account.isActive || !account.includeInTotal) continue;
-    totalBalance += convert(balances.get(account.id) ?? 0, account.currency, base, rates) ?? 0;
-  }
-  const total: WidgetScope = {
-    key: TOTAL,
-    name: t("home.total"),
-    color: TOTAL_COLOR,
-    balance: money(totalBalance, base),
-    ...spending(
-      spent.map((tx) => ({ categoryId: tx.categoryId, value: inBaseCurrency(tx, accountById, base, rates) })),
-      base
-    ),
+  // The three totals, in the main currency at today's rate, each over its own active accounts: all of them, those
+  // counted in Total (as on Home), those left out. Their month line and categories cover the same accounts.
+  const totalOver = (key: keyof typeof TOTAL_COLORS, name: string, counts: (account: Account) => boolean): WidgetScope => {
+    const ids = new Set(accounts.filter((account) => account.isActive && counts(account)).map((account) => account.id));
+    let balance = 0;
+    for (const id of ids) {
+      const account = accountById.get(id)!;
+      balance += convert(balances.get(id) ?? 0, account.currency, base, rates) ?? 0;
+    }
+    return {
+      key,
+      name,
+      color: TOTAL_COLORS[key],
+      balance: money(balance, base),
+      ...spending(
+        spent.filter((tx) => ids.has(tx.accountId)).map((tx) => ({ categoryId: tx.categoryId, value: inBaseCurrency(tx, accountById, base, rates) })),
+        base
+      ),
+    };
   };
+  const totals = [
+    totalOver(TOTAL_ALL, t("accounts.summary"), () => true),
+    totalOver(TOTAL, t("home.total"), (account) => account.includeInTotal),
+    totalOver(TOTAL_EXCLUDED, t("accounts.excluded"), (account) => !account.includeInTotal),
+  ];
 
   const scopes = accounts
     .filter((account) => account.isActive)
@@ -159,7 +178,7 @@ export const buildSnapshot = ({ user, lang, t, accounts, categories, transaction
   return {
     version: 1,
     updatedAt: new Date().toISOString(),
-    total,
+    totals,
     accounts: scopes,
     monthLabel: t(focus === "income" ? "widget.receivedMonth" : "widget.spentMonth"),
     i18n: Object.fromEntries(keys.map((key) => [key, t(key)])),
