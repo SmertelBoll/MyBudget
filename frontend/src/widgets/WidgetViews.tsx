@@ -83,11 +83,11 @@ const CATEGORY_ROW = 4 + 12 * LINE + 6; // margins, name and amount, bar
 
 const cellsTall = (height: number) => Math.max(1, Math.round((height + 16) / CELL_DP));
 
-// How many lines fit whole: at most one per cell of height (two cells: two), and only as many smaller lines as fit
-// completely under the first one. A line is shown whole or not at all.
+// How many lines fit whole: the first one, then as many smaller lines as fit completely under it (three at two
+// cells tall). A line is shown whole or not at all.
 export const linesThatFit = (height: number, firstValue: number, fontScale = 1) => {
   const room = height - PAD * 2 - (13 + firstValue) * LINE * fontScale;
-  return Math.max(1, Math.min(cellsTall(height), 1 + Math.floor(room / (NEXT_ROW * fontScale))));
+  return Math.max(1, 1 + Math.floor(room / (NEXT_ROW * fontScale)));
 };
 
 // Category lines that fit whole on 4×2: five at two cells tall, three more per extra cell.

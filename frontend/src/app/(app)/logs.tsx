@@ -14,7 +14,7 @@ import { useI18n } from "@/i18n/I18nProvider";
 import { useTheme } from "@/theme/ThemeProvider";
 import { radius, spacing } from "@/theme/tokens";
 import { addDays, formatLongDate, formatShortDate, todayLocal } from "@/utils/dates";
-import { openNewTransaction, openTransaction } from "@/utils/navigation";
+import { entryDateFor, openNewTransaction, openTransaction } from "@/utils/navigation";
 import { PERIOD_KINDS, currentPeriod, formatPeriod, type PeriodKind, type PeriodRange } from "@/utils/periods";
 import { useBottomSpace } from "@/utils/useBottomSpace";
 import { useMoney } from "@/utils/useMoney";
@@ -279,7 +279,7 @@ export default function LogsScreen() {
         }
         renderItem={({ item }) => renderRow(item)}
       />
-      <Fab label={t("entry.addTitle")} onPress={() => openNewTransaction(type)} />
+      <Fab label={t("entry.addTitle")} onPress={() => openNewTransaction(type, entryDateFor(range))} />
     </View>
   );
 }

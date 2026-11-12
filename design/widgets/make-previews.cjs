@@ -57,7 +57,8 @@ const stack = (x, top) =>
 write("summary.png", 180, 180, card(180, 180) + stack(14, 42));
 
 // 4×2: Total and spending on the left, five categories with bars on the right.
-const W = 360;
+// Wide enough to fill the launcher's preview frame (about 2.2 : 1), so no light bands show at the sides.
+const W = 396;
 const H = 180;
 const total = SAMPLE.top.reduce((sum, [, , amount]) => sum + amount, 0);
 const barMax = W / 2 - 40;
@@ -65,9 +66,9 @@ const rows = SAMPLE.top
   .map(([name, color, amount], i) => {
     const y = 34 + i * 28;
     return (
-      text(194, y, name, 12, TEXT) +
+      text(W / 2 + 14, y, name, 12, TEXT) +
       text(W - 14, y, `$${amount.toFixed(2)}`, 12, MUTED, 400, "end") +
-      `<rect x="${194 * S}" y="${(y + 5) * S}" width="${Math.max(4, Math.round((barMax * amount) / total)) * S}" height="${4 * S}" rx="${2 * S}" fill="${color}"/>`
+      `<rect x="${(W / 2 + 14) * S}" y="${(y + 5) * S}" width="${Math.max(4, Math.round((barMax * amount) / total)) * S}" height="${4 * S}" rx="${2 * S}" fill="${color}"/>`
     );
   })
   .join("");

@@ -150,7 +150,8 @@ export const buildSnapshot = ({ user, lang, t, accounts, categories, transaction
   const today = localDate(now);
   const dayOfMonth = now.getDate();
   const monthStart = `${today.slice(0, 7)}-01`;
-  const weekStart = periodContaining("week", today, user.settings.firstDayOfWeek ?? 1).start;
+  const monthEnd = periodContaining("month", today, 1).end;
+  const week = periodContaining("week", today, user.settings.firstDayOfWeek ?? 1);
   const tomorrow = addDays(today, 1);
   const dayWord = (date: string) =>
     date === today ? t("dates.today") : date === tomorrow ? t("widget.tomorrow") : date === addDays(today, -1) ? t("dates.yesterday") : formatShortDate(date, lang);
@@ -160,7 +161,8 @@ export const buildSnapshot = ({ user, lang, t, accounts, categories, transaction
   const categoryById = new Map(categories.map((category) => [category.id, category]));
   const entries = visibleEntries(transactions);
   const value = (tx: Transaction) => inBaseCurrency(tx, accountById, base, rates);
-  // Everything below counts every account (expenses, income, limits...), in the main currency at today's rate.
+  // Everything below counts every account (expenses, income, limits...), in the main currency at today's rate. A month
+  // or a week means all of it: entries already added for days still ahead count too.
   const sum = (type: EntryType, from: string, to: string) =>
     entries.reduce((total, tx) => (tx.type === type && tx.date >= from && tx.date <= to ? total + value(tx) : total), 0);
 
@@ -184,15 +186,18 @@ export const buildSnapshot = ({ user, lang, t, accounts, categories, transaction
   // ---- Expenses and income: this month, week, today, a day on average, against the same days of last month.
   const lastMonthStart = localDate(new Date(now.getFullYear(), now.getMonth() - 1, 1));
   const lastMonthDays = new Date(now.getFullYear(), now.getMonth(), 0).getDate();
-  const lastMonthSameDay = `${lastMonthStart.slice(0, 8)}${String(Math.min(dayOfMonth, lastMonthDays)).padStart(2, "0")}`;
+  // This month runs to today, or to the last day with an entry already added ahead.
+  const lastDay = entries.reduce((latest, tx) => (tx.date > latest && tx.date <= monthEnd ? tx.date : latest), today);
+  const daysSoFar = Number(lastDay.slice(8, 10));
+  const lastMonthSameDay = `${lastMonthStart.slice(0, 8)}${String(Math.min(daysSoFar, lastMonthDays)).padStart(2, "0")}`;
   const metrics = (type: EntryType, prefix: "exp" | "inc") => {
     const color = type === "expense" ? COLORS.expense : COLORS.income;
-    const month = sum(type, monthStart, today);
+    const month = sum(type, monthStart, monthEnd);
     add({ key: `${prefix}:month`, label: t(`widget.${prefix}.month`), value: money(month), color, tone: null });
-    add({ key: `${prefix}:week`, label: t(`widget.${prefix}.week`), value: money(sum(type, weekStart, today)), color, tone: null });
+    add({ key: `${prefix}:week`, label: t(`widget.${prefix}.week`), value: money(sum(type, week.start, week.end)), color, tone: null });
     add({ key: `${prefix}:today`, label: t(`widget.${prefix}.today`), value: money(sum(type, today, today)), color, tone: null });
-    add({ key: `${prefix}:avg`, label: t(`widget.${prefix}.avg`), value: money(Math.round(month / dayOfMonth)), color, tone: null });
-    // Same stretch of last month (1st–12th against 1st–12th), so the start of a month doesn't read as "−90 %".
+    add({ key: `${prefix}:avg`, label: t(`widget.${prefix}.avg`), value: money(Math.round(month / daysSoFar)), color, tone: null });
+    // The same stretch of last month (1st–12th against 1st–12th), so the start of a month doesn't read as "−90 %".
     const before = sum(type, lastMonthStart, lastMonthSameDay);
     const change = before ? Math.round(((month - before) / before) * 100) : null;
     add({
@@ -226,7 +231,7 @@ export const buildSnapshot = ({ user, lang, t, accounts, categories, transaction
   // Limits (monthly, in the main currency): categories over theirs, and what is left in all of them.
   const spentBy = new Map<string, number>();
   for (const tx of entries) {
-    if (tx.type === "expense" && tx.date >= monthStart && tx.date <= today) spentBy.set(tx.categoryId, (spentBy.get(tx.categoryId) ?? 0) + value(tx));
+    if (tx.type === "expense" && tx.date >= monthStart && tx.date <= monthEnd) spentBy.set(tx.categoryId, (spentBy.get(tx.categoryId) ?? 0) + value(tx));
   }
   const limited = categories.filter((category) => category.type === "expense" && category.plannedMonthly);
   const limitOf = (category: Category) => category.plannedMonthly ?? 0;
@@ -246,8 +251,8 @@ export const buildSnapshot = ({ user, lang, t, accounts, categories, transaction
   const result = receivedMonth - spentMonth;
   add({ key: "other:result", label: t("widget.other.result"), value: signed(result), color: other, tone: result > 0 ? "good" : result < 0 ? "bad" : null });
 
-  // The latest entry.
-  const last = [...entries].sort((a, b) => (a.date === b.date ? b.clientCreatedAt.localeCompare(a.clientCreatedAt) : b.date.localeCompare(a.date)))[0];
+  // The entry added last (whatever day it is for).
+  const last = [...entries].sort((a, b) => b.clientCreatedAt.localeCompare(a.clientCreatedAt))[0];
   const lastCategory = last ? categoryById.get(last.categoryId) : undefined;
   const lastAccount = last ? accountById.get(last.accountId) : undefined;
   add({
@@ -296,7 +301,7 @@ export const buildSnapshot = ({ user, lang, t, accounts, categories, transaction
     const by = new Map<string, number>();
     let total = 0;
     for (const tx of entries) {
-      if (tx.type !== type || tx.date < monthStart || tx.date > today) continue;
+      if (tx.type !== type || tx.date < monthStart || tx.date > monthEnd) continue;
       const amount = value(tx);
       total += amount;
       by.set(tx.categoryId, (by.get(tx.categoryId) ?? 0) + amount);

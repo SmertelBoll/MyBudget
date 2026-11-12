@@ -55,7 +55,7 @@ const sameValues = (a: FormValues, b: FormValues) => JSON.stringify(a) === JSON.
 
 // Screen 4: add ("new", ?type=expense|income) and edit share one form.
 export default function TransactionFormScreen() {
-  const { id, type } = useLocalSearchParams<{ id: string; type?: EntryType }>();
+  const { id, type, date } = useLocalSearchParams<{ id: string; type?: EntryType; date?: string }>();
   const existing = useRecord("transactions", id === "new" ? null : id);
   const { user } = useAuth();
   const { toInput } = useMoney();
@@ -89,7 +89,8 @@ export default function TransactionFormScreen() {
       currencyPicked: false,
       accountId: defaultAccount?.id ?? null,
       categoryId: null,
-      date: todayLocal(),
+      // A new entry opened from a day other than today (Home, the log) starts on that day.
+      date: date && /^\d{4}-\d{2}-\d{2}$/.test(date) ? date : todayLocal(),
       tagIds: [],
       comment: "",
       photos: [],
