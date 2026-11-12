@@ -743,5 +743,12 @@
   "home.innerSwitch": "Zeilen klappen zu {{now}} auf. Tippen für {{next}}",
   "home.inner.tag": "Tags",
   "home.inner.subtag": "Untertags",
-  "home.inner.category": "Kategorien"
+  "home.inner.category": "Kategorien",
+  "widget.spentMonth": "Diesen Monat ausgegeben",
+  "widget.accountGone": "Dieses Konto gibt es nicht mehr. Widget gedrückt halten, um ein anderes zu wählen",
+  "widget.empty": "Öffne zuerst MyBudget und melde dich an",
+  "widget.chooseTitle": "Was soll das Widget zeigen?",
+  "widget.chooseHint": "Total zählt dieselben Konten wie die Startseite",
+  "cents.widgets": "Widgets",
+  "cents.widgetsHint": "Widgets auf dem Startbildschirm"
 }

@@ -59,7 +59,59 @@
           "color": "#F9F919"
         }
       ],
-      "expo-sharing"
+      "expo-sharing",
+      [
+        "react-native-android-widget",
+        {
+          "widgets": [
+            {
+              "name": "Balance",
+              "label": "Balance",
+              "description": "An account or Total. Stretch it for − and + buttons",
+              "minWidth": "110dp",
+              "minHeight": "40dp",
+              "targetCellWidth": 2,
+              "targetCellHeight": 1,
+              "maxResizeWidth": "400dp",
+              "resizeMode": "horizontal",
+              "widgetFeatures": "reconfigurable"
+            },
+            {
+              "name": "Summary",
+              "label": "Balance and month",
+              "description": "Balance and this month's spending",
+              "minWidth": "110dp",
+              "minHeight": "110dp",
+              "targetCellWidth": 2,
+              "targetCellHeight": 2,
+              "resizeMode": "horizontal|vertical",
+              "widgetFeatures": "reconfigurable"
+            },
+            {
+              "name": "Overview",
+              "label": "Month overview",
+              "description": "Balance, spending and the top categories of the month",
+              "minWidth": "250dp",
+              "minHeight": "110dp",
+              "targetCellWidth": 4,
+              "targetCellHeight": 2,
+              "resizeMode": "horizontal|vertical",
+              "widgetFeatures": "reconfigurable"
+            },
+            {
+              "name": "QuickAdd",
+              "label": "New entry",
+              "description": "One tap to add an expense or income",
+              "minWidth": "40dp",
+              "minHeight": "40dp",
+              "targetCellWidth": 1,
+              "targetCellHeight": 1,
+              "resizeMode": "none"
+            }
+          ]
+        }
+      ],
+      "expo-background-task"
     ],
     "experiments": {
       "typedRoutes": true,

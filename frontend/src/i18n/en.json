@@ -743,5 +743,12 @@
   "home.innerSwitch": "Rows open into {{now}}. Tap for {{next}}",
   "home.inner.tag": "tags",
   "home.inner.subtag": "subtags",
-  "home.inner.category": "categories"
+  "home.inner.category": "categories",
+  "widget.spentMonth": "Spent this month",
+  "widget.accountGone": "This account is gone. Hold the widget to choose another",
+  "widget.empty": "Open MyBudget and sign in first",
+  "widget.chooseTitle": "What should the widget show?",
+  "widget.chooseHint": "Total counts the same accounts as on Home",
+  "cents.widgets": "Widgets",
+  "cents.widgetsHint": "Home-screen widgets"
 }

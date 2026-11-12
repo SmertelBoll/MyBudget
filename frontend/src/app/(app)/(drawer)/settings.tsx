@@ -39,6 +39,7 @@ const DEFAULT_SETTINGS: UserSettings = {
   centsInHome: false,
   centsInAccounts: false,
   centsInTotals: false,
+  centsInWidgets: true,
   focus: "expense",
   hideBalance: false,
   receiptComments: false,

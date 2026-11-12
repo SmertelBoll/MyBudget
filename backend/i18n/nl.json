@@ -743,5 +743,12 @@
   "home.innerSwitch": "Rijen openen in {{now}}. Tik voor {{next}}",
   "home.inner.tag": "tags",
   "home.inner.subtag": "subtags",
-  "home.inner.category": "categorieën"
+  "home.inner.category": "categorieën",
+  "widget.spentMonth": "Deze maand uitgegeven",
+  "widget.accountGone": "Deze rekening bestaat niet meer. Houd de widget ingedrukt om een andere te kiezen",
+  "widget.empty": "Open eerst MyBudget en log in",
+  "widget.chooseTitle": "Wat moet de widget tonen?",
+  "widget.chooseHint": "Total telt dezelfde rekeningen als Start",
+  "cents.widgets": "Widgets",
+  "cents.widgetsHint": "Widgets op het startscherm"
 }

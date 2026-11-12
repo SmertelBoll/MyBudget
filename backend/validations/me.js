@@ -16,6 +16,7 @@ export const settingsSchema = z
     centsInHome: z.boolean().nullable(),
     centsInAccounts: z.boolean().nullable(),
     centsInTotals: z.boolean().nullable(),
+    centsInWidgets: z.boolean().nullable(),
     focus: z.enum(["expense", "income"]),
     hideBalance: z.boolean(),
     receiptComments: z.boolean(),

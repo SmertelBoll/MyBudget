@@ -733,5 +733,12 @@
   "home.innerSwitch": "行は{{now}}に展開されます。タップで{{next}}",
   "home.inner.tag": "タグ",
   "home.inner.subtag": "サブタグ",
-  "home.inner.category": "カテゴリ"
+  "home.inner.category": "カテゴリ",
+  "widget.spentMonth": "今月の支出",
+  "widget.accountGone": "この口座はもうありません。ウィジェットを長押しして別の口座を選んでください",
+  "widget.empty": "まずMyBudgetを開いてログインしてください",
+  "widget.chooseTitle": "ウィジェットに何を表示しますか？",
+  "widget.chooseHint": "Totalはホームと同じ口座を合計します",
+  "cents.widgets": "ウィジェット",
+  "cents.widgetsHint": "ホーム画面のウィジェット"
 }

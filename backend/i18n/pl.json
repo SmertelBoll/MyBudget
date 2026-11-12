@@ -763,5 +763,12 @@
   "home.innerSwitch": "Wiersze rozwijają się na {{now}}. Dotknij, aby pokazać {{next}}",
   "home.inner.tag": "tagi",
   "home.inner.subtag": "podtagi",
-  "home.inner.category": "kategorie"
+  "home.inner.category": "kategorie",
+  "widget.spentMonth": "Wydano w tym miesiącu",
+  "widget.accountGone": "Tego konta już nie ma. Przytrzymaj widżet, aby wybrać inne",
+  "widget.empty": "Najpierw otwórz MyBudget i zaloguj się",
+  "widget.chooseTitle": "Co ma pokazywać widżet?",
+  "widget.chooseHint": "Total liczy te same konta co ekran główny",
+  "cents.widgets": "Widżety",
+  "cents.widgetsHint": "Widżety na ekranie głównym"
 }

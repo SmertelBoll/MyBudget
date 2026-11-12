@@ -743,5 +743,12 @@
   "home.innerSwitch": "A sorok ezekre nyílnak: {{now}}. Koppints: {{next}}",
   "home.inner.tag": "címkék",
   "home.inner.subtag": "alcímkék",
-  "home.inner.category": "kategóriák"
+  "home.inner.category": "kategóriák",
+  "widget.spentMonth": "Ebben a hónapban elköltve",
+  "widget.accountGone": "Ez a számla már nem létezik. Tartsd nyomva a widgetet, hogy mást válassz",
+  "widget.empty": "Előbb nyisd meg a MyBudgetet és jelentkezz be",
+  "widget.chooseTitle": "Mit mutasson a widget?",
+  "widget.chooseHint": "A Total ugyanazokat a számlákat számolja, mint a kezdőlap",
+  "cents.widgets": "Widgetek",
+  "cents.widgetsHint": "Kezdőképernyő-widgetek"
 }

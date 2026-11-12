@@ -763,5 +763,12 @@
   "home.innerSwitch": "Рядки розкриваються на {{now}}. Натисніть, щоб показати {{next}}",
   "home.inner.tag": "теги",
   "home.inner.subtag": "підтеги",
-  "home.inner.category": "категорії"
+  "home.inner.category": "категорії",
+  "widget.spentMonth": "Витрачено за місяць",
+  "widget.accountGone": "Цього рахунку більше немає. Затисніть віджет, щоб вибрати інший",
+  "widget.empty": "Спершу відкрийте MyBudget і увійдіть",
+  "widget.chooseTitle": "Що показувати на віджеті?",
+  "widget.chooseHint": "Total рахує ті самі рахунки, що й на головній",
+  "cents.widgets": "Віджети",
+  "cents.widgetsHint": "Віджети на робочому столі"
 }

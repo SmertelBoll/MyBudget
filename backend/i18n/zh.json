@@ -733,5 +733,12 @@
   "home.innerSwitch": "行展开为{{now}}。点按显示{{next}}",
   "home.inner.tag": "标签",
   "home.inner.subtag": "子标签",
-  "home.inner.category": "分类"
+  "home.inner.category": "分类",
+  "widget.spentMonth": "本月支出",
+  "widget.accountGone": "该账户已不存在。长按小组件以选择其他账户",
+  "widget.empty": "请先打开 MyBudget 并登录",
+  "widget.chooseTitle": "小组件显示什么？",
+  "widget.chooseHint": "Total 统计与首页相同的账户",
+  "cents.widgets": "小组件",
+  "cents.widgetsHint": "主屏幕小组件"
 }

@@ -743,5 +743,12 @@
   "home.innerSwitch": "Rader åpnes i {{now}}. Trykk for {{next}}",
   "home.inner.tag": "tagger",
   "home.inner.subtag": "undertagger",
-  "home.inner.category": "kategorier"
+  "home.inner.category": "kategorier",
+  "widget.spentMonth": "Brukt denne måneden",
+  "widget.accountGone": "Kontoen finnes ikke lenger. Hold inne widgeten for å velge en annen",
+  "widget.empty": "Åpne MyBudget og logg inn først",
+  "widget.chooseTitle": "Hva skal widgeten vise?",
+  "widget.chooseHint": "Total teller de samme kontoene som på Hjem",
+  "cents.widgets": "Moduler",
+  "cents.widgetsHint": "Moduler på startskjermen"
 }

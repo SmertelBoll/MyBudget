@@ -753,5 +753,12 @@
   "home.innerSwitch": "As linhas abrem em {{now}}. Toque para {{next}}",
   "home.inner.tag": "etiquetas",
   "home.inner.subtag": "subetiquetas",
-  "home.inner.category": "categorias"
+  "home.inner.category": "categorias",
+  "widget.spentMonth": "Gasto este mês",
+  "widget.accountGone": "Esta conta não existe mais. Mantenha o widget pressionado para escolher outra",
+  "widget.empty": "Abra o MyBudget e entre primeiro",
+  "widget.chooseTitle": "O que o widget deve mostrar?",
+  "widget.chooseHint": "Total conta as mesmas contas do Início",
+  "cents.widgets": "Widgets",
+  "cents.widgetsHint": "Widgets da tela inicial"
 }

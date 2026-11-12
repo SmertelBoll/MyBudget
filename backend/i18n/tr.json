@@ -743,5 +743,12 @@
   "home.innerSwitch": "Satırlar {{now}} olarak açılır. {{next}} için dokunun",
   "home.inner.tag": "etiketler",
   "home.inner.subtag": "alt etiketler",
-  "home.inner.category": "kategoriler"
+  "home.inner.category": "kategoriler",
+  "widget.spentMonth": "Bu ay harcanan",
+  "widget.accountGone": "Bu hesap artık yok. Başka birini seçmek için widget'a basılı tutun",
+  "widget.empty": "Önce MyBudget'ı açın ve giriş yapın",
+  "widget.chooseTitle": "Widget ne göstersin?",
+  "widget.chooseHint": "Total, ana sayfadaki hesapların aynısını sayar",
+  "cents.widgets": "Widget'lar",
+  "cents.widgetsHint": "Ana ekran widget'ları"
 }

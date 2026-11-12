@@ -14,13 +14,14 @@ import { useToast } from "@/components/Toast";
 import { ToggleRow } from "@/components/ToggleRow";
 import { SettingsCard } from "@/components/settings/SettingsCard";
 
-type CentsKey = "centsInEntries" | "centsInHome" | "centsInAccounts" | "centsInTotals";
+type CentsKey = "centsInEntries" | "centsInHome" | "centsInAccounts" | "centsInTotals" | "centsInWidgets";
 
 const SWITCHES: { key: CentsKey; label: string; hint: string }[] = [
   { key: "centsInEntries", label: "cents.entries", hint: "cents.entriesHint" },
   { key: "centsInHome", label: "cents.home", hint: "cents.homeHint" },
   { key: "centsInAccounts", label: "cents.accounts", hint: "cents.accountsHint" },
   { key: "centsInTotals", label: "cents.totals", hint: "cents.totalsHint" },
+  { key: "centsInWidgets", label: "cents.widgets", hint: "cents.widgetsHint" },
 ];
 
 const SAMPLE = 123456;

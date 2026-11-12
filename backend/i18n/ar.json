@@ -783,5 +783,12 @@
   "home.innerSwitch": "تُفتح الصفوف إلى {{now}}. اضغط لعرض {{next}}",
   "home.inner.tag": "الوسوم",
   "home.inner.subtag": "الوسوم الفرعية",
-  "home.inner.category": "الفئات"
+  "home.inner.category": "الفئات",
+  "widget.spentMonth": "المصروف هذا الشهر",
+  "widget.accountGone": "هذا الحساب لم يعد موجودًا. اضغط مطولًا على الأداة لاختيار آخر",
+  "widget.empty": "افتح MyBudget وسجّل الدخول أولًا",
+  "widget.chooseTitle": "ماذا تعرض الأداة؟",
+  "widget.chooseHint": "الإجمالي يحسب نفس الحسابات كما في الرئيسية",
+  "cents.widgets": "الأدوات",
+  "cents.widgetsHint": "أدوات الشاشة الرئيسية"
 }

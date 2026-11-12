@@ -19,6 +19,8 @@ export type UserSettings = {
   centsInHome?: boolean | null;
   centsInAccounts?: boolean | null;
   centsInTotals?: boolean | null;
+  // Home-screen widgets; unset = with cents.
+  centsInWidgets?: boolean | null;
   focus: EntryType;
   // Missing on users saved before it existed: shown.
   hideBalance?: boolean;

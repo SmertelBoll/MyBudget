@@ -743,5 +743,12 @@
   "home.innerSwitch": "पंक्तियाँ {{now}} में खुलती हैं। {{next}} के लिए टैप करें",
   "home.inner.tag": "टैग",
   "home.inner.subtag": "उप-टैग",
-  "home.inner.category": "श्रेणियाँ"
+  "home.inner.category": "श्रेणियाँ",
+  "widget.spentMonth": "इस महीने खर्च",
+  "widget.accountGone": "यह खाता अब नहीं है। दूसरा चुनने के लिए विजेट को दबाकर रखें",
+  "widget.empty": "पहले MyBudget खोलें और साइन इन करें",
+  "widget.chooseTitle": "विजेट पर क्या दिखाएँ?",
+  "widget.chooseHint": "Total वही खाते गिनता है जो होम पर",
+  "cents.widgets": "विजेट",
+  "cents.widgetsHint": "होम स्क्रीन विजेट"
 }

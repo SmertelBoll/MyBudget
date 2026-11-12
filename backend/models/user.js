@@ -34,6 +34,7 @@ const UserSchema = new mongoose.Schema(
       centsInHome: { type: Boolean, default: null },
       centsInAccounts: { type: Boolean, default: null },
       centsInTotals: { type: Boolean, default: null },
+      centsInWidgets: { type: Boolean, default: null },
       focus: { type: String, enum: ["expense", "income"], default: "expense" },
       // Home shows dots instead of the balance until the eye next to it is tapped.
       hideBalance: { type: Boolean, default: false },

@@ -743,5 +743,12 @@
   "home.innerSwitch": "Rækker åbner til {{now}}. Tryk for {{next}}",
   "home.inner.tag": "tags",
   "home.inner.subtag": "undertags",
-  "home.inner.category": "kategorier"
+  "home.inner.category": "kategorier",
+  "widget.spentMonth": "Brugt denne måned",
+  "widget.accountGone": "Kontoen findes ikke længere. Hold på widgetten for at vælge en anden",
+  "widget.empty": "Åbn MyBudget og log ind først",
+  "widget.chooseTitle": "Hvad skal widgetten vise?",
+  "widget.chooseHint": "Total tæller de samme konti som på Hjem",
+  "cents.widgets": "Widgets",
+  "cents.widgetsHint": "Widgets på startskærmen"
 }

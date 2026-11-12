@@ -13,6 +13,7 @@ export const centsSettings = (settings?: Partial<UserSettings>) => {
     centsInHome: settings?.centsInHome ?? totals,
     centsInAccounts: settings?.centsInAccounts ?? totals,
     centsInTotals: totals,
+    centsInWidgets: settings?.centsInWidgets ?? true,
   };
 };
 

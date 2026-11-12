@@ -763,5 +763,12 @@
   "home.innerSwitch": "Řádky se rozbalí na {{now}}. Klepnutím zobrazíte {{next}}",
   "home.inner.tag": "štítky",
   "home.inner.subtag": "podštítky",
-  "home.inner.category": "kategorie"
+  "home.inner.category": "kategorie",
+  "widget.spentMonth": "Utraceno tento měsíc",
+  "widget.accountGone": "Tento účet už neexistuje. Podržte widget a vyberte jiný",
+  "widget.empty": "Nejprve otevřete MyBudget a přihlaste se",
+  "widget.chooseTitle": "Co má widget ukazovat?",
+  "widget.chooseHint": "Total počítá stejné účty jako na domovské obrazovce",
+  "cents.widgets": "Widgety",
+  "cents.widgetsHint": "Widgety na ploše"
 }

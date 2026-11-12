@@ -743,5 +743,12 @@
   "home.innerSwitch": "Οι γραμμές ανοίγουν σε {{now}}. Πατήστε για {{next}}",
   "home.inner.tag": "ετικέτες",
   "home.inner.subtag": "υποετικέτες",
-  "home.inner.category": "κατηγορίες"
+  "home.inner.category": "κατηγορίες",
+  "widget.spentMonth": "Δαπάνες αυτόν τον μήνα",
+  "widget.accountGone": "Αυτός ο λογαριασμός δεν υπάρχει πια. Πατήστε παρατεταμένα το widget για άλλον",
+  "widget.empty": "Ανοίξτε πρώτα το MyBudget και συνδεθείτε",
+  "widget.chooseTitle": "Τι να δείχνει το widget;",
+  "widget.chooseHint": "Το Total μετρά τους ίδιους λογαριασμούς με την Αρχική",
+  "cents.widgets": "Widgets",
+  "cents.widgetsHint": "Widgets αρχικής οθόνης"
 }

@@ -753,5 +753,12 @@
   "home.innerSwitch": "Le righe si aprono in {{now}}. Tocca per {{next}}",
   "home.inner.tag": "etichette",
   "home.inner.subtag": "sottoetichette",
-  "home.inner.category": "categorie"
+  "home.inner.category": "categorie",
+  "widget.spentMonth": "Speso questo mese",
+  "widget.accountGone": "Questo conto non esiste più. Tieni premuto il widget per sceglierne un altro",
+  "widget.empty": "Apri prima MyBudget ed effettua l’accesso",
+  "widget.chooseTitle": "Cosa deve mostrare il widget?",
+  "widget.chooseHint": "Total conta gli stessi conti della Home",
+  "cents.widgets": "Widget",
+  "cents.widgetsHint": "Widget della schermata Home"
 }

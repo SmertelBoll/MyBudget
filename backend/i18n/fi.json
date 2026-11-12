@@ -743,5 +743,12 @@
   "home.innerSwitch": "Rivit avautuvat: {{now}}. Napauta: {{next}}",
   "home.inner.tag": "tunnisteet",
   "home.inner.subtag": "alatunnisteet",
-  "home.inner.category": "luokat"
+  "home.inner.category": "luokat",
+  "widget.spentMonth": "Käytetty tässä kuussa",
+  "widget.accountGone": "Tätä tiliä ei enää ole. Valitse toinen painamalla widgetiä pitkään",
+  "widget.empty": "Avaa ensin MyBudget ja kirjaudu sisään",
+  "widget.chooseTitle": "Mitä widget näyttää?",
+  "widget.chooseHint": "Total laskee samat tilit kuin kotinäkymä",
+  "cents.widgets": "Widgetit",
+  "cents.widgetsHint": "Aloitusnäytön widgetit"
 }

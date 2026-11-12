@@ -743,5 +743,12 @@
   "home.innerSwitch": "Rader öppnas i {{now}}. Tryck för {{next}}",
   "home.inner.tag": "taggar",
   "home.inner.subtag": "undertaggar",
-  "home.inner.category": "kategorier"
+  "home.inner.category": "kategorier",
+  "widget.spentMonth": "Spenderat denna månad",
+  "widget.accountGone": "Kontot finns inte längre. Håll in widgeten för att välja ett annat",
+  "widget.empty": "Öppna MyBudget och logga in först",
+  "widget.chooseTitle": "Vad ska widgeten visa?",
+  "widget.chooseHint": "Total räknar samma konton som Hem",
+  "cents.widgets": "Widgetar",
+  "cents.widgetsHint": "Widgetar på hemskärmen"
 }

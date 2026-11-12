@@ -3,6 +3,7 @@ import { useAuth } from "@/auth/AuthProvider";
 import { DataProvider } from "@/data/DataProvider";
 import "@/data/debug";
 import { RecurringRunner } from "@/notifications/RecurringRunner";
+import { WidgetUpdater } from "@/widgets/WidgetUpdater";
 import { BlockingOverlay } from "@/components/BlockingOverlay";
 import { useTheme } from "@/theme/ThemeProvider";
 
@@ -16,6 +17,7 @@ export default function AppLayout() {
   return (
     <DataProvider user={user}>
       <RecurringRunner />
+      <WidgetUpdater />
       <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background } }}>
         <Stack.Screen name="(drawer)" />
       </Stack>
