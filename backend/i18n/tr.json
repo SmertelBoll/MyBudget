@@ -750,5 +750,12 @@
   "widget.chooseTitle": "Widget ne göstersin?",
   "widget.chooseHint": "Total, ana sayfadaki hesapların aynısını sayar",
   "cents.widgets": "Widget'lar",
-  "cents.widgetsHint": "Ana ekran widget'ları"
+  "cents.widgetsHint": "Ana ekran widget'ları",
+  "widget.receivedMonth": "Bu ay alınan",
+  "widget.chooseAccounts": "Widget'taki hesaplar",
+  "widget.orderHint": "İlki büyük, diğerleri daha küçük; yüksekliğe sığdığı kadar gösterilir. Sırayı değiştirmek için basılı tutup sürükleyin",
+  "widget.shown": "Bu sırayla gösterilir",
+  "widget.add": "Ekle",
+  "widget.done": "Bitti",
+  "widget.remove": "Kaldır"
 }

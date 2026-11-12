@@ -750,5 +750,12 @@
   "widget.chooseTitle": "Hva skal widgeten vise?",
   "widget.chooseHint": "Total teller de samme kontoene som på Hjem",
   "cents.widgets": "Moduler",
-  "cents.widgetsHint": "Moduler på startskjermen"
+  "cents.widgetsHint": "Moduler på startskjermen",
+  "widget.receivedMonth": "Mottatt denne måneden",
+  "widget.chooseAccounts": "Kontoer på widgeten",
+  "widget.orderHint": "Den første er stor, de andre mindre; så mange vises som høyden gir plass til. Hold inne og dra for å endre rekkefølgen",
+  "widget.shown": "Vises i denne rekkefølgen",
+  "widget.add": "Legg til",
+  "widget.done": "Ferdig",
+  "widget.remove": "Fjern"
 }

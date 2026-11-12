@@ -750,5 +750,12 @@
   "widget.chooseTitle": "विजेट पर क्या दिखाएँ?",
   "widget.chooseHint": "Total वही खाते गिनता है जो होम पर",
   "cents.widgets": "विजेट",
-  "cents.widgetsHint": "होम स्क्रीन विजेट"
+  "cents.widgetsHint": "होम स्क्रीन विजेट",
+  "widget.receivedMonth": "इस महीने प्राप्त",
+  "widget.chooseAccounts": "विजेट पर खाते",
+  "widget.orderHint": "पहला बड़ा, बाकी छोटे; जितने ऊँचाई में आएँ उतने दिखते हैं। क्रम बदलने के लिए दबाकर खींचें",
+  "widget.shown": "इसी क्रम में दिखाए गए",
+  "widget.add": "जोड़ें",
+  "widget.done": "हो गया",
+  "widget.remove": "हटाएँ"
 }

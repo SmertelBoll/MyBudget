@@ -760,5 +760,12 @@
   "widget.chooseTitle": "O que o widget deve mostrar?",
   "widget.chooseHint": "Total conta as mesmas contas do Início",
   "cents.widgets": "Widgets",
-  "cents.widgetsHint": "Widgets da tela inicial"
+  "cents.widgetsHint": "Widgets da tela inicial",
+  "widget.receivedMonth": "Recebido este mês",
+  "widget.chooseAccounts": "Contas no widget",
+  "widget.orderHint": "A primeira é grande, as outras menores; aparecem quantas couberem na altura. Mantenha pressionado e arraste para mudar a ordem",
+  "widget.shown": "Exibidas nesta ordem",
+  "widget.add": "Adicionar",
+  "widget.done": "Concluído",
+  "widget.remove": "Remover"
 }

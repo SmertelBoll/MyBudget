@@ -770,5 +770,12 @@
   "widget.chooseTitle": "Co má widget ukazovat?",
   "widget.chooseHint": "Total počítá stejné účty jako na domovské obrazovce",
   "cents.widgets": "Widgety",
-  "cents.widgetsHint": "Widgety na ploše"
+  "cents.widgetsHint": "Widgety na ploše",
+  "widget.receivedMonth": "Přijato tento měsíc",
+  "widget.chooseAccounts": "Účty na widgetu",
+  "widget.orderHint": "První je velký, ostatní menší; zobrazí se tolik, kolik se vejde do výšky widgetu. Podržením a přetažením změníte pořadí",
+  "widget.shown": "Zobrazené, v tomto pořadí",
+  "widget.add": "Přidat",
+  "widget.done": "Hotovo",
+  "widget.remove": "Odebrat"
 }

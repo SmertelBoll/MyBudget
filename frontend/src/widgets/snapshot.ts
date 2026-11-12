@@ -21,7 +21,8 @@ export type WidgetScope = {
   name: string;
   color: string;
   balance: string;
-  monthSpent: string;
+  // This month's expenses or income (whichever the user focuses on, Settings -> Focus) and its biggest categories.
+  month: string;
   top: WidgetTop[];
 };
 
@@ -30,6 +31,8 @@ export type WidgetSnapshot = {
   updatedAt: string;
   total: WidgetScope;
   accounts: WidgetScope[];
+  // "Spent this month" or "Received this month", already in the user's language.
+  monthLabel: string;
   // Words the widgets and their setup screen need, in the user's language. The background sync also translates
   // default category names from here, as it has no dictionary of its own.
   i18n: Record<string, string>;
@@ -42,16 +45,37 @@ const SELECTION_KEY = (widgetId: number) => `widgets.selection.${widgetId}`;
 export const readSnapshot = () => readJson<WidgetSnapshot>(SNAPSHOT_KEY);
 export const writeSnapshot = (snapshot: WidgetSnapshot) => writeJson(SNAPSHOT_KEY, snapshot);
 
-// What each widget on the home screen shows: Total or an account id.
-export const readSelection = async (widgetId: number) => (await readJson<string>(SELECTION_KEY(widgetId))) ?? TOTAL;
-export const writeSelection = (widgetId: number, key: string) => writeJson(SELECTION_KEY(widgetId), key);
+// What each widget on the home screen shows: Total and / or accounts, in the user's order. The first is shown big,
+// the rest smaller under it, as many as fit. (Earlier versions stored a single key, then { main, second }.)
+export type Selection = string[];
+export const readSelection = async (widgetId: number): Promise<Selection> => {
+  const stored = await readJson<string | string[] | { main?: string; second?: string | null }>(SELECTION_KEY(widgetId));
+  if (!stored) return [TOTAL];
+  if (typeof stored === "string") return [stored];
+  if (Array.isArray(stored)) return stored.length ? stored : [TOTAL];
+  return [stored.main ?? TOTAL, ...(stored.second ? [stored.second] : [])];
+};
+export const writeSelection = (widgetId: number, selection: Selection) => writeJson(SELECTION_KEY(widgetId), selection);
 export const removeSelection = (widgetId: number) => storage.remove(SELECTION_KEY(widgetId));
 
-export const LABEL_KEYS = ["home.total", "widget.spentMonth", "widget.accountGone", "widget.empty", "widget.chooseTitle", "widget.chooseHint", "common.cancel"];
+export const LABEL_KEYS = [
+  "home.total",
+  "widget.accountGone",
+  "widget.empty",
+  "widget.chooseTitle",
+  "widget.chooseHint",
+  "widget.chooseAccounts",
+  "widget.orderHint",
+  "widget.shown",
+  "widget.add",
+  "widget.done",
+  "widget.remove",
+  "common.cancel",
+];
 
 const TOTAL_COLOR = "#F9F919";
-// The 4×2 widget lists this many categories.
-const TOP_COUNT = 5;
+// The most categories a stretched 4×2 widget can list (it shows as many as fit, five at two cells tall).
+const TOP_COUNT = 12;
 
 type Inputs = {
   user: User;
@@ -80,9 +104,11 @@ export const buildSnapshot = ({ user, lang, t, accounts, categories, transaction
   const accountById = new Map(accounts.map((account) => [account.id, account]));
   const categoryById = new Map(categories.map((category) => [category.id, category]));
   const month = today.slice(0, 7);
-  const spent = visibleEntries(transactions).filter((tx) => tx.type === "expense" && tx.date.slice(0, 7) === month);
+  // The month line follows Settings -> Focus: expenses or income.
+  const focus = user.settings.focus === "income" ? "income" : "expense";
+  const spent = visibleEntries(transactions).filter((tx) => tx.type === focus && tx.date.slice(0, 7) === month);
 
-  // This month's expenses and the biggest categories, from entries already in the scope's currency.
+  // This month's total and the biggest categories, from entries already in the scope's currency.
   const spending = (values: { categoryId: string; value: number }[], currency: string) => {
     const total = values.reduce((sum, item) => sum + item.value, 0);
     const byCategory = new Map<string, number>();
@@ -94,7 +120,7 @@ export const buildSnapshot = ({ user, lang, t, accounts, categories, transaction
         const category = categoryById.get(id);
         return { name: category ? categoryName(category, t) : "?", color: category?.color ?? "#9e9e9e", amount: money(value, currency), share: total ? value / total : 0 };
       });
-    return { monthSpent: money(total, currency), top };
+    return { month: money(total, currency), top };
   };
 
   // Total as on Home: active accounts counted in Total, in the main currency at today's rate. Its spending, like
@@ -135,6 +161,7 @@ export const buildSnapshot = ({ user, lang, t, accounts, categories, transaction
     updatedAt: new Date().toISOString(),
     total,
     accounts: scopes,
+    monthLabel: t(focus === "income" ? "widget.receivedMonth" : "widget.spentMonth"),
     i18n: Object.fromEntries(keys.map((key) => [key, t(key)])),
   };
 };

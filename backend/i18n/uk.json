@@ -770,5 +770,12 @@
   "widget.chooseTitle": "Що показувати на віджеті?",
   "widget.chooseHint": "Total рахує ті самі рахунки, що й на головній",
   "cents.widgets": "Віджети",
-  "cents.widgetsHint": "Віджети на робочому столі"
+  "cents.widgetsHint": "Віджети на робочому столі",
+  "widget.receivedMonth": "Отримано за місяць",
+  "widget.chooseAccounts": "Рахунки на віджеті",
+  "widget.orderHint": "Перший — великий, решта — менші; показується стільки, скільки вміщає висота віджета. Затисніть і перетягніть, щоб змінити порядок",
+  "widget.shown": "Показуються, у такому порядку",
+  "widget.add": "Додати",
+  "widget.done": "Готово",
+  "widget.remove": "Прибрати"
 }

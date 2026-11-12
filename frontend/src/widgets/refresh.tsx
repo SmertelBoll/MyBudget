@@ -9,7 +9,7 @@ export const refreshWidgets = async (snapshot: WidgetSnapshot) => {
     await requestWidgetUpdate({
       widgetName: name,
       renderWidget: async (info) => (
-        <WidgetFor name={name} snapshot={snapshot} selection={await readSelection(info.widgetId)} width={info.width} height={info.height} />
+        <WidgetFor name={name} snapshot={snapshot} selection={await readSelection(info.widgetId)} width={info.width} height={info.height} fontScale={info.screenInfo?.fontScale} />
       ),
     });
   }

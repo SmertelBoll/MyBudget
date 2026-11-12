@@ -750,5 +750,12 @@
   "widget.chooseTitle": "What should the widget show?",
   "widget.chooseHint": "Total counts the same accounts as on Home",
   "cents.widgets": "Widgets",
-  "cents.widgetsHint": "Home-screen widgets"
+  "cents.widgetsHint": "Home-screen widgets",
+  "widget.receivedMonth": "Received this month",
+  "widget.chooseAccounts": "Accounts on the widget",
+  "widget.orderHint": "The first one is big, the others smaller; as many show as fit the widget's height. Hold and drag to change the order",
+  "widget.shown": "Shown, in this order",
+  "widget.add": "Add",
+  "widget.done": "Done",
+  "widget.remove": "Remove"
 }

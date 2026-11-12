@@ -740,5 +740,12 @@
   "widget.chooseTitle": "위젯에 무엇을 표시할까요?",
   "widget.chooseHint": "Total은 홈과 같은 계좌를 합산합니다",
   "cents.widgets": "위젯",
-  "cents.widgetsHint": "홈 화면 위젯"
+  "cents.widgetsHint": "홈 화면 위젯",
+  "widget.receivedMonth": "이번 달 수입",
+  "widget.chooseAccounts": "위젯의 계좌",
+  "widget.orderHint": "첫 번째는 크게, 나머지는 작게 표시되며 높이에 맞는 만큼 보입니다. 길게 눌러 끌어서 순서 변경",
+  "widget.shown": "이 순서로 표시",
+  "widget.add": "추가",
+  "widget.done": "완료",
+  "widget.remove": "제거"
 }

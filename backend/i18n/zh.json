@@ -740,5 +740,12 @@
   "widget.chooseTitle": "小组件显示什么？",
   "widget.chooseHint": "Total 统计与首页相同的账户",
   "cents.widgets": "小组件",
-  "cents.widgetsHint": "主屏幕小组件"
+  "cents.widgetsHint": "主屏幕小组件",
+  "widget.receivedMonth": "本月收入",
+  "widget.chooseAccounts": "小组件上的账户",
+  "widget.orderHint": "第一个大号显示，其余小号；能放下多少显示多少。长按并拖动可调整顺序",
+  "widget.shown": "按此顺序显示",
+  "widget.add": "添加",
+  "widget.done": "完成",
+  "widget.remove": "移除"
 }

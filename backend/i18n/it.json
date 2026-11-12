@@ -760,5 +760,12 @@
   "widget.chooseTitle": "Cosa deve mostrare il widget?",
   "widget.chooseHint": "Total conta gli stessi conti della Home",
   "cents.widgets": "Widget",
-  "cents.widgetsHint": "Widget della schermata Home"
+  "cents.widgetsHint": "Widget della schermata Home",
+  "widget.receivedMonth": "Ricevuto questo mese",
+  "widget.chooseAccounts": "Conti nel widget",
+  "widget.orderHint": "Il primo è grande, gli altri più piccoli; se ne vedono quanti ne stanno in altezza. Tieni premuto e trascina per cambiare l’ordine",
+  "widget.shown": "Mostrati in quest’ordine",
+  "widget.add": "Aggiungi",
+  "widget.done": "Fatto",
+  "widget.remove": "Rimuovi"
 }

@@ -770,5 +770,12 @@
   "widget.chooseTitle": "Co ma pokazywać widżet?",
   "widget.chooseHint": "Total liczy te same konta co ekran główny",
   "cents.widgets": "Widżety",
-  "cents.widgetsHint": "Widżety na ekranie głównym"
+  "cents.widgetsHint": "Widżety na ekranie głównym",
+  "widget.receivedMonth": "Otrzymano w tym miesiącu",
+  "widget.chooseAccounts": "Konta na widżecie",
+  "widget.orderHint": "Pierwsze duże, pozostałe mniejsze; widać tyle, ile zmieści wysokość. Przytrzymaj i przeciągnij, aby zmienić kolejność",
+  "widget.shown": "Pokazywane w tej kolejności",
+  "widget.add": "Dodaj",
+  "widget.done": "Gotowe",
+  "widget.remove": "Usuń"
 }

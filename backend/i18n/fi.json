@@ -750,5 +750,12 @@
   "widget.chooseTitle": "Mitä widget näyttää?",
   "widget.chooseHint": "Total laskee samat tilit kuin kotinäkymä",
   "cents.widgets": "Widgetit",
-  "cents.widgetsHint": "Aloitusnäytön widgetit"
+  "cents.widgetsHint": "Aloitusnäytön widgetit",
+  "widget.receivedMonth": "Saatu tässä kuussa",
+  "widget.chooseAccounts": "Widgetin tilit",
+  "widget.orderHint": "Ensimmäinen on iso, muut pienempiä; niin monta näkyy kuin korkeuteen mahtuu. Muuta järjestystä painamalla pitkään ja vetämällä",
+  "widget.shown": "Näytetään tässä järjestyksessä",
+  "widget.add": "Lisää",
+  "widget.done": "Valmis",
+  "widget.remove": "Poista"
 }

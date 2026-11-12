@@ -14,7 +14,7 @@ const widgetTaskHandler = async ({ widgetInfo, widgetAction, renderWidget }: Wid
   // Taps open the app by link (OPEN_URI), handled by Android itself; nothing reaches here for them.
   if (widgetAction === "WIDGET_CLICK") return;
   const [snapshot, selection] = await Promise.all([readSnapshot(), readSelection(widgetInfo.widgetId)]);
-  renderWidget(<WidgetFor name={widgetInfo.widgetName} snapshot={snapshot} selection={selection} width={widgetInfo.width} height={widgetInfo.height} />);
+  renderWidget(<WidgetFor name={widgetInfo.widgetName} snapshot={snapshot} selection={selection} width={widgetInfo.width} height={widgetInfo.height} fontScale={widgetInfo.screenInfo?.fontScale} />);
 };
 
 registerWidgetTaskHandler(widgetTaskHandler);

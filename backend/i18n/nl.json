@@ -750,5 +750,12 @@
   "widget.chooseTitle": "Wat moet de widget tonen?",
   "widget.chooseHint": "Total telt dezelfde rekeningen als Start",
   "cents.widgets": "Widgets",
-  "cents.widgetsHint": "Widgets op het startscherm"
+  "cents.widgetsHint": "Widgets op het startscherm",
+  "widget.receivedMonth": "Deze maand ontvangen",
+  "widget.chooseAccounts": "Rekeningen op de widget",
+  "widget.orderHint": "De eerste groot, de rest kleiner; er staan er zoveel op als de hoogte toelaat. Houd ingedrukt en sleep om de volgorde te wijzigen",
+  "widget.shown": "Getoond, in deze volgorde",
+  "widget.add": "Toevoegen",
+  "widget.done": "Klaar",
+  "widget.remove": "Verwijderen"
 }

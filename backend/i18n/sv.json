@@ -750,5 +750,12 @@
   "widget.chooseTitle": "Vad ska widgeten visa?",
   "widget.chooseHint": "Total räknar samma konton som Hem",
   "cents.widgets": "Widgetar",
-  "cents.widgetsHint": "Widgetar på hemskärmen"
+  "cents.widgetsHint": "Widgetar på hemskärmen",
+  "widget.receivedMonth": "Mottaget denna månad",
+  "widget.chooseAccounts": "Konton på widgeten",
+  "widget.orderHint": "Det första stort, de andra mindre; så många visas som höjden rymmer. Håll in och dra för att ändra ordningen",
+  "widget.shown": "Visas i denna ordning",
+  "widget.add": "Lägg till",
+  "widget.done": "Klar",
+  "widget.remove": "Ta bort"
 }

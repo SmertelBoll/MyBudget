@@ -750,5 +750,12 @@
   "widget.chooseTitle": "Τι να δείχνει το widget;",
   "widget.chooseHint": "Το Total μετρά τους ίδιους λογαριασμούς με την Αρχική",
   "cents.widgets": "Widgets",
-  "cents.widgetsHint": "Widgets αρχικής οθόνης"
+  "cents.widgetsHint": "Widgets αρχικής οθόνης",
+  "widget.receivedMonth": "Έσοδα αυτόν τον μήνα",
+  "widget.chooseAccounts": "Λογαριασμοί στο widget",
+  "widget.orderHint": "Ο πρώτος μεγάλος, οι άλλοι μικρότεροι· φαίνονται όσοι χωρούν στο ύψος. Πατήστε παρατεταμένα και σύρετε για αλλαγή σειράς",
+  "widget.shown": "Εμφανίζονται με αυτή τη σειρά",
+  "widget.add": "Προσθήκη",
+  "widget.done": "Τέλος",
+  "widget.remove": "Αφαίρεση"
 }

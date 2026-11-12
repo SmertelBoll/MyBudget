@@ -750,5 +750,12 @@
   "widget.chooseTitle": "Was soll das Widget zeigen?",
   "widget.chooseHint": "Total zählt dieselben Konten wie die Startseite",
   "cents.widgets": "Widgets",
-  "cents.widgetsHint": "Widgets auf dem Startbildschirm"
+  "cents.widgetsHint": "Widgets auf dem Startbildschirm",
+  "widget.receivedMonth": "Diesen Monat erhalten",
+  "widget.chooseAccounts": "Konten im Widget",
+  "widget.orderHint": "Das erste groß, die anderen kleiner; es werden so viele gezeigt, wie in die Höhe passen. Gedrückt halten und ziehen, um die Reihenfolge zu ändern",
+  "widget.shown": "Angezeigt, in dieser Reihenfolge",
+  "widget.add": "Hinzufügen",
+  "widget.done": "Fertig",
+  "widget.remove": "Entfernen"
 }

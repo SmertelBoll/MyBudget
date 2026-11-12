@@ -750,5 +750,12 @@
   "widget.chooseTitle": "Hvad skal widgetten vise?",
   "widget.chooseHint": "Total tæller de samme konti som på Hjem",
   "cents.widgets": "Widgets",
-  "cents.widgetsHint": "Widgets på startskærmen"
+  "cents.widgetsHint": "Widgets på startskærmen",
+  "widget.receivedMonth": "Modtaget denne måned",
+  "widget.chooseAccounts": "Konti på widgetten",
+  "widget.orderHint": "Den første er stor, de andre mindre; der vises så mange, som højden giver plads til. Hold og træk for at ændre rækkefølgen",
+  "widget.shown": "Vises i denne rækkefølge",
+  "widget.add": "Tilføj",
+  "widget.done": "Færdig",
+  "widget.remove": "Fjern"
 }

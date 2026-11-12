@@ -750,5 +750,12 @@
   "widget.chooseTitle": "Mit mutasson a widget?",
   "widget.chooseHint": "A Total ugyanazokat a számlákat számolja, mint a kezdőlap",
   "cents.widgets": "Widgetek",
-  "cents.widgetsHint": "Kezdőképernyő-widgetek"
+  "cents.widgetsHint": "Kezdőképernyő-widgetek",
+  "widget.receivedMonth": "Ebben a hónapban kapott",
+  "widget.chooseAccounts": "Számlák a widgeten",
+  "widget.orderHint": "Az első nagy, a többi kisebb; annyi látszik, amennyi kifér. Tartsd nyomva és húzd a sorrend módosításához",
+  "widget.shown": "Megjelenítve, ebben a sorrendben",
+  "widget.add": "Hozzáadás",
+  "widget.done": "Kész",
+  "widget.remove": "Eltávolítás"
 }

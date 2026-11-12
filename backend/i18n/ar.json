@@ -790,5 +790,12 @@
   "widget.chooseTitle": "ماذا تعرض الأداة؟",
   "widget.chooseHint": "الإجمالي يحسب نفس الحسابات كما في الرئيسية",
   "cents.widgets": "الأدوات",
-  "cents.widgetsHint": "أدوات الشاشة الرئيسية"
+  "cents.widgetsHint": "أدوات الشاشة الرئيسية",
+  "widget.receivedMonth": "المستلم هذا الشهر",
+  "widget.chooseAccounts": "الحسابات على الأداة",
+  "widget.orderHint": "الأول كبير والبقية أصغر؛ يظهر منها ما يتسع له ارتفاع الأداة. اضغط مطولًا واسحب لتغيير الترتيب",
+  "widget.shown": "معروضة بهذا الترتيب",
+  "widget.add": "إضافة",
+  "widget.done": "تم",
+  "widget.remove": "إزالة"
 }

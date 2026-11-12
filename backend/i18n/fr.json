@@ -760,5 +760,12 @@
   "widget.chooseTitle": "Que doit afficher le widget ?",
   "widget.chooseHint": "Total compte les mêmes comptes que l’accueil",
   "cents.widgets": "Widgets",
-  "cents.widgetsHint": "Widgets de l’écran d’accueil"
+  "cents.widgetsHint": "Widgets de l’écran d’accueil",
+  "widget.receivedMonth": "Reçu ce mois-ci",
+  "widget.chooseAccounts": "Comptes du widget",
+  "widget.orderHint": "Le premier est grand, les autres plus petits ; autant s’affichent que la hauteur le permet. Maintenez et faites glisser pour changer l’ordre",
+  "widget.shown": "Affichés dans cet ordre",
+  "widget.add": "Ajouter",
+  "widget.done": "OK",
+  "widget.remove": "Retirer"
 }

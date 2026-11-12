@@ -2,7 +2,7 @@
 // Widgets are drawn by react-native-android-widget from these primitives only: no hooks, nothing async (the
 // library's rules). Everything they show comes ready-made in the snapshot.
 import { FlexWidget, TextWidget } from "react-native-android-widget";
-import { newEntryUri, type WidgetScope, type WidgetSnapshot } from "./snapshot";
+import { newEntryUri, type Selection, type WidgetScope, type WidgetSnapshot } from "./snapshot";
 
 export const WIDGET_NAMES = { balance: "Balance", summary: "Summary", overview: "Overview", quickAdd: "QuickAdd" } as const;
 
@@ -76,32 +76,72 @@ export function BalanceWidget({ scope, width, height }: { scope: WidgetScope; wi
   );
 }
 
-// 2×2: balance and this month's spending.
-export function SummaryWidget({ scope, snapshot }: { scope: WidgetScope; snapshot: WidgetSnapshot }) {
+// Heights in dp, from Android's line height (about 1.17 × the font size) at the default font size; the user's font
+// scale multiplies them. A home-screen cell is roughly 90 dp tall, though launchers differ (two cells: ~150–190 dp).
+const PAD = 12;
+const LINE = 1.17;
+const CELL_DP = 90;
+const NEXT_ROW = 6 + (11 + 16) * LINE; // gap, name, smaller balance
+const MONTH_ROW = 8 + (11 + 15) * LINE; // gap, label, amount
+const CATEGORY_ROW = 4 + 12 * LINE + 6; // margins, name and amount, bar
+
+const cellsTall = (height: number) => Math.max(1, Math.round((height + 16) / CELL_DP));
+
+// How many accounts fit whole: at most one per cell of height (two cells: two), and only as many smaller rows as fit
+// completely between the first account and the month line. A row is shown whole or not at all.
+export const accountsThatFit = (height: number, firstBalance: number, fontScale = 1) => {
+  const room = height - PAD * 2 - ((13 + firstBalance) * LINE + MONTH_ROW) * fontScale;
+  return Math.max(1, Math.min(cellsTall(height), 1 + Math.floor(room / (NEXT_ROW * fontScale))));
+};
+
+// Category lines that fit whole on 4×2: five at two cells tall, three more per extra cell.
+export const categoriesThatFit = (height: number, fontScale = 1) =>
+  Math.max(1, Math.min(cellsTall(height) * 3 - 1, Math.floor((height - PAD * 2) / (CATEGORY_ROW * fontScale))));
+
+// The first account big, the others the same smaller size under it, then this month's expenses or income of the
+// first one.
+function Stack({ scopes, snapshot, firstBalance }: { scopes: WidgetScope[]; snapshot: WidgetSnapshot; firstBalance: number }) {
+  const [first, ...rest] = scopes;
   return (
-    <Card padding={14}>
-      <TextWidget text={scope.name} maxLines={1} truncate="END" style={{ color: MUTED, fontSize: 13 }} />
-      <TextWidget text={scope.balance} maxLines={1} style={{ color: TEXT, fontSize: 30, fontWeight: "bold", adjustsFontSizeToFit: true }} />
-      <TextWidget text={label(snapshot, "widget.spentMonth", "Spent this month")} maxLines={1} style={{ color: MUTED, fontSize: 12, marginTop: 10 }} />
-      <TextWidget text={scope.monthSpent} maxLines={1} style={{ color: TEXT, fontSize: 18, fontWeight: "bold", adjustsFontSizeToFit: true }} />
+    <FlexWidget style={{ flexDirection: "column", justifyContent: "center", width: "match_parent", height: "match_parent" }}>
+      <TextWidget text={first.name} maxLines={1} truncate="END" style={{ color: MUTED, fontSize: 13 }} />
+      <TextWidget text={first.balance} maxLines={1} style={{ color: TEXT, fontSize: firstBalance, fontWeight: "bold", adjustsFontSizeToFit: true }} />
+      {rest.map((scope) => (
+        <FlexWidget key={scope.key} style={{ flexDirection: "column", marginTop: 6 }}>
+          <TextWidget text={scope.name} maxLines={1} truncate="END" style={{ color: MUTED, fontSize: 11 }} />
+          <TextWidget text={scope.balance} maxLines={1} style={{ color: TEXT, fontSize: 16, fontWeight: "bold", adjustsFontSizeToFit: true }} />
+        </FlexWidget>
+      ))}
+      <TextWidget text={snapshot.monthLabel ?? label(snapshot, "widget.spentMonth", "Spent this month")} maxLines={1} style={{ color: MUTED, fontSize: 11, marginTop: 8 }} />
+      <TextWidget text={first.month} maxLines={1} style={{ color: TEXT, fontSize: 15, fontWeight: "bold", adjustsFontSizeToFit: true }} />
+    </FlexWidget>
+  );
+}
+
+const SUMMARY_BALANCE = 28;
+const OVERVIEW_BALANCE = 26;
+
+// 2×2 (and taller): the chosen accounts that fit, the month line.
+export function SummaryWidget({ scopes, snapshot }: { scopes: WidgetScope[]; snapshot: WidgetSnapshot }) {
+  return (
+    <Card padding={PAD}>
+      <Stack scopes={scopes} snapshot={snapshot} firstBalance={SUMMARY_BALANCE} />
     </Card>
   );
 }
 
-// 4×2: balance and spending on the left, the month's five biggest categories with their share on the right.
-export function OverviewWidget({ scope, snapshot, width }: { scope: WidgetScope; snapshot: WidgetSnapshot; width: number }) {
+// 4×2: the same on the left; on the right the month's biggest categories (of expenses or income) with their share,
+// as many as fit whole.
+export function OverviewWidget({ scopes, snapshot, width, categories }: { scopes: WidgetScope[]; snapshot: WidgetSnapshot; width: number; categories: number }) {
   const barMax = Math.max(40, width / 2 - 40);
   return (
-    <Card padding={14}>
+    <Card padding={PAD}>
       <FlexWidget style={{ flexDirection: "row", width: "match_parent", height: "match_parent" }}>
-        <FlexWidget style={{ flex: 1, flexDirection: "column", justifyContent: "center", height: "match_parent" }}>
-          <TextWidget text={scope.name} maxLines={1} truncate="END" style={{ color: MUTED, fontSize: 13 }} />
-          <TextWidget text={scope.balance} maxLines={1} style={{ color: TEXT, fontSize: 28, fontWeight: "bold", adjustsFontSizeToFit: true }} />
-          <TextWidget text={label(snapshot, "widget.spentMonth", "Spent this month")} maxLines={1} style={{ color: MUTED, fontSize: 12, marginTop: 8 }} />
-          <TextWidget text={scope.monthSpent} maxLines={1} style={{ color: TEXT, fontSize: 17, fontWeight: "bold", adjustsFontSizeToFit: true }} />
+        <FlexWidget style={{ flex: 1, height: "match_parent" }}>
+          <Stack scopes={scopes} snapshot={snapshot} firstBalance={OVERVIEW_BALANCE} />
         </FlexWidget>
         <FlexWidget style={{ flex: 1, flexDirection: "column", justifyContent: "center", height: "match_parent", marginLeft: 12 }}>
-          {scope.top.map((item) => (
+          {scopes[0].top.slice(0, categories).map((item) => (
             <FlexWidget key={item.name} style={{ flexDirection: "column", width: "match_parent", marginVertical: 2 }}>
               <FlexWidget style={{ flexDirection: "row", width: "match_parent" }}>
                 <FlexWidget style={{ flex: 1 }}>
@@ -134,13 +174,13 @@ export function QuickAddWidget({ width, height }: { width: number; height: numbe
   );
 }
 
-// Any widget by name, for its chosen scope and current size.
-export function WidgetFor({ name, snapshot, selection, width, height }: { name: string; snapshot: WidgetSnapshot | null; selection: string; width: number; height: number }) {
+// Any widget by name, for its chosen accounts and current size. Accounts that are gone are skipped.
+export function WidgetFor({ name, snapshot, selection, width, height, fontScale }: { name: string; snapshot: WidgetSnapshot | null; selection: Selection; width: number; height: number; fontScale?: number }) {
   if (name === WIDGET_NAMES.quickAdd) return <QuickAddWidget width={width} height={height} />;
-  const scope = scopeOf(snapshot, selection);
-  if (scope === "empty" || !snapshot) return <Message text="Open MyBudget to set up the widget" />;
-  if (scope === "gone") return <Message text={label(snapshot, "widget.accountGone", "This account is gone. Hold the widget to choose another")} />;
-  if (name === WIDGET_NAMES.summary) return <SummaryWidget scope={scope} snapshot={snapshot} />;
-  if (name === WIDGET_NAMES.overview) return <OverviewWidget scope={scope} snapshot={snapshot} width={width} />;
-  return <BalanceWidget scope={scope} width={width} height={height} />;
+  if (!snapshot) return <Message text="Open MyBudget to set up the widget" />;
+  const scopes = selection.map((key) => scopeOf(snapshot, key)).filter((scope): scope is WidgetScope => typeof scope === "object");
+  if (!scopes.length) return <Message text={label(snapshot, "widget.accountGone", "This account is gone. Hold the widget to choose another")} />;
+  if (name === WIDGET_NAMES.summary) return <SummaryWidget scopes={scopes.slice(0, accountsThatFit(height, SUMMARY_BALANCE, fontScale))} snapshot={snapshot} />;
+  if (name === WIDGET_NAMES.overview) return <OverviewWidget scopes={scopes.slice(0, accountsThatFit(height, OVERVIEW_BALANCE, fontScale))} snapshot={snapshot} width={width} categories={categoriesThatFit(height, fontScale)} />;
+  return <BalanceWidget scope={scopes[0]} width={width} height={height} />;
 }
