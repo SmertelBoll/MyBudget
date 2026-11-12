@@ -105,7 +105,7 @@ const COLORS = { [TOTAL_ALL]: "#F9F919", [TOTAL]: "#FFD54F", [TOTAL_EXCLUDED]: "
 // The most categories a stretched 4×2 widget can list (it shows as many as fit, five at two cells tall).
 const TOP_COUNT = 12;
 const METRICS = ["month", "week", "today", "avg", "vs"];
-const OTHER = ["payment", "limitsOver", "limitsLeft", "result", "balanceChange", "last", "rate", "noSpend", "reminder"];
+const OTHER = ["payment", "limitsOver", "limitsLeft", "result", "last", "rate", "noSpend", "reminder"];
 
 type Inputs = {
   user: User;
@@ -246,11 +246,6 @@ export const buildSnapshot = ({ user, lang, t, accounts, categories, transaction
   const result = receivedMonth - spentMonth;
   add({ key: "other:result", label: t("widget.other.result"), value: signed(result), color: other, tone: result > 0 ? "good" : result < 0 ? "bad" : null });
 
-  // How much all balances moved this month: every income and expense, balance corrections too (transfers between
-  // accounts move nothing overall).
-  const moved = transactions.reduce((total, tx) => (tx.date >= monthStart && tx.date <= today ? total + (tx.type === "income" ? 1 : -1) * value(tx) : total), 0);
-  add({ key: "other:balanceChange", label: t("widget.other.balanceChange"), value: signed(moved), color: other, tone: moved > 0 ? "good" : moved < 0 ? "bad" : null });
-
   // The latest entry.
   const last = [...entries].sort((a, b) => (a.date === b.date ? b.clientCreatedAt.localeCompare(a.clientCreatedAt) : b.date.localeCompare(a.date)))[0];
   const lastCategory = last ? categoryById.get(last.categoryId) : undefined;
@@ -323,7 +318,7 @@ export const buildSnapshot = ({ user, lang, t, accounts, categories, transaction
     {
       key: "other",
       title: t("widget.group.other"),
-      keys: ["other:payment", "other:limitsOver", "other:limitsLeft", "other:result", "other:balanceChange", "other:last", ...rateKeys, "other:noSpend", "other:reminder"],
+      keys: ["other:payment", "other:limitsOver", "other:limitsLeft", "other:result", "other:last", ...rateKeys, "other:noSpend", "other:reminder"],
     },
   ];
 
