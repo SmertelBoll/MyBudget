@@ -111,7 +111,8 @@
           ]
         }
       ],
-      "expo-background-task"
+      "expo-background-task",
+      "./plugins/withLowMemoryGradle"
     ],
     "experiments": {
       "typedRoutes": true,
