@@ -18,7 +18,7 @@ const S = 2;
 const SAMPLE = {
   name: "Total",
   balance: "$1,250.00",
-  second: { name: "Card", balance: "$830.40" },
+  second: { name: "Spent this month", balance: "$467.30" },
   spentLabel: "Spent this month",
   spent: "$467.30",
   top: [
@@ -46,19 +46,17 @@ write("quick-add.png", 72, 72, `<rect width="${72 * S}" height="${72 * S}" rx="$
 // 2×1: name and a big balance.
 write("balance.png", 180, 80, card(180, 80) + text(12, 30, SAMPLE.name, 12, MUTED) + text(12, 60, SAMPLE.balance, 28, TEXT, 700));
 
-// The first account big, a second one smaller, then the month line, starting `top` dp down at `x`.
+// The first line big, a second one smaller, starting `top` dp down at `x`.
 const stack = (x, top) =>
   text(x, top + 13, SAMPLE.name, 13, MUTED) +
   text(x, top + 44, SAMPLE.balance, 28, TEXT, 700) +
-  text(x, top + 64, SAMPLE.second.name, 11, MUTED) +
-  text(x, top + 83, SAMPLE.second.balance, 16, TEXT, 700) +
-  text(x, top + 104, SAMPLE.spentLabel, 11, MUTED) +
-  text(x, top + 123, SAMPLE.spent, 15, TEXT, 700);
+  text(x, top + 66, SAMPLE.second.name, 11, MUTED) +
+  text(x, top + 86, SAMPLE.second.balance, 16, TEXT, 700);
 
-// 2×2: two accounts and this month's spending.
-write("summary.png", 180, 180, card(180, 180) + stack(14, 24));
+// 2×2: Total and this month's spending.
+write("summary.png", 180, 180, card(180, 180) + stack(14, 42));
 
-// 4×2: two accounts and spending on the left, five categories with bars on the right.
+// 4×2: Total and spending on the left, five categories with bars on the right.
 const W = 360;
 const H = 180;
 const total = SAMPLE.top.reduce((sum, [, , amount]) => sum + amount, 0);
@@ -77,5 +75,5 @@ write(
   "overview.png",
   W,
   H,
-  card(W, H) + stack(14, 24) + rows
+  card(W, H) + stack(14, 42) + rows
 );

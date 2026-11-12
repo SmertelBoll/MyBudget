@@ -3,7 +3,6 @@ import { useAuth } from "@/auth/AuthProvider";
 import { useCollection } from "@/data/hooks";
 import { useRates } from "@/data/rates";
 import { useI18n } from "@/i18n/I18nProvider";
-import { todayLocal } from "@/utils/dates";
 import { registerBackgroundSync } from "./background";
 import { refreshWidgets } from "./refresh";
 import { buildSnapshot } from "./snapshot";
@@ -19,6 +18,8 @@ export function WidgetUpdater() {
   const categories = useCollection("categories");
   const transactions = useCollection("transactions");
   const transfers = useCollection("transfers");
+  const recurring = useCollection("recurring");
+  const reminders = useCollection("reminders");
   const rates = useRates();
 
   useEffect(() => {
@@ -28,11 +29,11 @@ export function WidgetUpdater() {
   useEffect(() => {
     if (!user) return;
     const timer = setTimeout(() => {
-      const snapshot = buildSnapshot({ user, lang, t, accounts, categories, transactions, transfers, rates, today: todayLocal() });
+      const snapshot = buildSnapshot({ user, lang, t, accounts, categories, transactions, transfers, recurring, reminders, rates, now: new Date() });
       refreshWidgets(snapshot).catch((error) => console.warn("widgets not updated:", error));
     }, SETTLE_MS);
     return () => clearTimeout(timer);
-  }, [user, lang, t, accounts, categories, transactions, transfers, rates]);
+  }, [user, lang, t, accounts, categories, transactions, transfers, recurring, reminders, rates]);
 
   return null;
 }

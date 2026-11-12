@@ -7,7 +7,6 @@ import { getRates, loadRates } from "@/data/rates";
 import { getMeta, getSnapshot, loadAll } from "@/data/store";
 import { requestSync, startSync } from "@/data/sync";
 import { readJson } from "@/storage/json";
-import { todayLocal } from "@/utils/dates";
 import { refreshWidgets } from "./refresh";
 import { buildSnapshot, readSnapshot } from "./snapshot";
 
@@ -40,8 +39,10 @@ const backgroundRefresh = async () => {
     categories: getSnapshot("categories"),
     transactions: getSnapshot("transactions"),
     transfers: getSnapshot("transfers"),
+    recurring: getSnapshot("recurring"),
+    reminders: getSnapshot("reminders"),
     rates: getRates(),
-    today: todayLocal(),
+    now: new Date(),
   });
   await refreshWidgets(snapshot);
 };
