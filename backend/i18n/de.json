@@ -785,5 +785,6 @@
   "widget.other.last": "Letzter Eintrag",
   "widget.other.rate": "Kurs",
   "widget.other.noSpend": "Tage ohne Ausgaben",
-  "widget.other.reminder": "Nächste Erinnerung"
+  "widget.other.reminder": "Nächste Erinnerung",
+  "common.saveFailed": "Die Änderungen konnten nicht gespeichert werden. Bitte versuche es erneut"
 }

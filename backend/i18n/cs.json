@@ -805,5 +805,6 @@
   "widget.other.last": "Poslední záznam",
   "widget.other.rate": "Kurz",
   "widget.other.noSpend": "Dny bez výdajů",
-  "widget.other.reminder": "Další připomínka"
+  "widget.other.reminder": "Další připomínka",
+  "common.saveFailed": "Změny se nepodařilo uložit. Zkuste to znovu"
 }

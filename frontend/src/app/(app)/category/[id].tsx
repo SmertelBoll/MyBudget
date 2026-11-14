@@ -6,7 +6,6 @@ import { useLocalSearchParams } from "expo-router";
 import type { EntryType } from "@/api/types";
 import { categoryName, countCategoryEntries, deleteCategory, saveCategory } from "@/data/categories";
 import { useRecord } from "@/data/hooks";
-import { reportWriteError } from "@/data/store";
 import { DEFAULT_CATEGORY_ICON, EXPENSE_ICON_SECTIONS, INCOME_ICON_SECTIONS, NEUTRAL_COLOR } from "@/constants/appearance";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTheme } from "@/theme/ThemeProvider";
@@ -14,6 +13,7 @@ import { radius, spacing } from "@/theme/tokens";
 import { parseAmount } from "@/utils/money";
 import { useBottomSpace } from "@/utils/useBottomSpace";
 import { useMoney } from "@/utils/useMoney";
+import { useLeaveAndSave } from "@/utils/useLeaveAndSave";
 import { useUnsavedGuard } from "@/utils/useUnsavedGuard";
 import { useDialog } from "@/components/AppDialog";
 import { AmountInput } from "@/components/AmountInput";
@@ -78,6 +78,7 @@ function CategoryForm({ initial, existingId }: { initial: FormValues; existingId
 
   const dirty = useMemo(() => (Object.keys(initial) as (keyof FormValues)[]).some((key) => values[key] !== initial[key]), [values, initial]);
   const leave = useUnsavedGuard(dirty && !saving);
+  const leaveAndSave = useLeaveAndSave(leave);
 
   // Empty limit = no limit (spec 7.2, optional).
   const limit = values.limit.trim() ? parseAmount(values.limit) : null;
@@ -90,12 +91,13 @@ function CategoryForm({ initial, existingId }: { initial: FormValues; existingId
     if (nameError || limitError) return;
     setSaving(true);
     const translated = existing?.nameKey ? t(existing.nameKey) : null;
-    saveCategory(
-      { name: values.name.trim(), type: values.type, icon: values.icon, color: values.color, plannedMonthly: limit, hidden: values.hidden },
-      translated,
-      existing
-    ).catch(reportWriteError);
-    leave();
+    leaveAndSave(() =>
+      saveCategory(
+        { name: values.name.trim(), type: values.type, icon: values.icon, color: values.color, plannedMonthly: limit, hidden: values.hidden },
+        translated,
+        existing
+      )
+    );
   };
 
   // Spec 7.3: confirm, warning that its entries move to "Other".
@@ -110,8 +112,7 @@ function CategoryForm({ initial, existingId }: { initial: FormValues; existingId
     });
     if (!ok) return;
     setSaving(true);
-    deleteCategory(existing).catch(reportWriteError);
-    leave();
+    leaveAndSave(() => deleteCategory(existing));
   };
 
   // Changing the type of a new category swaps a still-default icon for the other type's default.

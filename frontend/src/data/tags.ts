@@ -119,5 +119,16 @@ export const deleteTag = async (tag: Tag) => {
   await removeEntity("tags", tag.id);
 };
 
+// Entries per tag, counted in one pass over the entries (for a list of every tag: counting each row on its own went
+// through all entries once per tag, which held up every redraw of the tag list).
+export const useTagUses = () => {
+  const transactions = useCollection("transactions");
+  return useMemo(() => {
+    const uses = new Map<string, number>();
+    for (const tx of transactions) for (const id of tx.tagIds) uses.set(id, (uses.get(id) ?? 0) + 1);
+    return uses;
+  }, [transactions]);
+};
+
 export const countTagUses = (tagId: string) =>
   getSnapshot("transactions").filter((tx) => tx.tagIds.includes(tagId)).length;

@@ -775,5 +775,6 @@
   "widget.other.last": "最近一笔",
   "widget.other.rate": "汇率",
   "widget.other.noSpend": "无支出天数",
-  "widget.other.reminder": "下一个提醒"
+  "widget.other.reminder": "下一个提醒",
+  "common.saveFailed": "无法保存更改，请重试"
 }

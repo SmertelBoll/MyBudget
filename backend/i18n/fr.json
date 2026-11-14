@@ -795,5 +795,6 @@
   "widget.other.last": "Dernière saisie",
   "widget.other.rate": "Taux",
   "widget.other.noSpend": "Jours sans dépense",
-  "widget.other.reminder": "Prochain rappel"
+  "widget.other.reminder": "Prochain rappel",
+  "common.saveFailed": "Impossible d’enregistrer les modifications. Réessayez"
 }

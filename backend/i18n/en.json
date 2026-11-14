@@ -785,5 +785,6 @@
   "widget.other.last": "Last entry",
   "widget.other.rate": "Rate",
   "widget.other.noSpend": "Days without spending",
-  "widget.other.reminder": "Next reminder"
+  "widget.other.reminder": "Next reminder",
+  "common.saveFailed": "Couldn't save the changes. Please try again"
 }

@@ -825,5 +825,6 @@
   "widget.other.last": "آخر معاملة",
   "widget.other.rate": "سعر الصرف",
   "widget.other.noSpend": "أيام بلا مصروف",
-  "widget.other.reminder": "التذكير التالي"
+  "widget.other.reminder": "التذكير التالي",
+  "common.saveFailed": "تعذّر حفظ التغييرات. حاول مرة أخرى"
 }

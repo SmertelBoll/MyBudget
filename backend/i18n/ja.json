@@ -775,5 +775,6 @@
   "widget.other.last": "最新の記録",
   "widget.other.rate": "為替レート",
   "widget.other.noSpend": "支出のない日",
-  "widget.other.reminder": "次のリマインダー"
+  "widget.other.reminder": "次のリマインダー",
+  "common.saveFailed": "変更を保存できませんでした。もう一度お試しください"
 }

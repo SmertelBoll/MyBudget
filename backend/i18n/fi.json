@@ -785,5 +785,6 @@
   "widget.other.last": "Viimeisin merkintä",
   "widget.other.rate": "Kurssi",
   "widget.other.noSpend": "Päivät ilman menoja",
-  "widget.other.reminder": "Seuraava muistutus"
+  "widget.other.reminder": "Seuraava muistutus",
+  "common.saveFailed": "Muutoksia ei voitu tallentaa. Yritä uudelleen"
 }

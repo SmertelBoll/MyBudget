@@ -6,7 +6,6 @@ import { useLocalSearchParams } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRecord } from "@/data/hooks";
 import { deleteReminder, saveReminder } from "@/data/recurring";
-import { reportWriteError } from "@/data/store";
 import type { RepeatRule } from "@/data/types";
 import { useI18n } from "@/i18n/I18nProvider";
 import { requestNotificationPermission } from "@/notifications/notifications";
@@ -14,6 +13,7 @@ import { useTheme } from "@/theme/ThemeProvider";
 import { spacing } from "@/theme/tokens";
 import { toLocalDate } from "@/utils/dates";
 import { useBottomSpace } from "@/utils/useBottomSpace";
+import { useLeaveAndSave } from "@/utils/useLeaveAndSave";
 import { useUnsavedGuard } from "@/utils/useUnsavedGuard";
 import { useDialog } from "@/components/AppDialog";
 import { BottomActionButton } from "@/components/BottomActionButton";
@@ -65,6 +65,7 @@ function ReminderForm({ initial, existingId }: { initial: FormValues; existingId
   const set = <K extends keyof FormValues>(key: K, value: FormValues[K]) => setValues((current) => ({ ...current, [key]: value }));
   const dirty = useMemo(() => JSON.stringify(values) !== JSON.stringify(initial), [values, initial]);
   const leave = useUnsavedGuard(dirty && !saving);
+  const leaveAndSave = useLeaveAndSave(leave);
 
   const errors = {
     title: !values.title.trim() ? t("recurring.nameRequired") : null,
@@ -78,14 +79,19 @@ function ReminderForm({ initial, existingId }: { initial: FormValues; existingId
     if (invalid) return;
     setSaving(true);
     const { defaultTime, ...fields } = values;
-    saveReminder(
-      { ...fields, time: timeOrDefault(values.time, defaultTime), title: values.title.trim(), comment: values.comment.trim() },
-      existing
-    ).catch(reportWriteError);
-    if (values.active && !(await requestNotificationPermission()) && Platform.OS !== "web") {
-      toast.show(t("recurring.notificationsOff"), { kind: "error" });
-    }
-    leave();
+    const active = values.active;
+    leaveAndSave(
+      () =>
+        saveReminder(
+          { ...fields, time: timeOrDefault(values.time, defaultTime), title: values.title.trim(), comment: values.comment.trim() },
+          existing
+        ),
+      async () => {
+        if (active && !(await requestNotificationPermission()) && Platform.OS !== "web") {
+          toast.show(t("recurring.notificationsOff"), { kind: "error" });
+        }
+      }
+    );
   };
 
   const remove = async () => {
@@ -93,8 +99,7 @@ function ReminderForm({ initial, existingId }: { initial: FormValues; existingId
     const ok = await dialog.confirm({ title: t("reminders.deleteTitle"), confirmText: t("common.delete"), destructive: true });
     if (!ok) return;
     setSaving(true);
-    deleteReminder(existing.id).catch(reportWriteError);
-    leave();
+    leaveAndSave(() => deleteReminder(existing.id));
   };
 
   return (

@@ -8,7 +8,6 @@ import type { EntryType } from "@/api/types";
 import { useAuth } from "@/auth/AuthProvider";
 import { useCollection, useRecord } from "@/data/hooks";
 import { deleteRecurring, saveRecurring } from "@/data/recurring";
-import { reportWriteError } from "@/data/store";
 import type { RepeatRule } from "@/data/types";
 import { useI18n } from "@/i18n/I18nProvider";
 import { requestNotificationPermission } from "@/notifications/notifications";
@@ -19,6 +18,7 @@ import { parseAmount } from "@/utils/money";
 import { useBottomSpace } from "@/utils/useBottomSpace";
 import { useMoney } from "@/utils/useMoney";
 import { useAfterFirstFrame } from "@/utils/useAfterFirstFrame";
+import { useLeaveAndSave } from "@/utils/useLeaveAndSave";
 import { useUnsavedGuard } from "@/utils/useUnsavedGuard";
 import { AccountPicker } from "@/components/AccountPicker";
 import { useDialog } from "@/components/AppDialog";
@@ -145,6 +145,7 @@ function RecurringForm({ initial, existingId }: { initial: FormValues; existingI
   const account = useRecord("accounts", values.accountId);
   const dirty = useMemo(() => JSON.stringify(values) !== JSON.stringify(initial), [values, initial]);
   const leave = useUnsavedGuard(dirty && !saving);
+  const leaveAndSave = useLeaveAndSave(leave);
   // Fields below the fold are drawn a frame later, so the screen opens without waiting for them.
   const belowFold = useAfterFirstFrame();
 
@@ -174,8 +175,8 @@ function RecurringForm({ initial, existingId }: { initial: FormValues; existingI
     setSubmitted(true);
     if (invalid || !values.accountId || !values.categoryId || !amountMinor || !account) return;
     setSaving(true);
-    saveRecurring(
-      {
+    const notify = values.notify;
+    const fields = {
         type: values.type,
         name: values.name.trim(),
         rule: values.rule,
@@ -192,14 +193,16 @@ function RecurringForm({ initial, existingId }: { initial: FormValues; existingI
         comment: values.comment.trim(),
         notify: values.notify,
         active: values.active,
-      },
-      existing
-    ).catch(reportWriteError);
-    // Notifications are on by default: the system is asked on saving, not only when the switch is touched.
-    if (values.notify && !(await requestNotificationPermission()) && Platform.OS !== "web") {
-      toast.show(t("recurring.notificationsOff"), { kind: "error" });
-    }
-    leave();
+      };
+    leaveAndSave(
+      () => saveRecurring(fields, existing),
+      // Notifications are on by default: the system is asked on saving, not only when the switch is touched.
+      async () => {
+        if (notify && !(await requestNotificationPermission()) && Platform.OS !== "web") {
+          toast.show(t("recurring.notificationsOff"), { kind: "error" });
+        }
+      }
+    );
   };
 
   const remove = async () => {
@@ -212,8 +215,7 @@ function RecurringForm({ initial, existingId }: { initial: FormValues; existingI
     });
     if (!ok) return;
     setSaving(true);
-    deleteRecurring(existing.id).catch(reportWriteError);
-    leave();
+    leaveAndSave(() => deleteRecurring(existing.id));
   };
 
   return (

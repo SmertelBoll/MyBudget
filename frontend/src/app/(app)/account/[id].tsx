@@ -17,8 +17,8 @@ import { useCurrencyOptions, usePinnedCurrencies } from "@/utils/currency";
 import { todayLocal } from "@/utils/dates";
 import { parseSignedAmount } from "@/utils/money";
 import { useMoney } from "@/utils/useMoney";
+import { useLeaveAndSave } from "@/utils/useLeaveAndSave";
 import { useUnsavedGuard } from "@/utils/useUnsavedGuard";
-import { reportWriteError } from "@/data/store";
 import { useDialog } from "@/components/AppDialog";
 import { AmountInput } from "@/components/AmountInput";
 import { AppText } from "@/components/AppText";
@@ -91,6 +91,7 @@ function AccountForm({ initial, existingId }: { initial: FormValues; existingId:
 
   const dirty = useMemo(() => (Object.keys(initial) as (keyof FormValues)[]).some((key) => values[key] !== initial[key]), [values, initial]);
   const leave = useUnsavedGuard(dirty && !saving);
+  const leaveAndSave = useLeaveAndSave(leave);
 
   // Empty balance means 0 (spec 5.2).
   const balance = values.balance.trim() ? parseSignedAmount(values.balance) : 0;
@@ -102,20 +103,20 @@ function AccountForm({ initial, existingId }: { initial: FormValues; existingId:
     setSubmitted(true);
     if (nameError || balance === null) return;
     setSaving(true);
-    // Memory is updated synchronously inside the call; the disk write finishes in the background.
-    saveAccount(
-      {
-        name: values.name.trim(),
-        currency: values.currency,
-        icon: values.icon,
-        color: values.color,
-        includeInTotal: values.includeInTotal,
-        note: values.note.trim(),
-      },
-      balance,
-      existing
-    ).catch(reportWriteError);
-    leave();
+    leaveAndSave(() =>
+      saveAccount(
+        {
+          name: values.name.trim(),
+          currency: values.currency,
+          icon: values.icon,
+          color: values.color,
+          includeInTotal: values.includeInTotal,
+          note: values.note.trim(),
+        },
+        balance,
+        existing
+      )
+    );
   };
 
   // Spec 5.3: confirm -> (money left?) move it -> with or without its transactions -> 10 s countdown.
@@ -167,9 +168,11 @@ function AccountForm({ initial, existingId }: { initial: FormValues; existingId:
 
     setSaving(true);
     const target = others.find((account) => account.id === moveTo);
-    if (target) await moveBalance(existing, target, todayLocal());
-    if (mode === "all") await deleteAccountWithData(existing);
-    else await deactivateAccount(existing);
+    leaveAndSave(async () => {
+      if (target) await moveBalance(existing, target, todayLocal());
+      if (mode === "all") await deleteAccountWithData(existing);
+      else await deactivateAccount(existing);
+    });
 
     // Settings pointing at this account fall back to the defaults.
     const settings = user?.settings;
@@ -182,7 +185,6 @@ function AccountForm({ initial, existingId }: { initial: FormValues; existingId:
       }).catch(() => {});
     }
     toast.show(t("accounts.deleted"));
-    leave();
   };
 
   return (

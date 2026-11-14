@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { FlatList, View } from "react-native";
 import { router } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { countTagUses, useTagTree } from "@/data/tags";
+import { useTagTree, useTagUses } from "@/data/tags";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTheme } from "@/theme/ThemeProvider";
 import { spacing } from "@/theme/tokens";
@@ -28,6 +28,7 @@ export default function TagsScreen() {
   const bottomSpace = useBottomSpace();
   const { t } = useI18n();
   const tree = useTagTree();
+  const uses = useTagUses();
   const remove = useDeleteTag();
   const [query, setQuery] = useState("");
   // Hidden tags (and subtags of hidden ones) form their own block at the end.
@@ -92,7 +93,7 @@ export default function TagsScreen() {
                   {tag.name}
                 </AppText>
                 <AppText variant="caption" secondary numberOfLines={1}>
-                  {[t("tags.uses", { count: countTagUses(tag.id) }), subtags ? t("tags.subtagCount", { count: subtags }) : null]
+                  {[t("tags.uses", { count: uses.get(tag.id) ?? 0 }), subtags ? t("tags.subtagCount", { count: subtags }) : null]
                     .filter(Boolean)
                     .join(" · ")}
                 </AppText>

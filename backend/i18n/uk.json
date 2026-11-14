@@ -805,5 +805,6 @@
   "widget.other.last": "Остання транзакція",
   "widget.other.rate": "Курс",
   "widget.other.noSpend": "Днів без витрат",
-  "widget.other.reminder": "Наступне нагадування"
+  "widget.other.reminder": "Наступне нагадування",
+  "common.saveFailed": "Не вдалося зберегти зміни. Спробуйте ще раз"
 }

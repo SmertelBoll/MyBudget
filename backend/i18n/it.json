@@ -795,5 +795,6 @@
   "widget.other.last": "Ultima voce",
   "widget.other.rate": "Cambio",
   "widget.other.noSpend": "Giorni senza spese",
-  "widget.other.reminder": "Prossimo promemoria"
+  "widget.other.reminder": "Prossimo promemoria",
+  "common.saveFailed": "Impossibile salvare le modifiche. Riprova"
 }

@@ -785,5 +785,6 @@
   "widget.other.last": "Senaste post",
   "widget.other.rate": "Kurs",
   "widget.other.noSpend": "Dagar utan utgifter",
-  "widget.other.reminder": "Nästa påminnelse"
+  "widget.other.reminder": "Nästa påminnelse",
+  "common.saveFailed": "Ändringarna kunde inte sparas. Försök igen"
 }

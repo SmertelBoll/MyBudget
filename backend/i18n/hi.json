@@ -785,5 +785,6 @@
   "widget.other.last": "अंतिम प्रविष्टि",
   "widget.other.rate": "विनिमय दर",
   "widget.other.noSpend": "बिना खर्च के दिन",
-  "widget.other.reminder": "अगला रिमाइंडर"
+  "widget.other.reminder": "अगला रिमाइंडर",
+  "common.saveFailed": "बदलाव सहेजे नहीं जा सके। फिर से कोशिश करें"
 }

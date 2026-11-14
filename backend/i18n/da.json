@@ -785,5 +785,6 @@
   "widget.other.last": "Seneste post",
   "widget.other.rate": "Kurs",
   "widget.other.noSpend": "Dage uden forbrug",
-  "widget.other.reminder": "Næste påmindelse"
+  "widget.other.reminder": "Næste påmindelse",
+  "common.saveFailed": "Ændringerne kunne ikke gemmes. Prøv igen"
 }

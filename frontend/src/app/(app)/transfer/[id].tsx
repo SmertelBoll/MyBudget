@@ -14,8 +14,8 @@ import { useBottomSpace } from "@/utils/useBottomSpace";
 import { todayLocal } from "@/utils/dates";
 import { parseAmount } from "@/utils/money";
 import { useMoney } from "@/utils/useMoney";
+import { useLeaveAndSave } from "@/utils/useLeaveAndSave";
 import { useUnsavedGuard } from "@/utils/useUnsavedGuard";
-import { reportWriteError } from "@/data/store";
 import { AccountPicker } from "@/components/AccountPicker";
 import { useDialog } from "@/components/AppDialog";
 import { AmountInput } from "@/components/AmountInput";
@@ -76,6 +76,7 @@ function TransferForm({ initial, existingId }: { initial: FormValues; existingId
 
   const dirty = useMemo(() => (Object.keys(initial) as (keyof FormValues)[]).some((key) => values[key] !== initial[key]), [values, initial]);
   const leave = useUnsavedGuard(dirty && !saving);
+  const leaveAndSave = useLeaveAndSave(leave);
 
   const { topMinor, bottomMinor } = twoCurrencies
     ? resolvePair(values.amountFrom, values.amountTo, rate)
@@ -94,19 +95,21 @@ function TransferForm({ initial, existingId }: { initial: FormValues; existingId
     setSubmitted(true);
     if (invalid || !values.from || !values.to || !topMinor || !bottomMinor) return;
     setSaving(true);
-    // Memory is updated synchronously inside the call; the disk write finishes in the background.
-    saveTransfer(
-      {
-        fromAccountId: values.from,
-        toAccountId: values.to,
-        amountFrom: topMinor,
-        amountTo: bottomMinor,
-        date: values.date,
-        comment: values.comment.trim(),
-      },
-      existing
-    ).catch(reportWriteError);
-    leave();
+    const from = values.from;
+    const to = values.to;
+    leaveAndSave(() =>
+      saveTransfer(
+        {
+          fromAccountId: from,
+          toAccountId: to,
+          amountFrom: topMinor,
+          amountTo: bottomMinor,
+          date: values.date,
+          comment: values.comment.trim(),
+        },
+        existing
+      )
+    );
   };
 
   const remove = async () => {
@@ -119,8 +122,7 @@ function TransferForm({ initial, existingId }: { initial: FormValues; existingId
     });
     if (!ok) return;
     setSaving(true);
-    deleteTransfer(existing.id).catch(reportWriteError);
-    leave();
+    leaveAndSave(() => deleteTransfer(existing.id));
   };
 
   return (

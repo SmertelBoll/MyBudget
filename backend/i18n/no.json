@@ -785,5 +785,6 @@
   "widget.other.last": "Siste oppføring",
   "widget.other.rate": "Kurs",
   "widget.other.noSpend": "Dager uten forbruk",
-  "widget.other.reminder": "Neste påminnelse"
+  "widget.other.reminder": "Neste påminnelse",
+  "common.saveFailed": "Endringene kunne ikke lagres. Prøv igjen"
 }

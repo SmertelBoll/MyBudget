@@ -3,7 +3,6 @@ import { View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { useLocalSearchParams } from "expo-router";
 import { useRecord } from "@/data/hooks";
-import { reportWriteError } from "@/data/store";
 import { TAG_MAX_LENGTH, DEFAULT_TAG_COLOR, createTag, findTagByName, updateTag, useTagTree } from "@/data/tags";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTheme } from "@/theme/ThemeProvider";
@@ -11,6 +10,7 @@ import { spacing } from "@/theme/tokens";
 import { KEYBOARD_GAP } from "@/utils/keyboard";
 import { useBottomSpace } from "@/utils/useBottomSpace";
 import { useDeleteTag } from "@/utils/useDeleteTag";
+import { useLeaveAndSave } from "@/utils/useLeaveAndSave";
 import { useUnsavedGuard } from "@/utils/useUnsavedGuard";
 import { AppText } from "@/components/AppText";
 import { BottomActionButton } from "@/components/BottomActionButton";
@@ -58,6 +58,7 @@ function TagForm({ initial, existingId }: { initial: FormValues; existingId: str
 
   const dirty = useMemo(() => (Object.keys(initial) as (keyof FormValues)[]).some((key) => values[key] !== initial[key]), [values, initial]);
   const leave = useUnsavedGuard(dirty && !saving);
+  const leaveAndSave = useLeaveAndSave(leave);
 
   const nameError = !values.name.trim()
     ? t("accounts.nameRequired")
@@ -92,8 +93,7 @@ function TagForm({ initial, existingId }: { initial: FormValues; existingId: str
         : existing && values.color === initial.color
           ? (existing.color ?? null)
           : values.color;
-    (existing ? updateTag(existing, { name: values.name, color, parentId, hidden: values.hidden }) : createTag(values.name, { color, parentId })).catch(reportWriteError);
-    leave();
+    leaveAndSave(() => (existing ? updateTag(existing, { name: values.name, color, parentId, hidden: values.hidden }) : createTag(values.name, { color, parentId })));
   };
 
   return (
@@ -107,10 +107,11 @@ function TagForm({ initial, existingId }: { initial: FormValues; existingId: str
               icon="trash-can-outline"
               label={t("common.delete")}
               onPress={async () => {
-                if (await remove(existing)) {
+                // Confirmed: the screen goes, the deletion follows.
+                await remove(existing, (work) => {
                   setSaving(true);
-                  leave();
-                }
+                  leaveAndSave(work);
+                });
               }}
             />
           ) : undefined

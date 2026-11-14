@@ -8,7 +8,6 @@ import { useAuth } from "@/auth/AuthProvider";
 import { categoryName } from "@/data/categories";
 import { useCollection, useRecord } from "@/data/hooks";
 import { rateBetween, useRates } from "@/data/rates";
-import { reportWriteError } from "@/data/store";
 import { createOneTimePayment, deleteTransaction, saveTransaction } from "@/data/transactions";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTheme } from "@/theme/ThemeProvider";
@@ -19,6 +18,7 @@ import { parseAmount } from "@/utils/money";
 import { useBottomSpace } from "@/utils/useBottomSpace";
 import { useMoney } from "@/utils/useMoney";
 import { useAfterFirstFrame } from "@/utils/useAfterFirstFrame";
+import { useLeaveAndSave } from "@/utils/useLeaveAndSave";
 import { useUnsavedGuard } from "@/utils/useUnsavedGuard";
 import { AccountPicker } from "@/components/AccountPicker";
 import { useDialog } from "@/components/AppDialog";
@@ -131,6 +131,7 @@ function TransactionForm({ initial, existingId }: { initial: FormValues; existin
 
   const dirty = useMemo(() => !sameValues(values, initial), [values, initial]);
   const leave = useUnsavedGuard(dirty && !saving);
+  const leaveAndSave = useLeaveAndSave(leave);
   // Fields below the fold are drawn a frame later, so the screen opens without waiting for them.
   const belowFold = useAfterFirstFrame();
 
@@ -224,22 +225,22 @@ function TransactionForm({ initial, existingId }: { initial: FormValues; existin
         }
         const category = categories.find((item) => item.id === values.categoryId);
         setSaving(true);
-        createOneTimePayment({
-          ...fields,
-          name: category ? categoryName(category, t) : t("entry.payment"),
-          notify: remind === "yes",
-          accountCurrency: account.currency,
-        }).catch(reportWriteError);
         toast.show(t("entry.paymentCreated"));
-        leave();
+        leaveAndSave(() =>
+          createOneTimePayment({
+            ...fields,
+            name: category ? categoryName(category, t) : t("entry.payment"),
+            notify: remind === "yes",
+            accountCurrency: account.currency,
+          })
+        );
         return;
       }
     }
 
     setSaving(true);
-    saveTransaction(fields, existing).catch(reportWriteError);
     toast.show(t(existing ? "entry.saved" : "entry.added"));
-    leave();
+    leaveAndSave(() => saveTransaction(fields, existing));
   };
 
   const remove = async () => {
@@ -252,8 +253,7 @@ function TransactionForm({ initial, existingId }: { initial: FormValues; existin
     });
     if (!ok) return;
     setSaving(true);
-    deleteTransaction(existing.id).catch(reportWriteError);
-    leave();
+    leaveAndSave(() => deleteTransaction(existing.id));
   };
 
   return (

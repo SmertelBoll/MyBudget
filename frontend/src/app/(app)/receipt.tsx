@@ -8,7 +8,6 @@ import { categoryName } from "@/data/categories";
 import { useCollection } from "@/data/hooks";
 import { addPhoto } from "@/data/photos";
 import { parseReceipt, parseReceiptRows, type ParsedReceipt } from "@/data/receiptParser";
-import { reportWriteError } from "@/data/store";
 import { useTagTree } from "@/data/tags";
 import { saveTransaction } from "@/data/transactions";
 import { useI18n } from "@/i18n/I18nProvider";
@@ -21,6 +20,7 @@ import { canRecognizeReceipts, recognizeReceipt } from "@/utils/receiptOcr";
 import { useBottomSpace } from "@/utils/useBottomSpace";
 import { useMoney } from "@/utils/useMoney";
 import { usePickImage, type PickedImage } from "@/utils/usePickImage";
+import { useLeaveAndSave } from "@/utils/useLeaveAndSave";
 import { useUnsavedGuard } from "@/utils/useUnsavedGuard";
 import { AccountPicker } from "@/components/AccountPicker";
 import { AmountInput } from "@/components/AmountInput";
@@ -90,6 +90,7 @@ export default function ReceiptScreen() {
   const [submitted, setSubmitted] = useState(false);
   const [saving, setSaving] = useState(false);
   const leave = useUnsavedGuard(stage === "review" && items.length > 0 && !saving);
+  const leaveAndSave = useLeaveAndSave(leave);
 
   const fill = (parsed: ParsedReceipt) => {
     const lines = parsed.items.map((item) => keyed(item.name, item.amount));
@@ -152,13 +153,19 @@ export default function ReceiptScreen() {
     setSubmitted(true);
     if (!included.length || missingCategory || missingAccount) return;
     setSaving(true);
-    try {
-      const photoId = photo && user?.settings.showPhotos !== false ? await addPhoto(photo) : null;
-      const shop = merchant.trim();
-      for (const item of included) {
-        const { accountId, categoryId, tagIds } = resolved(item);
-        const account = accountById.get(accountId!);
-        if (!account || !categoryId) continue;
+    const shop = merchant.trim();
+    const keepPhoto = photo && user?.settings.showPhotos !== false ? photo : null;
+    // Each item is worked out now, while the screen is still here; the photo and the entries are saved after it has
+    // gone (a failure there shows an error).
+    const entries = included.flatMap((item) => {
+      const { accountId, categoryId, tagIds } = resolved(item);
+      const account = accountById.get(accountId!);
+      return account && categoryId ? [{ item, account, categoryId, tagIds }] : [];
+    });
+    toast.show(t("receipt.added", { count: included.length }));
+    leaveAndSave(async () => {
+      const photoId = keepPhoto ? await addPhoto(keepPhoto) : null;
+      for (const { item, account, categoryId, tagIds } of entries) {
         await saveTransaction({
           type: "expense",
           accountId: account.id,
@@ -173,12 +180,7 @@ export default function ReceiptScreen() {
           photos: photoId ? [photoId] : [],
         });
       }
-      toast.show(t("receipt.added", { count: included.length }));
-      leave();
-    } catch (error) {
-      reportWriteError(error);
-      setSaving(false);
-    }
+    });
   };
 
   const updateItem = (next: Item) => setItems((current) => current.map((item) => (item.key === next.key ? next : item)));
