@@ -4,7 +4,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useCollection } from "@/data/hooks";
 import { reportWriteError } from "@/data/store";
 import { useRankedTags } from "@/data/tagRanking";
-import { TAG_MAX_LENGTH, createTag, findTagByName, nextTagColor, useTagTree } from "@/data/tags";
+import { DEFAULT_TAG_COLOR, TAG_MAX_LENGTH, createTag, findTagByName, useTagTree } from "@/data/tags";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTheme } from "@/theme/ThemeProvider";
 import { fontSize, fonts, radius, spacing } from "@/theme/tokens";
@@ -107,7 +107,7 @@ export function TagChips({
       validate: (text) => (findTagByName(text) ? t("tag.duplicate") : null),
     });
     if (!name) return;
-    const tag = await createTag(name, { color: nextTagColor(tagTree) }).catch((error) => {
+    const tag = await createTag(name, { color: DEFAULT_TAG_COLOR }).catch((error) => {
       reportWriteError(error);
       return null;
     });

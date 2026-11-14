@@ -92,11 +92,8 @@ export const rootsOf = (tagIds: string[], tree: TagTree) => {
   return roots;
 };
 
-// A new top-level tag gets the first quick color no other top-level tag has yet.
-export const nextTagColor = (tree: TagTree) => {
-  const used = new Set(tree.ordered.filter((item) => item.depth === 0).map((item) => tree.colorOf(item.tag.id).toLowerCase()));
-  return QUICK_COLORS.find((color) => !used.has(color.toLowerCase())) ?? QUICK_COLORS[tree.byId.size % QUICK_COLORS.length];
-};
+// A new top-level tag starts dark grey (the user can pick any colour on its screen); a subtag follows its parent.
+export const DEFAULT_TAG_COLOR = "#414141";
 
 export const createTag = async (name: string, fields: { color?: string | null; parentId?: string | null } = {}) => {
   const tag: Tag = { id: newId(), name: name.trim(), color: fields.color ?? null, parentId: fields.parentId ?? null };

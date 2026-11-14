@@ -4,7 +4,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { useLocalSearchParams } from "expo-router";
 import { useRecord } from "@/data/hooks";
 import { reportWriteError } from "@/data/store";
-import { TAG_MAX_LENGTH, createTag, findTagByName, nextTagColor, updateTag, useTagTree } from "@/data/tags";
+import { TAG_MAX_LENGTH, DEFAULT_TAG_COLOR, createTag, findTagByName, updateTag, useTagTree } from "@/data/tags";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTheme } from "@/theme/ThemeProvider";
 import { spacing } from "@/theme/tokens";
@@ -35,7 +35,7 @@ export default function TagFormScreen() {
   const [initial] = useState<FormValues>(() => ({
     name: existing?.name ?? "",
     parentId: (existing && tree.parentOf(existing.id)) ?? NO_PARENT,
-    color: existing ? tree.colorOf(existing.id) : nextTagColor(tree),
+    color: existing ? tree.colorOf(existing.id) : DEFAULT_TAG_COLOR,
     hidden: Boolean(existing?.hidden),
   }));
   if (id !== "new" && !existing) return null;
@@ -77,7 +77,7 @@ function TagForm({ initial, existingId }: { initial: FormValues; existingId: str
     setValues((current) => ({
       ...current,
       parentId,
-      color: colorTouched ? current.color : parentId ? tree.colorOf(parentId) : existing && !existing.parentId ? initial.color : nextTagColor(tree),
+      color: colorTouched ? current.color : parentId ? tree.colorOf(parentId) : existing && !existing.parentId ? initial.color : DEFAULT_TAG_COLOR,
     }));
 
   const save = () => {
