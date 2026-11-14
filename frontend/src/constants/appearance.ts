@@ -156,6 +156,9 @@ export const QUICK_COLOR_COUNT = 14;
 
 export const DEFAULT_COLOR = QUICK_COLORS[0];
 
+// New categories and tags start dark grey; the user picks a colour on their screen if they want one.
+export const NEUTRAL_COLOR = "#414141";
+
 const hslToHex = (h: number, s: number, l: number) => {
   const a = (s / 100) * Math.min(l / 100, 1 - l / 100);
   const channel = (n: number) => {

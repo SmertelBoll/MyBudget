@@ -7,7 +7,7 @@ import type { EntryType } from "@/api/types";
 import { categoryName, countCategoryEntries, deleteCategory, saveCategory } from "@/data/categories";
 import { useRecord } from "@/data/hooks";
 import { reportWriteError } from "@/data/store";
-import { DEFAULT_CATEGORY_ICON, DEFAULT_COLOR, EXPENSE_ICON_SECTIONS, INCOME_ICON_SECTIONS } from "@/constants/appearance";
+import { DEFAULT_CATEGORY_ICON, EXPENSE_ICON_SECTIONS, INCOME_ICON_SECTIONS, NEUTRAL_COLOR } from "@/constants/appearance";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTheme } from "@/theme/ThemeProvider";
 import { radius, spacing } from "@/theme/tokens";
@@ -51,7 +51,7 @@ export default function CategoryFormScreen() {
       type: startType,
       limit: existing?.plannedMonthly ? toInput(existing.plannedMonthly) : "",
       icon: existing?.icon ?? DEFAULT_CATEGORY_ICON[startType],
-      color: existing?.color ?? DEFAULT_COLOR,
+      color: existing?.color ?? NEUTRAL_COLOR,
       hidden: Boolean(existing?.hidden),
     };
   });

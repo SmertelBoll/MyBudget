@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { QUICK_COLORS } from "@/constants/appearance";
+import { NEUTRAL_COLOR, QUICK_COLORS } from "@/constants/appearance";
 import { newId } from "./accounts";
 import { useCollection } from "./hooks";
 import { getSnapshot, removeEntity, saveEntities, saveEntity } from "./store";
@@ -93,7 +93,7 @@ export const rootsOf = (tagIds: string[], tree: TagTree) => {
 };
 
 // A new top-level tag starts dark grey (the user can pick any colour on its screen); a subtag follows its parent.
-export const DEFAULT_TAG_COLOR = "#414141";
+export const DEFAULT_TAG_COLOR = NEUTRAL_COLOR;
 
 export const createTag = async (name: string, fields: { color?: string | null; parentId?: string | null } = {}) => {
   const tag: Tag = { id: newId(), name: name.trim(), color: fields.color ?? null, parentId: fields.parentId ?? null };
