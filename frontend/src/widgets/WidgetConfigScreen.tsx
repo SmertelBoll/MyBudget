@@ -15,6 +15,8 @@ const MUTED = "#999999";
 const ACCENT = "#F9F919";
 const ON_ACCENT = "#0C1618";
 const GOOD = "#66BB6A";
+// Clears a 3-button navigation bar (48 dp) with room to spare.
+const BOTTOM_ROOM = 96;
 const BAD = "#EF5350";
 
 const toneColor = (tone: WidgetItem["tone"]) => (tone === "good" ? GOOD : tone === "bad" ? BAD : TEXT);
@@ -76,7 +78,9 @@ export function WidgetConfigScreen({ widgetInfo, renderWidget, setResult }: Widg
 
   return (
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: BG, paddingTop: (StatusBar.currentHeight ?? 24) + 12 }}>
-      <ScrollView scrollEnabled={!dragging} contentContainerStyle={{ padding: 16, gap: 8, paddingBottom: 32 }}>
+      {/* Extra room at the bottom: this screen runs outside the app, without its safe-area padding, and the buttons
+          must clear the phone's navigation bar. */}
+      <ScrollView scrollEnabled={!dragging} contentContainerStyle={{ padding: 16, gap: 8, paddingBottom: BOTTOM_ROOM }}>
         {snapshot && !single ? <Preview items={picked.map((key) => items[key])} /> : null}
 
         <Text style={{ color: TEXT, fontSize: 22, fontWeight: "bold" }}>

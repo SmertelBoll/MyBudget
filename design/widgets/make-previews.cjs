@@ -57,8 +57,9 @@ const stack = (x, top) =>
 write("summary.png", 180, 180, card(180, 180) + stack(14, 42));
 
 // 4×2: Total and spending on the left, five categories with bars on the right.
-// Wide enough to fill the launcher's preview frame (about 2.2 : 1), so no light bands show at the sides.
-const W = 396;
+// The launcher's preview frame for 4×2 is about 2.16 : 1 (measured on a Xiaomi): the picture matches it, so no
+// light bands show at the sides.
+const W = 389;
 const H = 180;
 const total = SAMPLE.top.reduce((sum, [, , amount]) => sum + amount, 0);
 const barMax = W / 2 - 40;

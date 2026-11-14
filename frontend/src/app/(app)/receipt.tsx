@@ -24,6 +24,7 @@ import { usePickImage, type PickedImage } from "@/utils/usePickImage";
 import { useUnsavedGuard } from "@/utils/useUnsavedGuard";
 import { AccountPicker } from "@/components/AccountPicker";
 import { AmountInput } from "@/components/AmountInput";
+import { ActionRow } from "@/components/ActionRow";
 import { AppText } from "@/components/AppText";
 import { BottomActionButton } from "@/components/BottomActionButton";
 import { Button } from "@/components/Button";
@@ -252,57 +253,39 @@ export default function ReceiptScreen() {
             ].filter(Boolean);
             const problem = submitted && item.include && (!categoryId || !accountId);
             return (
-              <View
+              <ActionRow
                 key={item.key}
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  borderRadius: radius.md,
-                  backgroundColor: colors.surface,
-                  borderWidth: problem ? 1.5 : 0,
-                  borderColor: colors.danger,
-                  opacity: item.include ? 1 : 0.5,
-                  overflow: "hidden",
-                }}
+                onPress={() => setEditing(item)}
+                style={{ borderWidth: problem ? 1.5 : 0, borderColor: colors.danger, opacity: item.include ? 1 : 0.5 }}
+                contentStyle={{ gap: spacing.sm, padding: spacing.md }}
+                leading={
+                  <Pressable
+                    onPress={() => updateItem({ ...item, include: !item.include })}
+                    accessibilityRole="checkbox"
+                    accessibilityState={{ checked: item.include }}
+                    accessibilityLabel={item.name}
+                    hitSlop={6}
+                    style={{ paddingLeft: spacing.md, paddingVertical: spacing.md }}
+                  >
+                    <MaterialCommunityIcons
+                      name={item.include ? "checkbox-marked-circle" : "checkbox-blank-circle-outline"}
+                      size={24}
+                      color={item.include ? colors.mark : colors.textSecondary}
+                    />
+                  </Pressable>
+                }
               >
-                <Pressable
-                  onPress={() => updateItem({ ...item, include: !item.include })}
-                  accessibilityRole="checkbox"
-                  accessibilityState={{ checked: item.include }}
-                  accessibilityLabel={item.name}
-                  hitSlop={6}
-                  style={{ paddingLeft: spacing.md, paddingVertical: spacing.md }}
-                >
-                  <MaterialCommunityIcons
-                    name={item.include ? "checkbox-marked-circle" : "checkbox-blank-circle-outline"}
-                    size={24}
-                    color={item.include ? colors.mark : colors.textSecondary}
-                  />
-                </Pressable>
-                <Pressable
-                  onPress={() => setEditing(item)}
-                  accessibilityRole="button"
-                  style={({ pressed }) => ({
-                    flex: 1,
-                    flexDirection: "row",
-                    alignItems: "center",
-                    gap: spacing.sm,
-                    padding: spacing.md,
-                    backgroundColor: pressed ? colors.selected : "transparent",
-                  })}
-                >
-                  <IconCircle icon={category?.icon ?? "help"} color={category?.color ?? colors.tonal} size={36} />
-                  <View style={{ flex: 1, gap: 2 }}>
-                    <AppText numberOfLines={1}>{item.name}</AppText>
-                    <AppText variant="caption" secondary numberOfLines={1}>
-                      {[category ? categoryName(category, t) : t("receipt.needCategory"), ...own]
-                        .filter(Boolean)
-                        .join(" · ")}
-                    </AppText>
-                  </View>
-                  <AppText variant="heading">{money(item.amount, accountById.get(accountId ?? "")?.currency ?? currency, true)}</AppText>
-                </Pressable>
-              </View>
+                <IconCircle icon={category?.icon ?? "help"} color={category?.color ?? colors.tonal} size={36} />
+                <View style={{ flex: 1, gap: 2 }}>
+                  <AppText numberOfLines={1}>{item.name}</AppText>
+                  <AppText variant="caption" secondary numberOfLines={1}>
+                    {[category ? categoryName(category, t) : t("receipt.needCategory"), ...own]
+                      .filter(Boolean)
+                      .join(" · ")}
+                  </AppText>
+                </View>
+                <AppText variant="heading">{money(item.amount, accountById.get(accountId ?? "")?.currency ?? currency, true)}</AppText>
+              </ActionRow>
             );
           })}
           <Button

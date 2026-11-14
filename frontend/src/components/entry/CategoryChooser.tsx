@@ -1,7 +1,6 @@
 import { useMemo, useState } from "react";
 import { Pressable, ScrollView, View } from "react-native";
 import { router } from "expo-router";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import type { EntryType } from "@/api/types";
 import { categoriesOfType, categoryName, isHiddenCategory } from "@/data/categories";
@@ -31,7 +30,6 @@ export function CategoryChooser({
 }) {
   const { colors } = useTheme();
   const { t } = useI18n();
-  const insets = useSafeAreaInsets();
   const categories = useCollection("categories");
   const [open, setOpen] = useState(false);
 
@@ -80,7 +78,7 @@ export function CategoryChooser({
       ) : null}
 
       <FullScreenModal visible={open} title={t("entry.allCategories")} onClose={() => setOpen(false)}>
-        <ScrollView contentContainerStyle={{ padding: spacing.md, gap: spacing.md, paddingBottom: insets.bottom + spacing.lg }}>
+        <ScrollView contentContainerStyle={{ padding: spacing.md, gap: spacing.md, paddingBottom: spacing.lg }}>
           <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
             {all.map((category) => (
               <CategoryCell

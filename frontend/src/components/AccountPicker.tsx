@@ -1,6 +1,5 @@
 import { useMemo, useState } from "react";
 import { FlatList, Pressable, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useBalances } from "@/data/balances";
 import { useCollection } from "@/data/hooks";
@@ -30,7 +29,6 @@ export function AccountPicker({
 }) {
   const { colors } = useTheme();
   const { t } = useI18n();
-  const insets = useSafeAreaInsets();
   const { money } = useMoney();
   const accounts = useCollection("accounts");
   const balances = useBalances();
@@ -89,7 +87,7 @@ export function AccountPicker({
         <FlatList
           data={options}
           keyExtractor={(account) => account.id}
-          contentContainerStyle={{ padding: spacing.md, gap: spacing.sm, paddingBottom: insets.bottom + spacing.lg }}
+          contentContainerStyle={{ padding: spacing.md, gap: spacing.sm, paddingBottom: spacing.lg }}
           ListEmptyComponent={
             <AppText secondary style={{ textAlign: "center", padding: spacing.lg }}>
               {t("accounts.noOther")}

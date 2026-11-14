@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Pressable, ScrollView, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import type { IconChoice, IconSection } from "@/constants/appearance";
 import { useI18n } from "@/i18n/I18nProvider";
@@ -63,7 +62,6 @@ export function IconPicker({
 }) {
   const { colors } = useTheme();
   const { t } = useI18n();
-  const insets = useSafeAreaInsets();
   const [open, setOpen] = useState(false);
 
   // An icon may sit in two sections (e.g. the hryvnia in Money and Currencies); inline it appears once.
@@ -103,7 +101,7 @@ export function IconPicker({
       </View>
 
       <FullScreenModal visible={open} title={label} onClose={() => setOpen(false)}>
-        <ScrollView contentContainerStyle={{ padding: spacing.md, paddingBottom: insets.bottom + spacing.lg, gap: spacing.md }}>
+        <ScrollView contentContainerStyle={{ padding: spacing.md, paddingBottom: spacing.lg, gap: spacing.md }}>
           {sections.map((section) => (
             <View key={section.title} style={{ gap: spacing.xs }}>
               <AppText variant="heading">{t(section.title)}</AppText>

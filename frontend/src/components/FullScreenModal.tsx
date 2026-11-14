@@ -52,7 +52,8 @@ export function FullScreenModal({
             {title}
           </AppText>
         </View>
-        {children}
+        {/* Room for the phone's navigation bar, so buttons at the bottom of any content are never under it. */}
+        <View style={{ flex: 1, paddingBottom: insets.bottom }}>{children}</View>
       </View>
     </Modal>
   );

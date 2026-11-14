@@ -1,6 +1,5 @@
 import { useMemo, useState } from "react";
 import { FlatList, Pressable, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTheme } from "@/theme/ThemeProvider";
@@ -37,7 +36,6 @@ type ModalProps = {
 export function SelectModal({ title, value, options, onChange, onClose, searchLabel, pinned }: ModalProps) {
   const { colors } = useTheme();
   const { t } = useI18n();
-  const insets = useSafeAreaInsets();
   const [query, setQuery] = useState("");
 
   const rows = useMemo<Row[]>(() => {
@@ -72,7 +70,7 @@ export function SelectModal({ title, value, options, onChange, onClose, searchLa
         data={rows}
         keyExtractor={(row) => ("divider" in row ? "--divider--" : row.value)}
         keyboardShouldPersistTaps="handled"
-        contentContainerStyle={{ paddingBottom: insets.bottom + spacing.lg }}
+        contentContainerStyle={{ paddingBottom: spacing.lg }}
         ListEmptyComponent={
           <AppText secondary style={{ textAlign: "center", padding: spacing.lg }}>
             {t("common.nothingFound")}

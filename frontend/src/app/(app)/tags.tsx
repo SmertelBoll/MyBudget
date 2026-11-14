@@ -1,13 +1,14 @@
 import { useMemo, useState } from "react";
-import { FlatList, Pressable, View } from "react-native";
+import { FlatList, View } from "react-native";
 import { router } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { countTagUses, useTagTree } from "@/data/tags";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTheme } from "@/theme/ThemeProvider";
-import { radius, spacing } from "@/theme/tokens";
+import { spacing } from "@/theme/tokens";
 import { useBottomSpace } from "@/utils/useBottomSpace";
 import { useDeleteTag } from "@/utils/useDeleteTag";
+import { ActionRow } from "@/components/ActionRow";
 import { AppText } from "@/components/AppText";
 import { Fab } from "@/components/Fab";
 import { TAG_ICON } from "@/components/GroupRow";
@@ -74,50 +75,29 @@ export default function TagsScreen() {
           const { tag, depth, hidden } = item;
           const subtags = tree.children.get(tag.id)?.length ?? 0;
           return (
-            // The row and the delete button are siblings: a button inside a button isn't allowed (and confuses
-            // screen readers).
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                marginLeft: depth ? spacing.xl : 0,
-                borderRadius: radius.md,
-                backgroundColor: colors.surface,
-                overflow: "hidden",
-                opacity: hidden ? 0.6 : 1,
-              }}
-            >
-              <Pressable
-                onPress={() => router.push({ pathname: "/tag/[id]", params: { id: tag.id } })}
-                accessibilityRole="button"
-                accessibilityHint={t("tags.edit")}
-                style={({ pressed }) => ({
-                  flex: 1,
-                  flexDirection: "row",
-                  alignItems: "center",
-                  gap: spacing.md,
-                  minHeight: 56,
-                  paddingHorizontal: spacing.md,
-                  paddingVertical: spacing.sm,
-                  backgroundColor: pressed ? colors.selected : "transparent",
-                })}
-              >
-                <IconCircle icon={TAG_ICON} color={tree.colorOf(tag.id)} size={depth ? 32 : 40} />
-                <View style={{ flex: 1, gap: 2 }}>
-                  <AppText variant="heading" numberOfLines={1}>
-                    {tag.name}
-                  </AppText>
-                  <AppText variant="caption" secondary numberOfLines={1}>
-                    {[t("tags.uses", { count: countTagUses(tag.id) }), subtags ? t("tags.subtagCount", { count: subtags }) : null]
-                      .filter(Boolean)
-                      .join(" · ")}
-                  </AppText>
+            <ActionRow
+              onPress={() => router.push({ pathname: "/tag/[id]", params: { id: tag.id } })}
+              accessibilityHint={t("tags.edit")}
+              style={{ marginLeft: depth ? spacing.xl : 0, opacity: hidden ? 0.6 : 1 }}
+              contentStyle={{ gap: spacing.md, minHeight: 56, paddingHorizontal: spacing.md, paddingVertical: spacing.sm }}
+              trailing={
+                <View style={{ paddingRight: spacing.sm }}>
+                  <IconButton icon="trash-can-outline" label={t("common.delete")} size={36} onPress={() => remove(tag)} />
                 </View>
-              </Pressable>
-              <View style={{ paddingRight: spacing.sm }}>
-                <IconButton icon="trash-can-outline" label={t("common.delete")} size={36} onPress={() => remove(tag)} />
+              }
+            >
+              <IconCircle icon={TAG_ICON} color={tree.colorOf(tag.id)} size={depth ? 32 : 40} />
+              <View style={{ flex: 1, gap: 2 }}>
+                <AppText variant="heading" numberOfLines={1}>
+                  {tag.name}
+                </AppText>
+                <AppText variant="caption" secondary numberOfLines={1}>
+                  {[t("tags.uses", { count: countTagUses(tag.id) }), subtags ? t("tags.subtagCount", { count: subtags }) : null]
+                    .filter(Boolean)
+                    .join(" · ")}
+                </AppText>
               </View>
-            </View>
+            </ActionRow>
           );
         }}
       />

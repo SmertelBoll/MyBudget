@@ -1,6 +1,5 @@
 import { useMemo, useState } from "react";
 import { Pressable, ScrollView, View, useWindowDimensions } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { COLOR_PAGES, HEX_COLOR, QUICK_COLORS, QUICK_COLOR_COUNT } from "@/constants/appearance";
 import { useCollection } from "@/data/hooks";
@@ -61,7 +60,6 @@ const useRecentColors = (value: string) => {
 export function ColorPicker({ label, value, onChange }: { label: string; value: string; onChange: (color: string) => void }) {
   const { colors } = useTheme();
   const { t } = useI18n();
-  const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   const [open, setOpen] = useState(false);
   const [draft, setDraft] = useState(value);
@@ -164,7 +162,7 @@ export function ColorPicker({ label, value, onChange }: { label: string; value: 
         </View>
 
         <View style={{ flex: 1 }} />
-        <View style={{ flexDirection: "row", alignItems: "center", gap: spacing.md, padding: spacing.md, paddingBottom: insets.bottom + spacing.md }}>
+        <View style={{ flexDirection: "row", alignItems: "center", gap: spacing.md, padding: spacing.md, paddingBottom: spacing.md }}>
           <View style={{ width: 48, height: 48, borderRadius: 24, backgroundColor: draft }} />
           <Button
             title={t("colors.select")}

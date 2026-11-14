@@ -1,5 +1,5 @@
 import { type ComponentRef, useEffect, useMemo, useRef, useState } from "react";
-import { Pressable, ScrollView, TextInput, View } from "react-native";
+import { Keyboard, Pressable, ScrollView, TextInput, View } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useCollection } from "@/data/hooks";
 import { reportWriteError } from "@/data/store";
@@ -91,7 +91,11 @@ export function TagChips({
     return sorted.filter((tag) => !needle || tag.name.toLowerCase().includes(needle));
   }, [ranked, query, value, tagTree]);
 
-  const toggle = (id: string) => onChange(value.includes(id) ? value.filter((tagId) => tagId !== id) : [...value, id]);
+  const toggle = (id: string) => {
+    // A tag picked from a search: the keyboard has done its job.
+    if (searching) Keyboard.dismiss();
+    onChange(value.includes(id) ? value.filter((tagId) => tagId !== id) : [...value, id]);
+  };
 
   const add = async () => {
     const name = await dialog.prompt({

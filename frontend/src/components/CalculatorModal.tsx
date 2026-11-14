@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Pressable, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTheme } from "@/theme/ThemeProvider";
@@ -33,7 +32,6 @@ export function CalculatorModal({
 }) {
   const { colors } = useTheme();
   const { t } = useI18n();
-  const insets = useSafeAreaInsets();
   const [expression, setExpression] = useState(initial);
   const [error, setError] = useState<string | null>(null);
 
@@ -64,7 +62,7 @@ export function CalculatorModal({
 
   return (
     <FullScreenModal visible title={t("calculator.open")} onClose={onClose}>
-      <View style={{ flex: 1, padding: spacing.md, paddingBottom: insets.bottom + spacing.md, gap: spacing.sm }}>
+      <View style={{ flex: 1, padding: spacing.md, paddingBottom: spacing.md, gap: spacing.sm }}>
         <View style={{ flex: 1, justifyContent: "flex-end", alignItems: "flex-end", paddingHorizontal: spacing.sm, gap: spacing.xs }}>
           <AppText variant="display" numberOfLines={3} style={{ textAlign: "right", fontSize: 40 }}>
             {expression || "0"}
