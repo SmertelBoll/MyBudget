@@ -36,6 +36,7 @@ import { TextField } from "@/components/TextField";
 import { TimeField, isValidTime, timeOrDefault } from "@/components/TimeField";
 import { useToast } from "@/components/Toast";
 import { ToggleRow } from "@/components/ToggleRow";
+import { useTapAwayBlur } from "@/utils/useTapAwayBlur";
 
 const DEFAULT_TIME = "09:00";
 
@@ -131,6 +132,7 @@ export default function RecurringFormScreen() {
 
 function RecurringForm({ initial, existingId }: { initial: FormValues; existingId: string | null }) {
   const { colors } = useTheme();
+  const tapAway = useTapAwayBlur();
   const { t } = useI18n();
   const dialog = useDialog();
   const toast = useToast();
@@ -219,7 +221,7 @@ function RecurringForm({ initial, existingId }: { initial: FormValues; existingI
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background }}>
+    <View style={{ flex: 1, backgroundColor: colors.background }} {...tapAway}>
       <ScreenHeader
         title={t(existing ? "recurring.edit" : "recurring.add")}
         left="back"

@@ -581,6 +581,7 @@
   "settings.fieldsHint": "Los campos ocultos desaparecen de formularios y listas; lo ya guardado se conserva",
   "settings.advanced": "Personalización avanzada",
   "settings.firstDay": "Primer día de la semana",
+  "settings.dateFormat": "Formato de fecha",
   "settings.decimalSeparator": "Separador decimal",
   "settings.decimalDot": "Punto  1.50",
   "settings.decimalComma": "Coma  1,50",

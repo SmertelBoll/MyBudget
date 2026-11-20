@@ -25,6 +25,7 @@ import { BottomActionButton } from "@/components/BottomActionButton";
 import { DateField } from "@/components/DateField";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import { TextField } from "@/components/TextField";
+import { useTapAwayBlur } from "@/utils/useTapAwayBlur";
 
 type FormValues = {
   from: string | null;
@@ -57,6 +58,7 @@ export default function TransferFormScreen() {
 
 function TransferForm({ initial, existingId }: { initial: FormValues; existingId: string | null }) {
   const { colors } = useTheme();
+  const tapAway = useTapAwayBlur();
   const bottomSpace = useBottomSpace();
   const { t } = useI18n();
   const dialog = useDialog();
@@ -126,7 +128,7 @@ function TransferForm({ initial, existingId }: { initial: FormValues; existingId
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background }}>
+    <View style={{ flex: 1, backgroundColor: colors.background }} {...tapAway}>
       <ScreenHeader
         title={t(existing ? "transfers.edit" : "transfers.new")}
         left="back"

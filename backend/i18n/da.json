@@ -572,6 +572,7 @@
   "settings.fieldsHint": "Skjulte felter forsvinder fra formularer og lister; det, der allerede er gemt, bliver",
   "settings.advanced": "Avanceret tilpasning",
   "settings.firstDay": "Ugens første dag",
+  "settings.dateFormat": "Datoformat",
   "settings.decimalSeparator": "Decimaltegn",
   "settings.decimalDot": "Punktum  1.50",
   "settings.decimalComma": "Komma  1,50",

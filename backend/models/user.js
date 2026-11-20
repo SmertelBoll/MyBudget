@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { DATE_FORMATS } from "../utils/dateFormats.js";
 
 const UserSchema = new mongoose.Schema(
   {
@@ -27,6 +28,8 @@ const UserSchema = new mongoose.Schema(
       // 0 = Sunday ... 6 = Saturday
       firstDayOfWeek: { type: Number, default: 1 },
       decimalSeparator: { type: String, enum: [".", ","], default: "." },
+      // How numeric dates are written in the app.
+      dateFormat: { type: String, enum: DATE_FORMATS, default: "dd/mm/yyyy" },
       // The one switch before cents were split (for totals; entries always had cents). Unset (null), the Cents switches
       // below fall back to it (entries to "with cents").
       showCents: { type: Boolean, default: false },

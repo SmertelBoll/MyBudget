@@ -34,9 +34,28 @@ export const formatLongDate = (value: string, lang: string) => {
   return `${main} (${weekday})`;
 };
 
-// "05/11"
-export const formatShortDate = (value: string, lang: string) =>
-  safeFormat(parseLocalDate(value), lang, { day: "2-digit", month: "2-digit" });
+// Settings -> Advanced: how numeric dates are written. The default is day first.
+export type DateFormat = "dd/mm/yyyy" | "mm/dd/yyyy" | "yyyy-mm-dd" | "dd.mm.yyyy" | "dd-mm-yyyy" | "yyyy/mm/dd";
+export const DATE_FORMATS: DateFormat[] = ["dd/mm/yyyy", "mm/dd/yyyy", "dd.mm.yyyy", "dd-mm-yyyy", "yyyy-mm-dd", "yyyy/mm/dd"];
+export const DEFAULT_DATE_FORMAT: DateFormat = "dd/mm/yyyy";
+
+export const toDateFormat = (value: string | null | undefined): DateFormat =>
+  DATE_FORMATS.includes(value as DateFormat) ? (value as DateFormat) : DEFAULT_DATE_FORMAT;
+
+// "20/11/2026" (or, without the year, "20/11") in the chosen format.
+export const formatNumericDate = (value: string, format: DateFormat, withYear = true) => {
+  const [year, month, day] = value.split("-");
+  const separator = format.match(/[./-]/)?.[0] ?? "/";
+  const parts = { dd: day, mm: month, yyyy: year } as Record<string, string>;
+  return format
+    .split(separator)
+    .filter((token) => withYear || token !== "yyyy")
+    .map((token) => parts[token])
+    .join(separator);
+};
+
+// "20/11": day and month, in the chosen format.
+export const formatShortDate = (value: string, format: DateFormat) => formatNumericDate(value, format, false);
 
 export const formatMonthTitle = (year: number, month: number, lang: string) =>
   safeFormat(new Date(year, month, 1, 12), lang, { month: "long", year: "numeric" });

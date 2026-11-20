@@ -31,6 +31,7 @@ import { SelectField } from "@/components/SelectField";
 import { TextField } from "@/components/TextField";
 import { ToggleRow } from "@/components/ToggleRow";
 import { useToast } from "@/components/Toast";
+import { useTapAwayBlur } from "@/utils/useTapAwayBlur";
 
 const DELETE_COUNTDOWN_S = 10;
 
@@ -69,6 +70,7 @@ type FormValues = {
 
 function AccountForm({ initial, existingId }: { initial: FormValues; existingId: string | null }) {
   const { colors } = useTheme();
+  const tapAway = useTapAwayBlur();
   const bottomSpace = useBottomSpace();
   const { t } = useI18n();
   const dialog = useDialog();
@@ -188,7 +190,7 @@ function AccountForm({ initial, existingId }: { initial: FormValues; existingId:
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background }}>
+    <View style={{ flex: 1, backgroundColor: colors.background }} {...tapAway}>
       <ScreenHeader
         title={existing ? existing.name : t("accounts.new")}
         left="back"

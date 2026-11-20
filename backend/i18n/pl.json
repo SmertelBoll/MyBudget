@@ -590,6 +590,7 @@
   "settings.fieldsHint": "Ukryte pola znikają z formularzy i list; to, co już zapisane, zostaje",
   "settings.advanced": "Zaawansowane dostosowanie",
   "settings.firstDay": "Pierwszy dzień tygodnia",
+  "settings.dateFormat": "Format daty",
   "settings.decimalSeparator": "Separator dziesiętny",
   "settings.decimalDot": "Kropka  1.50",
   "settings.decimalComma": "Przecinek  1,50",

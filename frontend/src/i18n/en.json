@@ -572,6 +572,7 @@
   "settings.fieldsHint": "Hidden fields disappear from the forms and lists; what's already saved stays",
   "settings.advanced": "Advanced customization",
   "settings.firstDay": "First day of the week",
+  "settings.dateFormat": "Date format",
   "settings.decimalSeparator": "Decimal separator",
   "settings.decimalDot": "Dot  1.50",
   "settings.decimalComma": "Comma  1,50",

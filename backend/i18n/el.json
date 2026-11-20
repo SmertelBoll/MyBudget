@@ -572,6 +572,7 @@
   "settings.fieldsHint": "Τα κρυφά πεδία εξαφανίζονται από φόρμες και λίστες· ό,τι έχει αποθηκευτεί μένει",
   "settings.advanced": "Προηγμένη προσαρμογή",
   "settings.firstDay": "Πρώτη ημέρα της εβδομάδας",
+  "settings.dateFormat": "Μορφή ημερομηνίας",
   "settings.decimalSeparator": "Δεκαδικό διαχωριστικό",
   "settings.decimalDot": "Τελεία  1.50",
   "settings.decimalComma": "Κόμμα  1,50",

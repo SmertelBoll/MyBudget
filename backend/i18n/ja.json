@@ -563,6 +563,7 @@
   "settings.fieldsHint": "非表示の項目はフォームと一覧から消えます。保存済みの内容は残ります",
   "settings.advanced": "詳細設定",
   "settings.firstDay": "週の始まり",
+  "settings.dateFormat": "日付の形式",
   "settings.decimalSeparator": "小数点記号",
   "settings.decimalDot": "ピリオド  1.50",
   "settings.decimalComma": "カンマ  1,50",

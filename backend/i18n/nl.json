@@ -572,6 +572,7 @@
   "settings.fieldsHint": "Verborgen velden verdwijnen uit formulieren en lijsten; wat al is opgeslagen blijft",
   "settings.advanced": "Geavanceerde aanpassing",
   "settings.firstDay": "Eerste dag van de week",
+  "settings.dateFormat": "Datumnotatie",
   "settings.decimalSeparator": "Decimaalteken",
   "settings.decimalDot": "Punt  1.50",
   "settings.decimalComma": "Komma  1,50",

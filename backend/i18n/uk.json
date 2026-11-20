@@ -590,6 +590,7 @@
   "settings.fieldsHint": "Приховані поля зникають з форм і списків; уже збережене лишається",
   "settings.advanced": "Розширені налаштування",
   "settings.firstDay": "Перший день тижня",
+  "settings.dateFormat": "Формат дати",
   "settings.decimalSeparator": "Роздільник десяткових",
   "settings.decimalDot": "Крапка  1.50",
   "settings.decimalComma": "Кома  1,50",

@@ -572,6 +572,7 @@
   "settings.fieldsHint": "A rejtett mezők eltűnnek az űrlapokról és listákból; a már mentett adatok megmaradnak",
   "settings.advanced": "Speciális testreszabás",
   "settings.firstDay": "A hét első napja",
+  "settings.dateFormat": "Dátumformátum",
   "settings.decimalSeparator": "Tizedesjel",
   "settings.decimalDot": "Pont  1.50",
   "settings.decimalComma": "Vessző  1,50",

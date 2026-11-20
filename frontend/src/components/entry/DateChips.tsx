@@ -5,6 +5,7 @@ import { useI18n } from "@/i18n/I18nProvider";
 import { useTheme } from "@/theme/ThemeProvider";
 import { radius, spacing } from "@/theme/tokens";
 import { addDays, formatShortDate, todayLocal } from "@/utils/dates";
+import { useDateFormat } from "@/utils/useDateFormat";
 import { getLastUsedDate } from "@/data/transactions";
 import { AppText } from "../AppText";
 import { CalendarModal } from "../CalendarModal";
@@ -13,7 +14,8 @@ import { CalendarModal } from "../CalendarModal";
 // the app (handy for typing in last week), or "2 days ago"; a date picked in the calendar takes its place.
 export function DateChips({ value, onChange }: { value: string; onChange: (date: string) => void }) {
   const { colors } = useTheme();
-  const { t, lang } = useI18n();
+  const { t } = useI18n();
+  const dateFormat = useDateFormat();
   const [calendar, setCalendar] = useState(false);
   // Third button chosen once when the form opens, then replaced by calendar picks.
   const today = todayLocal();
@@ -52,7 +54,7 @@ export function DateChips({ value, onChange }: { value: string; onChange: (date:
               })}
             >
               <AppText variant="heading" color={active ? colors.onAccent : undefined}>
-                {formatShortDate(chip.date, lang)}
+                {formatShortDate(chip.date, dateFormat)}
               </AppText>
               <AppText variant="caption" color={active ? colors.onAccent : colors.textSecondary} numberOfLines={1}>
                 {chip.label ?? " "}

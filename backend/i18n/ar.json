@@ -608,6 +608,7 @@
   "settings.fieldsHint": "تختفي الحقول المخفية من النماذج والقوائم؛ ويبقى ما تم حفظه",
   "settings.advanced": "تخصيص متقدم",
   "settings.firstDay": "أول يوم في الأسبوع",
+  "settings.dateFormat": "تنسيق التاريخ",
   "settings.decimalSeparator": "الفاصل العشري",
   "settings.decimalDot": "نقطة  1.50",
   "settings.decimalComma": "فاصلة  1,50",

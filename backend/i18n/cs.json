@@ -590,6 +590,7 @@
   "settings.fieldsHint": "Skrytá pole zmizí z formulářů a seznamů; co už je uložené, zůstane",
   "settings.advanced": "Pokročilé přizpůsobení",
   "settings.firstDay": "První den týdne",
+  "settings.dateFormat": "Formát data",
   "settings.decimalSeparator": "Desetinný oddělovač",
   "settings.decimalDot": "Tečka  1.50",
   "settings.decimalComma": "Čárka  1,50",

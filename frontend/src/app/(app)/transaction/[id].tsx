@@ -35,6 +35,7 @@ import { CategoryChooser } from "@/components/entry/CategoryChooser";
 import { DateChips } from "@/components/entry/DateChips";
 import { PhotoStrip } from "@/components/entry/PhotoStrip";
 import { TagChips } from "@/components/entry/TagChips";
+import { useTapAwayBlur } from "@/utils/useTapAwayBlur";
 
 type FormValues = {
   type: EntryType;
@@ -103,6 +104,7 @@ export default function TransactionFormScreen() {
 
 function TransactionForm({ initial, existingId }: { initial: FormValues; existingId: string | null }) {
   const { colors } = useTheme();
+  const tapAway = useTapAwayBlur();
   const bottomSpace = useBottomSpace();
   const { t } = useI18n();
   const dialog = useDialog();
@@ -257,7 +259,7 @@ function TransactionForm({ initial, existingId }: { initial: FormValues; existin
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background }}>
+    <View style={{ flex: 1, backgroundColor: colors.background }} {...tapAway}>
       <ScreenHeader
         title={t(existing ? "entry.editTitle" : "entry.addTitle")}
         left="back"

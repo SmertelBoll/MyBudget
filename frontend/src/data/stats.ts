@@ -18,8 +18,10 @@ export type Breakdown = { id: string; amount: number };
 export type Group = { id: string; amount: number; share: number; children: Breakdown[]; childBy: "category" | "tag" };
 
 // An entry in the main currency at today's rate (like Total, spec 2.2). The account's amount is used when the
-// account is known, otherwise the entry's own amount.
+// account is known, otherwise the entry's own amount. An entry already in the main currency is shown as typed: $20
+// paid from a hryvnia card (₴1,000 at the bank's rate) stays $20, not ₴1,000 converted back at our rate.
 export const inBaseCurrency = (tx: Transaction, accounts: Map<string, Account>, base: string, rates: Rates) => {
+  if (tx.currency === base) return tx.amount;
   const account = accounts.get(tx.accountId);
   const value = account ? convert(tx.accountAmount, account.currency, base, rates) : convert(tx.amount, tx.currency, base, rates);
   return value ?? 0;

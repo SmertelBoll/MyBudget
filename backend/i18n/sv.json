@@ -572,6 +572,7 @@
   "settings.fieldsHint": "Dolda fält försvinner från formulär och listor; det som redan är sparat finns kvar",
   "settings.advanced": "Avancerad anpassning",
   "settings.firstDay": "Veckans första dag",
+  "settings.dateFormat": "Datumformat",
   "settings.decimalSeparator": "Decimaltecken",
   "settings.decimalDot": "Punkt  1.50",
   "settings.decimalComma": "Komma  1,50",

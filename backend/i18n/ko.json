@@ -563,6 +563,7 @@
   "settings.fieldsHint": "숨긴 항목은 입력 화면과 목록에서 사라집니다. 이미 저장된 내용은 유지됩니다",
   "settings.advanced": "고급 설정",
   "settings.firstDay": "한 주의 첫날",
+  "settings.dateFormat": "날짜 형식",
   "settings.decimalSeparator": "소수점 기호",
   "settings.decimalDot": "마침표  1.50",
   "settings.decimalComma": "쉼표  1,50",

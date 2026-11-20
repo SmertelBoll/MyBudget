@@ -1,4 +1,5 @@
 import type { ThemeMode } from "@/theme/ThemeProvider";
+import type { DateFormat } from "@/utils/dates";
 
 export type Period = "day" | "week" | "month" | "year";
 export type EntryType = "expense" | "income";
@@ -12,6 +13,8 @@ export type UserSettings = {
   showPhotos: boolean;
   firstDayOfWeek: number;
   decimalSeparator: "." | ",";
+  // Numeric dates ("20/11/2026"); missing on users saved before it existed: day first.
+  dateFormat?: DateFormat;
   // The single switch before cents were split (it was for totals; entries always had cents): stands in for
   // centsInTotals until that is set.
   showCents: boolean;

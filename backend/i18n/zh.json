@@ -563,6 +563,7 @@
   "settings.fieldsHint": "隐藏的字段会从表单和列表中消失；已保存的内容会保留",
   "settings.advanced": "高级自定义",
   "settings.firstDay": "每周第一天",
+  "settings.dateFormat": "日期格式",
   "settings.decimalSeparator": "小数分隔符",
   "settings.decimalDot": "句点  1.50",
   "settings.decimalComma": "逗号  1,50",

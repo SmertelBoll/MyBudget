@@ -8,7 +8,7 @@ import { inBaseCurrency } from "@/data/stats";
 import type { Account, Category, Recurring, Reminder, Transaction, Transfer } from "@/data/types";
 import { readJson, writeJson } from "@/storage/json";
 import { storage } from "@/storage/storage";
-import { addDays, formatShortDate } from "@/utils/dates";
+import { addDays, formatShortDate, toDateFormat } from "@/utils/dates";
 import { formatMoney, type MoneyFormat } from "@/utils/money";
 import { periodContaining } from "@/utils/periods";
 import { atMinute, nextOccurrence, type Occurrence } from "@/utils/schedule";
@@ -154,7 +154,7 @@ export const buildSnapshot = ({ user, lang, t, accounts, categories, transaction
   const week = periodContaining("week", today, user.settings.firstDayOfWeek ?? 1);
   const tomorrow = addDays(today, 1);
   const dayWord = (date: string) =>
-    date === today ? t("dates.today") : date === tomorrow ? t("widget.tomorrow") : date === addDays(today, -1) ? t("dates.yesterday") : formatShortDate(date, lang);
+    date === today ? t("dates.today") : date === tomorrow ? t("widget.tomorrow") : date === addDays(today, -1) ? t("dates.yesterday") : formatShortDate(date, toDateFormat(user.settings.dateFormat));
 
   const balances = computeBalances(accounts, transactions, transfers);
   const accountById = new Map(accounts.map((account) => [account.id, account]));

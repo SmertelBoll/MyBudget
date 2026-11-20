@@ -572,6 +572,7 @@
   "settings.fieldsHint": "छिपे फ़ील्ड फ़ॉर्म और सूचियों से गायब हो जाते हैं; जो पहले से सहेजा है वह बना रहता है",
   "settings.advanced": "उन्नत अनुकूलन",
   "settings.firstDay": "सप्ताह का पहला दिन",
+  "settings.dateFormat": "तारीख का प्रारूप",
   "settings.decimalSeparator": "दशमलव विभाजक",
   "settings.decimalDot": "बिंदु  1.50",
   "settings.decimalComma": "अल्पविराम  1,50",

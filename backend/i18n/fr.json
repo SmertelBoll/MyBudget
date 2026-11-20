@@ -581,6 +581,7 @@
   "settings.fieldsHint": "Les champs masqués disparaissent des formulaires et des listes ; ce qui est déjà enregistré reste",
   "settings.advanced": "Personnalisation avancée",
   "settings.firstDay": "Premier jour de la semaine",
+  "settings.dateFormat": "Format de date",
   "settings.decimalSeparator": "Séparateur décimal",
   "settings.decimalDot": "Point  1.50",
   "settings.decimalComma": "Virgule  1,50",

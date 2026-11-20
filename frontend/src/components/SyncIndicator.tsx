@@ -5,20 +5,26 @@ import { requestSync } from "@/data/sync";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTheme } from "@/theme/ThemeProvider";
 import { spacing } from "@/theme/tokens";
+import { formatNumericDate, toLocalDate, type DateFormat } from "@/utils/dates";
+import { useDateFormat } from "@/utils/useDateFormat";
 import { AppText } from "./AppText";
 
-const formatTime = (iso: string, lang: string) => {
+const formatTime = (iso: string, lang: string, dateFormat: DateFormat) => {
+  const date = new Date(iso);
+  let time: string;
   try {
-    return new Intl.DateTimeFormat(lang, { dateStyle: "short", timeStyle: "short" }).format(new Date(iso));
+    time = new Intl.DateTimeFormat(lang, { timeStyle: "short" }).format(date);
   } catch {
-    return new Date(iso).toLocaleString();
+    time = date.toLocaleTimeString();
   }
+  return `${formatNumericDate(toLocalDate(date), dateFormat)}, ${time}`;
 };
 
 // Spec 4.1: "Synced / N waiting / Sync error" at the bottom of the side menu. Tapping it syncs now.
 export function SyncIndicator() {
   const { colors } = useTheme();
   const { t, lang } = useI18n();
+  const dateFormat = useDateFormat();
   const { status, pending, lastSyncedAt, errorCode } = useSyncState();
 
   let icon: keyof typeof MaterialCommunityIcons.glyphMap = "sync";
@@ -37,7 +43,7 @@ export function SyncIndicator() {
     icon = "cloud-upload-outline";
     text = t("sync.pending", { count: pending });
   } else {
-    text = lastSyncedAt ? t("sync.synced", { time: formatTime(lastSyncedAt, lang) }) : t("sync.never");
+    text = lastSyncedAt ? t("sync.synced", { time: formatTime(lastSyncedAt, lang, dateFormat) }) : t("sync.never");
   }
 
   return (

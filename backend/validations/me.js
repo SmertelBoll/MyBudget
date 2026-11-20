@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { DATE_FORMATS } from "../utils/dateFormats.js";
 import { LANGUAGE_CODES } from "../utils/languages.js";
 import { color, currency, icon } from "./common.js";
 
@@ -11,6 +12,7 @@ export const settingsSchema = z
     showPhotos: z.boolean(),
     firstDayOfWeek: z.number().int().min(0).max(6),
     decimalSeparator: z.enum([".", ","]),
+    dateFormat: z.enum(DATE_FORMATS),
     showCents: z.boolean(),
     centsInEntries: z.boolean().nullable(),
     centsInHome: z.boolean().nullable(),

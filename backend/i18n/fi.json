@@ -572,6 +572,7 @@
   "settings.fieldsHint": "Piilotetut kentät katoavat lomakkeista ja listoista; jo tallennettu säilyy",
   "settings.advanced": "Lisäasetukset",
   "settings.firstDay": "Viikon ensimmäinen päivä",
+  "settings.dateFormat": "Päivämäärän muoto",
   "settings.decimalSeparator": "Desimaalierotin",
   "settings.decimalDot": "Piste  1.50",
   "settings.decimalComma": "Pilkku  1,50",

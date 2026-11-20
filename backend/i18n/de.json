@@ -572,6 +572,7 @@
   "settings.fieldsHint": "Ausgeblendete Felder verschwinden aus Formularen und Listen; bereits Gespeichertes bleibt",
   "settings.advanced": "Erweiterte Anpassung",
   "settings.firstDay": "Erster Wochentag",
+  "settings.dateFormat": "Datumsformat",
   "settings.decimalSeparator": "Dezimaltrennzeichen",
   "settings.decimalDot": "Punkt  1.50",
   "settings.decimalComma": "Komma  1,50",

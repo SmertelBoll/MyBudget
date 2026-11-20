@@ -36,10 +36,25 @@ const TOP_TOLERANCE = 2;
 // by category or by tag.
 // Changing the Home account, the period or the focus in Settings starts Home over from them the next time it's
 // opened (it stays mounted in the drawer, so its own choices would otherwise win).
+//   Leaving Home for another menu screen also starts it over (the default period, accounts and focus again); a
+// screen opened on top of it (a category's entries, an entry) keeps everything, so coming back finds it as it was.
 export default function HomeScreen() {
   const { user } = useAuth();
   const settings = user?.settings;
-  return <HomeContent key={[settings?.homeAccount, settings?.defaultPeriod, settings?.firstDayOfWeek, settings?.focus].join("|")} />;
+  const navigation = useNavigation();
+  const [visit, setVisit] = useState(0);
+  useEffect(
+    () =>
+      navigation.addListener("blur", () => {
+        // The drawer's own state: another of its screens is shown now, rather than one pushed above the drawer.
+        const state = navigation.getState();
+        if (state && state.routes[state.index]?.name !== "index") setVisit((current) => current + 1);
+      }),
+    [navigation]
+  );
+  return (
+    <HomeContent key={[visit, settings?.homeAccount, settings?.defaultPeriod, settings?.firstDayOfWeek, settings?.focus].join("|")} />
+  );
 }
 
 function HomeContent() {

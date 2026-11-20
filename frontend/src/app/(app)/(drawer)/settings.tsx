@@ -9,6 +9,7 @@ import { useLanguageOptions } from "@/i18n/languages";
 import { useTheme, type ThemeMode } from "@/theme/ThemeProvider";
 import { spacing } from "@/theme/tokens";
 import { useCurrencyOptions, usePinnedCurrencies } from "@/utils/currency";
+import { DATE_FORMATS, DEFAULT_DATE_FORMAT, formatNumericDate, todayLocal, toDateFormat } from "@/utils/dates";
 import { useBottomSpace } from "@/utils/useBottomSpace";
 import { AppText } from "@/components/AppText";
 import { Button } from "@/components/Button";
@@ -34,6 +35,7 @@ const DEFAULT_SETTINGS: UserSettings = {
   showPhotos: true,
   firstDayOfWeek: 1,
   decimalSeparator: ".",
+  dateFormat: DEFAULT_DATE_FORMAT,
   showCents: false,
   centsInEntries: true,
   centsInHome: false,
@@ -78,6 +80,10 @@ export default function SettingsScreen() {
   const pinnedCurrencies = usePinnedCurrencies();
   const languageOptions = useLanguageOptions(user?.language);
 
+  const dateFormatOptions = useMemo(() => {
+    const today = todayLocal();
+    return DATE_FORMATS.map((format) => ({ value: format, label: `${format.toUpperCase()}  (${formatNumericDate(today, format)})` }));
+  }, []);
   const weekdayOptions = useMemo(() => WEEKDAYS.map((day) => ({ value: String(day), label: weekdayLong(day, lang) })), [lang]);
 
   if (!user) return null;
@@ -162,6 +168,12 @@ export default function SettingsScreen() {
             value={String(settings.firstDayOfWeek)}
             options={weekdayOptions}
             onChange={(value) => setSetting("firstDayOfWeek", Number(value))}
+          />
+          <ChoiceField
+            label={t("settings.dateFormat")}
+            value={toDateFormat(settings.dateFormat)}
+            options={dateFormatOptions}
+            onChange={(value) => setSetting("dateFormat", toDateFormat(value))}
           />
           <Labeled label={t("settings.decimalSeparator")}>
             <SegmentedSwitch<"." | ",">

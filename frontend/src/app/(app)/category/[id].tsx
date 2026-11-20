@@ -27,6 +27,7 @@ import { ScreenHeader } from "@/components/ScreenHeader";
 import { SegmentedSwitch } from "@/components/SegmentedSwitch";
 import { TextField } from "@/components/TextField";
 import { ToggleRow } from "@/components/ToggleRow";
+import { useTapAwayBlur } from "@/utils/useTapAwayBlur";
 
 type FormValues = {
   name: string;
@@ -62,6 +63,7 @@ export default function CategoryFormScreen() {
 
 function CategoryForm({ initial, existingId }: { initial: FormValues; existingId: string | null }) {
   const { colors } = useTheme();
+  const tapAway = useTapAwayBlur();
   const bottomSpace = useBottomSpace();
   const { t } = useI18n();
   const dialog = useDialog();
@@ -124,7 +126,7 @@ function CategoryForm({ initial, existingId }: { initial: FormValues; existingId
     }));
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background }}>
+    <View style={{ flex: 1, backgroundColor: colors.background }} {...tapAway}>
       <ScreenHeader
         title={existing ? categoryName(existing, t) : t("categories.new")}
         left="back"

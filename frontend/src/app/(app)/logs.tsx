@@ -14,6 +14,7 @@ import { useI18n } from "@/i18n/I18nProvider";
 import { useTheme } from "@/theme/ThemeProvider";
 import { radius, spacing } from "@/theme/tokens";
 import { addDays, formatLongDate, formatShortDate, todayLocal } from "@/utils/dates";
+import { useDateFormat } from "@/utils/useDateFormat";
 import { entryDateFor, openNewTransaction, openTransaction } from "@/utils/navigation";
 import { PERIOD_KINDS, currentPeriod, formatPeriod, type PeriodKind, type PeriodRange } from "@/utils/periods";
 import { useBottomSpace } from "@/utils/useBottomSpace";
@@ -55,6 +56,7 @@ export default function LogsScreen() {
   const { t, lang } = useI18n();
   const { money, toInput, baseCurrency } = useMoney();
   const { user } = useAuth();
+  const dateFormat = useDateFormat();
   const bottomSpace = useBottomSpace();
   const params = useLocalSearchParams<Params>();
   const transactions = useEntries();
@@ -162,7 +164,7 @@ export default function LogsScreen() {
         icon={category?.icon ?? "help"}
         color={category?.color ?? colors.iconIdle}
         title={category ? categoryName(category, t) : "?"}
-        account={byAmount ? `${account?.name ?? "?"} · ${formatShortDate(tx.date, lang)}` : (account?.name ?? "?")}
+        account={byAmount ? `${account?.name ?? "?"} · ${formatShortDate(tx.date, dateFormat)}` : (account?.name ?? "?")}
         amount={money(value, baseCurrency, "entry")}
         original={tx.currency !== baseCurrency ? money(tx.amount, tx.currency, "entry") : undefined}
         tags={tx.tagIds.filter((id) => tagById.has(id)).map((id) => ({ name: tagById.get(id)!.name, color: tagTree.colorOf(id) }))}

@@ -572,6 +572,7 @@
   "settings.fieldsHint": "Gizlenen alanlar formlardan ve listelerden kaybolur; kaydedilmiş olanlar kalır",
   "settings.advanced": "Gelişmiş özelleştirme",
   "settings.firstDay": "Haftanın ilk günü",
+  "settings.dateFormat": "Tarih biçimi",
   "settings.decimalSeparator": "Ondalık ayırıcı",
   "settings.decimalDot": "Nokta  1.50",
   "settings.decimalComma": "Virgül  1,50",

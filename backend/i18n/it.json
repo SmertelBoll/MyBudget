@@ -581,6 +581,7 @@
   "settings.fieldsHint": "I campi nascosti spariscono da moduli ed elenchi; ciò che è già salvato resta",
   "settings.advanced": "Personalizzazione avanzata",
   "settings.firstDay": "Primo giorno della settimana",
+  "settings.dateFormat": "Formato data",
   "settings.decimalSeparator": "Separatore decimale",
   "settings.decimalDot": "Punto  1.50",
   "settings.decimalComma": "Virgola  1,50",
