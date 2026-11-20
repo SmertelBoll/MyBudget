@@ -14,12 +14,31 @@ const fail = (message) => {
 if (!fs.existsSync(path.join(root, "credentials.json"))) {
   fail("credentials.json is missing: run `npx eas-cli@latest credentials -p android` -> credentials.json -> Download.");
 }
-for (const name of ["ANDROID_HOME", "JAVA_HOME"]) {
-  if (!process.env[name]) fail(`${name} is not set (open a new terminal after setting it).`);
-}
+// A terminal opened before ANDROID_HOME / JAVA_HOME were set doesn't see them: look in the usual install places too.
+const firstExisting = (paths) => paths.find((item) => item && fs.existsSync(item));
+const jdkIn = (dir) =>
+  fs.existsSync(dir) ? fs.readdirSync(dir).filter((name) => /^jdk-17/.test(name)).sort().reverse().map((name) => path.join(dir, name)) : [];
+const androidHome = firstExisting([
+  process.env.ANDROID_HOME,
+  process.env.ANDROID_SDK_ROOT,
+  process.env.LOCALAPPDATA && path.join(process.env.LOCALAPPDATA, "Android", "Sdk"),
+]);
+const javaHome = firstExisting([process.env.JAVA_HOME, ...jdkIn("C:\\Program Files\\Microsoft"), ...jdkIn("C:\\Program Files\\Java")]);
+if (!androidHome) fail("Android SDK not found: install it with Android Studio and set ANDROID_HOME.");
+if (!javaHome) fail("JDK 17 not found: winget install Microsoft.OpenJDK.17, then set JAVA_HOME.");
+console.log(`Android SDK: ${androidHome}\nJDK: ${javaHome}`);
 
 const profile = JSON.parse(fs.readFileSync(path.join(root, "eas.json"), "utf8")).build.preview;
-const env = { ...process.env, ...profile.env, NODE_ENV: "production" };
+// Windows spells it "Path"; a second "PATH" key next to it would be ambiguous.
+const pathKey = Object.keys(process.env).find((key) => key.toUpperCase() === "PATH") ?? "PATH";
+const env = {
+  ...process.env,
+  ...profile.env,
+  NODE_ENV: "production",
+  ANDROID_HOME: androidHome,
+  JAVA_HOME: javaHome,
+  [pathKey]: [path.join(javaHome, "bin"), path.join(androidHome, "platform-tools"), process.env[pathKey]].join(path.delimiter),
+};
 
 const run = (command, args, cwd) => {
   console.log(`\n> ${command} ${args.join(" ")}`);
