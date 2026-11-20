@@ -46,10 +46,46 @@ const run = (command, args, cwd) => {
   if (result.status !== 0) fail(`Failed: ${command} ${args.join(" ")}`);
 };
 
+// Windows: the C++ parts (worklets, Skia) build in folders far past 260 characters. That needs long paths switched on
+// in Windows (once, as administrator) and a ninja new enough to use them (1.12, shipped with CMake 3.31+; the CMake
+// 3.22 that Gradle installs by itself has 1.10, which fails with "mkdir(...): No such file or directory").
+let cmakeDir = null;
+if (process.platform === "win32") {
+  const reg = spawnSync("reg", ["query", "HKLM\\SYSTEM\\CurrentControlSet\\Control\\FileSystem", "/v", "LongPathsEnabled"], { encoding: "utf8" });
+  if (!/LongPathsEnabled\s+REG_DWORD\s+0x1/.test(reg.stdout ?? "")) {
+    fail(
+      "Long paths are off in Windows, and the C++ part of the build fails without them. In PowerShell run as administrator:\n" +
+        '  Set-ItemProperty -Path "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\FileSystem" -Name LongPathsEnabled -Value 1\n' +
+        "then restart the computer and run npm run apk again."
+    );
+  }
+  const cmakeRoot = path.join(androidHome, "cmake");
+  const version = (name) => name.split(".").map(Number);
+  const newest = (fs.existsSync(cmakeRoot) ? fs.readdirSync(cmakeRoot) : [])
+    .filter((name) => /^\d+\.\d+\.\d+$/.test(name))
+    .sort((a, b) => {
+      const [x, y] = [version(a), version(b)];
+      return x[0] - y[0] || x[1] - y[1] || x[2] - y[2];
+    })
+    .pop();
+  if (!newest || version(newest)[0] < 3 || (version(newest)[0] === 3 && version(newest)[1] < 31)) {
+    fail("CMake 3.31 or newer is needed: Android Studio -> SDK Manager -> SDK Tools -> CMake.");
+  }
+  cmakeDir = path.join(cmakeRoot, newest);
+}
+
 const clean = process.argv.includes("--clean");
 run("npx", ["expo", "prebuild", "--platform", "android", "--no-install", ...(clean ? ["--clean"] : [])], root);
+
+// Gradle reads the SDK and the CMake to use from here (the file is generated, android/ isn't in git).
+const escape = (value) => value.replace(/\\/g, "\\\\").replace(/:/g, "\\:");
+const localProperties = [`sdk.dir=${escape(androidHome)}`, ...(cmakeDir ? [`cmake.dir=${escape(cmakeDir)}`] : [])];
+fs.writeFileSync(path.join(root, "android", "local.properties"), localProperties.join("\n") + "\n");
+
 const gradlew = process.platform === "win32" ? "gradlew.bat" : "./gradlew";
-run(gradlew, ["assembleRelease"], path.join(root, "android"));
+// Phones are arm64: building the native code for that one processor type takes a quarter of the time (EAS still
+// builds all four).
+run(gradlew, ["assembleRelease", "-PreactNativeArchitectures=arm64-v8a"], path.join(root, "android"));
 
 const built = path.join(root, "android", "app", "build", "outputs", "apk", "release", "app-release.apk");
 const target = path.join(root, "MyBudget.apk");
