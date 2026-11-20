@@ -47,3 +47,10 @@ example
 
 # Skia for the browser preview (npm run skia:web copies it)
 public/canvaskit.wasm
+
+# EAS signing key and its passwords, downloaded for local APK builds (eas credentials). Never commit.
+credentials.json
+/credentials
+*.jks
+*.keystore
+/MyBudget.apk
