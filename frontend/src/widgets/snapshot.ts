@@ -102,8 +102,8 @@ export const LABEL_KEYS = [
 ];
 
 const COLORS = { [TOTAL_ALL]: "#F9F919", [TOTAL]: "#FFD54F", [TOTAL_EXCLUDED]: "#9E9E9E", expense: "#EF5350", income: "#66BB6A", other: "#90A4AE" };
-// The most categories the 4×2 widget lists; more than fit scroll on its right side.
-const TOP_COUNT = 30;
+// The most categories a stretched 4×2 widget can list (it shows as many as fit, five at two cells tall).
+const TOP_COUNT = 12;
 const METRICS = ["month", "week", "today", "avg", "vs"];
 const OTHER = ["payment", "limitsOver", "limitsLeft", "result", "last", "rate", "noSpend", "reminder"];
 
