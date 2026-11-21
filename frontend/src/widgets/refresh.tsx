@@ -1,5 +1,5 @@
 import { requestWidgetUpdate } from "react-native-android-widget";
-import { readOffset, readSelection, writeSnapshot, type WidgetSnapshot } from "./snapshot";
+import { readSelection, writeSnapshot, type WidgetSnapshot } from "./snapshot";
 import { WIDGET_NAMES, WidgetFor } from "./WidgetViews";
 
 // Saves the snapshot and redraws every widget on the home screen with it (each with its own Total or account).
@@ -9,7 +9,7 @@ export const refreshWidgets = async (snapshot: WidgetSnapshot) => {
     await requestWidgetUpdate({
       widgetName: name,
       renderWidget: async (info) => (
-        <WidgetFor name={name} snapshot={snapshot} selection={await readSelection(info.widgetId)} width={info.width} height={info.height} fontScale={info.screenInfo?.fontScale} offset={await readOffset(info.widgetId)} />
+        <WidgetFor name={name} snapshot={snapshot} selection={await readSelection(info.widgetId)} width={info.width} height={info.height} fontScale={info.screenInfo?.fontScale} />
       ),
     });
   }

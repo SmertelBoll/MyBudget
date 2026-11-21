@@ -2,28 +2,19 @@
 // background sync must be known even when Android starts the app's code without opening it.
 import { registerWidgetConfigurationScreen, registerWidgetTaskHandler, type WidgetTaskHandlerProps } from "react-native-android-widget";
 import "./background";
-import { readOffset, readSelection, readSnapshot, removeSelection, writeOffset } from "./snapshot";
+import { readSelection, readSnapshot, removeSelection } from "./snapshot";
 import { WidgetConfigScreen } from "./WidgetConfigScreen";
-import { categoriesThatFit, SCROLL_DOWN, SCROLL_UP, scrolled, WidgetFor } from "./WidgetViews";
+import { WidgetFor } from "./WidgetViews";
 
-const widgetTaskHandler = async ({ widgetInfo, widgetAction, clickAction, renderWidget }: WidgetTaskHandlerProps) => {
-  const id = widgetInfo.widgetId;
+const widgetTaskHandler = async ({ widgetInfo, widgetAction, renderWidget }: WidgetTaskHandlerProps) => {
   if (widgetAction === "WIDGET_DELETED") {
-    await removeSelection(id);
+    await removeSelection(widgetInfo.widgetId);
     return;
   }
-  // Taps that open a new entry go by link (OPEN_URI), handled by Android itself; only the right half of 4×2, which
-  // moves its categories by one, reaches here.
-  const scroll = widgetAction === "WIDGET_CLICK" && (clickAction === SCROLL_UP || clickAction === SCROLL_DOWN);
-  if (widgetAction === "WIDGET_CLICK" && !scroll) return;
-  const [snapshot, selection, saved] = await Promise.all([readSnapshot(), readSelection(id), readOffset(id)]);
-  let offset = saved;
-  if (scroll && snapshot) {
-    const shown = categoriesThatFit(widgetInfo.height, widgetInfo.screenInfo?.fontScale);
-    offset = scrolled(saved, clickAction!, snapshot.top[selection.side].length, shown);
-    await writeOffset(id, offset);
-  }
-  renderWidget(<WidgetFor name={widgetInfo.widgetName} snapshot={snapshot} selection={selection} width={widgetInfo.width} height={widgetInfo.height} fontScale={widgetInfo.screenInfo?.fontScale} offset={offset} />);
+  // Taps open the app by link (OPEN_URI), handled by Android itself; nothing reaches here for them.
+  if (widgetAction === "WIDGET_CLICK") return;
+  const [snapshot, selection] = await Promise.all([readSnapshot(), readSelection(widgetInfo.widgetId)]);
+  renderWidget(<WidgetFor name={widgetInfo.widgetName} snapshot={snapshot} selection={selection} width={widgetInfo.width} height={widgetInfo.height} fontScale={widgetInfo.screenInfo?.fontScale} />);
 };
 
 registerWidgetTaskHandler(widgetTaskHandler);

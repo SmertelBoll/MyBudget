@@ -2,7 +2,7 @@
 // Widgets are drawn by react-native-android-widget from these primitives only: no hooks, nothing async (the
 // library's rules). Everything they show comes ready-made in the snapshot.
 import type { EntryType } from "@/api/types";
-import { FlexWidget, OverlapWidget, TextWidget } from "react-native-android-widget";
+import { FlexWidget, ListWidget, TextWidget } from "react-native-android-widget";
 import { newEntryUri, type Selection, type Tone, type WidgetItem, type WidgetSnapshot, type WidgetTop } from "./snapshot";
 
 export const WIDGET_NAMES = { balance: "Balance", summary: "Summary", overview: "Overview", quickAdd: "QuickAdd" } as const;
@@ -123,77 +123,54 @@ export function SummaryWidget({ items }: { items: WidgetItem[] }) {
   );
 }
 
-// Taps on the right half of 4×2 move its categories by one; they reach the task handler as these actions.
-export const SCROLL_UP = "SCROLL_UP";
-export const SCROLL_DOWN = "SCROLL_DOWN";
-
 const GAP = 12; // between the two halves of 4×2
 
-// The first category shown, kept so the last ones shown are still the last ones (fewer categories now, or a taller
-// widget).
-const firstShown = (offset: number, total: number, shown: number) => Math.max(0, Math.min(offset, total - shown));
-
-// One step up or down. Past the ends it jumps to the other end: down from the last ones back to the top, up from the
-// top to the last ones.
-export const scrolled = (offset: number, action: string, total: number, shown: number) => {
-  const last = Math.max(0, total - shown);
-  const first = firstShown(offset, total, shown);
-  if (action === SCROLL_DOWN) return first < last ? first + 1 : 0;
-  return first > 0 ? first - 1 : last;
-};
-
 // 4×2: the same on the left; on the right this month's biggest categories of expenses or income (the user's choice)
-// with their share, as many as fit whole. When there are more, a tap on the upper right quarter shows one higher,
-// on the lower one lower (clear tap areas over the same look); the left half still opens a new entry.
-export function OverviewWidget({ items, snapshot, side, width, categories, offset }: { items: WidgetItem[]; snapshot: WidgetSnapshot; side: EntryType; width: number; categories: number; offset: number }) {
-  // Fixed column widths (the right one two fifths), so moving through the categories never shifts the split: with
-  // flex the columns shared the width by their content, and a shorter longest bar made the right one narrower.
+// with their share. When they all fit whole they sit centred; when there are more, the right side is a list that
+// scrolls with a swipe, and a tap on a row still opens a new entry.
+export function OverviewWidget({ items, snapshot, side, width, categories }: { items: WidgetItem[]; snapshot: WidgetSnapshot; side: EntryType; width: number; categories: number }) {
+  // Fixed column widths (the right one two fifths): with flex the columns shared the width by their content, so the
+  // right one narrowed when its longest bar was shorter, and a scrolling list (no content to measure) narrowed it most.
   const inner = Math.max(0, width - PAD * 2 - GAP);
   const rightWidth = Math.round(inner * 0.4);
   const barMax = Math.max(40, rightWidth);
   const all = snapshot.top[side];
-  const start = firstShown(offset, all.length, categories);
-  const top = all.slice(start, start + categories);
   return (
     <Card padding={PAD}>
       <FlexWidget style={{ flexDirection: "row", width: "match_parent", height: "match_parent" }}>
         <FlexWidget style={{ width: inner - rightWidth, height: "match_parent" }}>
           <Lines items={items} firstValue={OVERVIEW_VALUE} />
         </FlexWidget>
-        <FlexWidget style={{ width: rightWidth, height: "match_parent", marginLeft: GAP }}>
-          <OverlapWidget style={{ width: "match_parent", height: "match_parent" }}>
-            <Categories top={top} barMax={barMax} none={word(snapshot, "widget.none", "Nothing yet")} />
-            {all.length > categories ? (
-              <FlexWidget style={{ flexDirection: "column", width: "match_parent", height: "match_parent" }}>
-                <FlexWidget clickAction={SCROLL_UP} style={{ flex: 1, width: "match_parent" }} />
-                <FlexWidget clickAction={SCROLL_DOWN} style={{ flex: 1, width: "match_parent" }} />
-              </FlexWidget>
-            ) : null}
-          </OverlapWidget>
+        <FlexWidget style={{ width: rightWidth, height: "match_parent", marginLeft: GAP, flexDirection: "column", justifyContent: "center" }}>
+          {all.length > categories ? (
+            <ListWidget style={{ width: "match_parent", height: "match_parent" }}>
+              {all.map((item) => (
+                <CategoryRow key={item.name} item={item} barMax={barMax} inList />
+              ))}
+            </ListWidget>
+          ) : all.length ? (
+            all.map((item) => <CategoryRow key={item.name} item={item} barMax={barMax} />)
+          ) : (
+            <TextWidget text={word(snapshot, "widget.none", "Nothing yet")} style={{ color: MUTED, fontSize: 12 }} />
+          )}
         </FlexWidget>
       </FlexWidget>
     </Card>
   );
 }
 
-function Categories({ top, barMax, none }: { top: WidgetTop[]; barMax: number; none: string }) {
+// One category: name, amount and a bar for its share. In the scrolling list each row is drawn as its own picture,
+// which leaves out outer margins, so there the same 2 dp gap sits inside the row as padding.
+function CategoryRow({ item, barMax, inList }: { item: WidgetTop; barMax: number; inList?: boolean }) {
   return (
-    <FlexWidget style={{ flexDirection: "column", justifyContent: "center", width: "match_parent", height: "match_parent" }}>
-      {top.length ? (
-        top.map((item) => (
-          <FlexWidget key={item.name} style={{ flexDirection: "column", width: "match_parent", marginVertical: 2 }}>
-            <FlexWidget style={{ flexDirection: "row", width: "match_parent" }}>
-              <FlexWidget style={{ flex: 1 }}>
-                <TextWidget text={item.name} maxLines={1} truncate="END" style={{ color: TEXT, fontSize: 12 }} />
-              </FlexWidget>
-              <TextWidget text={item.amount} maxLines={1} style={{ color: MUTED, fontSize: 12 }} />
-            </FlexWidget>
-            <FlexWidget style={{ height: 4, width: Math.max(4, Math.round(barMax * item.share)), borderRadius: 2, backgroundColor: hex(item.color), marginTop: 2 }} />
-          </FlexWidget>
-        ))
-      ) : (
-        <TextWidget text={none} style={{ color: MUTED, fontSize: 12 }} />
-      )}
+    <FlexWidget {...(inList ? open() : {})} style={{ flexDirection: "column", width: "match_parent", ...(inList ? { paddingVertical: 2 } : { marginVertical: 2 }) }}>
+      <FlexWidget style={{ flexDirection: "row", width: "match_parent" }}>
+        <FlexWidget style={{ flex: 1 }}>
+          <TextWidget text={item.name} maxLines={1} truncate="END" style={{ color: TEXT, fontSize: 12 }} />
+        </FlexWidget>
+        <TextWidget text={item.amount} maxLines={1} style={{ color: MUTED, fontSize: 12 }} />
+      </FlexWidget>
+      <FlexWidget style={{ height: 4, width: Math.max(4, Math.round(barMax * item.share)), borderRadius: 2, backgroundColor: hex(item.color), marginTop: 2 }} />
     </FlexWidget>
   );
 }
@@ -215,7 +192,7 @@ export function QuickAddWidget({ width, height }: { width: number; height: numbe
 }
 
 // Any widget by name, for its chosen lines and current size. Lines that are gone (a removed account) are skipped.
-export function WidgetFor({ name, snapshot, selection, width, height, fontScale, offset = 0 }: { name: string; snapshot: WidgetSnapshot | null; selection: Selection; width: number; height: number; fontScale?: number; offset?: number }) {
+export function WidgetFor({ name, snapshot, selection, width, height, fontScale }: { name: string; snapshot: WidgetSnapshot | null; selection: Selection; width: number; height: number; fontScale?: number }) {
   if (name === WIDGET_NAMES.quickAdd) return <QuickAddWidget width={width} height={height} />;
   if (!snapshot) return <Message text="Open MyBudget to set up the widget" />;
   const items = selection.items.map((key) => snapshot.items[key]).filter((item): item is WidgetItem => Boolean(item));
@@ -229,7 +206,6 @@ export function WidgetFor({ name, snapshot, selection, width, height, fontScale,
         side={selection.side}
         width={width}
         categories={categoriesThatFit(height, fontScale)}
-        offset={offset}
       />
     );
   }
