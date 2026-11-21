@@ -127,13 +127,15 @@ const GAP = 12; // between the two halves of 4×2
 
 // 4×2: the same on the left; on the right this month's biggest categories of expenses or income (the user's choice)
 // with their share. When they all fit whole they sit centred; when there are more, the right side is a list that
-// scrolls with a swipe, and a tap on a row still opens a new entry.
-export function OverviewWidget({ items, snapshot, side, width, categories }: { items: WidgetItem[]; snapshot: WidgetSnapshot; side: EntryType; width: number; categories: number }) {
-  // Fixed column widths (the right one two fifths): with flex the columns shared the width by their content, so the
-  // right one narrowed when its longest bar was shorter, and a scrolling list (no content to measure) narrowed it most.
+// scrolls with a swipe (exactly as many rows in view as fit whole, sharing the height evenly, none peeking in), and a
+// tap on a row still opens a new entry.
+export function OverviewWidget({ items, snapshot, side, width, height, categories }: { items: WidgetItem[]; snapshot: WidgetSnapshot; side: EntryType; width: number; height: number; categories: number }) {
+  // Fixed column widths (the right one a little under half): with flex the columns shared the width by their content,
+  // so the right one narrowed when its longest bar was shorter, and a scrolling list (no content to measure) the most.
   const inner = Math.max(0, width - PAD * 2 - GAP);
-  const rightWidth = Math.round(inner * 0.4);
+  const rightWidth = Math.round(inner * 0.46);
   const barMax = Math.max(40, rightWidth);
+  const rowHeight = Math.max(1, Math.floor((height - PAD * 2) / Math.max(1, categories)));
   const all = snapshot.top[side];
   return (
     <Card padding={PAD}>
@@ -145,7 +147,7 @@ export function OverviewWidget({ items, snapshot, side, width, categories }: { i
           {all.length > categories ? (
             <ListWidget style={{ width: "match_parent", height: "match_parent" }}>
               {all.map((item) => (
-                <CategoryRow key={item.name} item={item} barMax={barMax} inList />
+                <CategoryRow key={item.name} item={item} barMax={barMax} rowHeight={rowHeight} />
               ))}
             </ListWidget>
           ) : all.length ? (
@@ -159,11 +161,14 @@ export function OverviewWidget({ items, snapshot, side, width, categories }: { i
   );
 }
 
-// One category: name, amount and a bar for its share. In the scrolling list each row is drawn as its own picture,
-// which leaves out outer margins, so there the same 2 dp gap sits inside the row as padding.
-function CategoryRow({ item, barMax, inList }: { item: WidgetTop; barMax: number; inList?: boolean }) {
+// One category: name, amount and a bar for its share. In the scrolling list (rowHeight given) each row is drawn as its
+// own picture, which leaves out outer margins, so there it gets a set height with its content centred instead.
+function CategoryRow({ item, barMax, rowHeight }: { item: WidgetTop; barMax: number; rowHeight?: number }) {
   return (
-    <FlexWidget {...(inList ? open() : {})} style={{ flexDirection: "column", width: "match_parent", ...(inList ? { paddingVertical: 2 } : { marginVertical: 2 }) }}>
+    <FlexWidget
+      {...(rowHeight ? open() : {})}
+      style={{ flexDirection: "column", width: "match_parent", ...(rowHeight ? { height: rowHeight, justifyContent: "center" } : { marginVertical: 2 }) }}
+    >
       <FlexWidget style={{ flexDirection: "row", width: "match_parent" }}>
         <FlexWidget style={{ flex: 1 }}>
           <TextWidget text={item.name} maxLines={1} truncate="END" style={{ color: TEXT, fontSize: 12 }} />
@@ -205,6 +210,7 @@ export function WidgetFor({ name, snapshot, selection, width, height, fontScale 
         snapshot={snapshot}
         side={selection.side}
         width={width}
+        height={height}
         categories={categoriesThatFit(height, fontScale)}
       />
     );
