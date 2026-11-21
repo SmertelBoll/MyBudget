@@ -127,6 +127,8 @@ export function SummaryWidget({ items }: { items: WidgetItem[] }) {
 export const SCROLL_UP = "SCROLL_UP";
 export const SCROLL_DOWN = "SCROLL_DOWN";
 
+const GAP = 12; // between the two halves of 4×2
+
 // The first category shown, kept so the last ones shown are still the last ones (fewer categories now, or a taller
 // widget).
 const firstShown = (offset: number, total: number, shown: number) => Math.max(0, Math.min(offset, total - shown));
@@ -144,17 +146,21 @@ export const scrolled = (offset: number, action: string, total: number, shown: n
 // with their share, as many as fit whole. When there are more, a tap on the upper right quarter shows one higher,
 // on the lower one lower (clear tap areas over the same look); the left half still opens a new entry.
 export function OverviewWidget({ items, snapshot, side, width, categories, offset }: { items: WidgetItem[]; snapshot: WidgetSnapshot; side: EntryType; width: number; categories: number; offset: number }) {
-  const barMax = Math.max(40, width / 2 - 40);
+  // Fixed column widths (the right one two fifths), so moving through the categories never shifts the split: with
+  // flex the columns shared the width by their content, and a shorter longest bar made the right one narrower.
+  const inner = Math.max(0, width - PAD * 2 - GAP);
+  const rightWidth = Math.round(inner * 0.4);
+  const barMax = Math.max(40, rightWidth);
   const all = snapshot.top[side];
   const start = firstShown(offset, all.length, categories);
   const top = all.slice(start, start + categories);
   return (
     <Card padding={PAD}>
       <FlexWidget style={{ flexDirection: "row", width: "match_parent", height: "match_parent" }}>
-        <FlexWidget style={{ flex: 1, height: "match_parent" }}>
+        <FlexWidget style={{ width: inner - rightWidth, height: "match_parent" }}>
           <Lines items={items} firstValue={OVERVIEW_VALUE} />
         </FlexWidget>
-        <FlexWidget style={{ flex: 1, height: "match_parent", marginLeft: 12 }}>
+        <FlexWidget style={{ width: rightWidth, height: "match_parent", marginLeft: GAP }}>
           <OverlapWidget style={{ width: "match_parent", height: "match_parent" }}>
             <Categories top={top} barMax={barMax} none={word(snapshot, "widget.none", "Nothing yet")} />
             {all.length > categories ? (
