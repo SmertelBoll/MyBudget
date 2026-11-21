@@ -2,8 +2,8 @@
 // Widgets are drawn by react-native-android-widget from these primitives only: no hooks, nothing async (the
 // library's rules). Everything they show comes ready-made in the snapshot.
 import type { EntryType } from "@/api/types";
-import { FlexWidget, ListWidget, TextWidget } from "react-native-android-widget";
-import { newEntryUri, type Selection, type Tone, type WidgetItem, type WidgetSnapshot, type WidgetTop } from "./snapshot";
+import { FlexWidget, TextWidget } from "react-native-android-widget";
+import { newEntryUri, type Selection, type Tone, type WidgetItem, type WidgetSnapshot } from "./snapshot";
 
 export const WIDGET_NAMES = { balance: "Balance", summary: "Summary", overview: "Overview", quickAdd: "QuickAdd" } as const;
 
@@ -123,27 +123,11 @@ export function SummaryWidget({ items }: { items: WidgetItem[] }) {
   );
 }
 
-function CategoryRow({ item, barMax, tappable }: { item: WidgetTop; barMax: number; tappable?: boolean }) {
-  return (
-    <FlexWidget {...(tappable ? open() : {})} style={{ flexDirection: "column", width: "match_parent", marginVertical: 2 }}>
-      <FlexWidget style={{ flexDirection: "row", width: "match_parent" }}>
-        <FlexWidget style={{ flex: 1 }}>
-          <TextWidget text={item.name} maxLines={1} truncate="END" style={{ color: TEXT, fontSize: 12 }} />
-        </FlexWidget>
-        <TextWidget text={item.amount} maxLines={1} style={{ color: MUTED, fontSize: 12 }} />
-      </FlexWidget>
-      <FlexWidget style={{ height: 4, width: Math.max(4, Math.round(barMax * item.share)), borderRadius: 2, backgroundColor: hex(item.color), marginTop: 2 }} />
-    </FlexWidget>
-  );
-}
-
 // 4×2: the same on the left; on the right this month's biggest categories of expenses or income (the user's choice)
-// with their share. When they all fit whole they sit centred as they are; when there are more, the right side
-// becomes a list that scrolls with a swipe (the same rows and gaps), and a tap on a row still opens a new entry.
+// with their share, as many as fit whole.
 export function OverviewWidget({ items, snapshot, side, width, categories }: { items: WidgetItem[]; snapshot: WidgetSnapshot; side: EntryType; width: number; categories: number }) {
   const barMax = Math.max(40, width / 2 - 40);
-  const all = snapshot.top[side];
-  const scrolls = all.length > categories;
+  const top = snapshot.top[side].slice(0, categories);
   return (
     <Card padding={PAD}>
       <FlexWidget style={{ flexDirection: "row", width: "match_parent", height: "match_parent" }}>
@@ -151,14 +135,18 @@ export function OverviewWidget({ items, snapshot, side, width, categories }: { i
           <Lines items={items} firstValue={OVERVIEW_VALUE} />
         </FlexWidget>
         <FlexWidget style={{ flex: 1, flexDirection: "column", justifyContent: "center", height: "match_parent", marginLeft: 12 }}>
-          {scrolls ? (
-            <ListWidget style={{ width: "match_parent", height: "match_parent" }}>
-              {all.map((item) => (
-                <CategoryRow key={item.name} item={item} barMax={barMax} tappable />
-              ))}
-            </ListWidget>
-          ) : all.length ? (
-            all.map((item) => <CategoryRow key={item.name} item={item} barMax={barMax} />)
+          {top.length ? (
+            top.map((item) => (
+              <FlexWidget key={item.name} style={{ flexDirection: "column", width: "match_parent", marginVertical: 2 }}>
+                <FlexWidget style={{ flexDirection: "row", width: "match_parent" }}>
+                  <FlexWidget style={{ flex: 1 }}>
+                    <TextWidget text={item.name} maxLines={1} truncate="END" style={{ color: TEXT, fontSize: 12 }} />
+                  </FlexWidget>
+                  <TextWidget text={item.amount} maxLines={1} style={{ color: MUTED, fontSize: 12 }} />
+                </FlexWidget>
+                <FlexWidget style={{ height: 4, width: Math.max(4, Math.round(barMax * item.share)), borderRadius: 2, backgroundColor: hex(item.color), marginTop: 2 }} />
+              </FlexWidget>
+            ))
           ) : (
             <TextWidget text={word(snapshot, "widget.none", "Nothing yet")} style={{ color: MUTED, fontSize: 12 }} />
           )}
